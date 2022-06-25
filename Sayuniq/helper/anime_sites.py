@@ -261,21 +261,27 @@ async def tioanime(app):
                             [
                                 [
                                     InlineKeyboardButton(
-                                        "Menú",
+                                        "Listado",
                                         url=f"https://t.me/{BOT_ALIAS}?start=mty_{prk}")
                                 ]
                             ]
                         )
                     )
-                    msg_ = await download_assistant(app, servers, folder, caption)
-                    await _sa.update_property(
-                        anime_url=anime_url,
-                        msg=msg_,
-                        message_id=msg_.id,
-                        key_id=prk,
-                        menu_id=_msg_menu
-                    )
-                    await _sa.update_or_add_db()
+                    try:
+                        msg_ = await download_assistant(app, servers, folder, caption)
+                        await _sa.update_property(
+                            anime_url=anime_url,
+                            msg=msg_,
+                            message_id=msg_.id,
+                            key_id=prk,
+                            menu_id=_msg_menu
+                        )
+                        print(msg_)
+                        await _sa.update_or_add_db()
+                    except Exception as e:
+                        print(e)
+                        await app.delete_messages(CHANNEL_ID, _msg_menu.id)
+
     shutil.rmtree(folder)
 
 

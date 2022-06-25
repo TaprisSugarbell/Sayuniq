@@ -1,5 +1,6 @@
 aiofiles
 aiohttp[speedups]
+beautifulsoup4
 cloudscraper
 dnspython
 pymongo
