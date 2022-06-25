@@ -19,7 +19,7 @@ API_HASH = config("API_HASH", default=None)
 BOT_TOKEN = config("BOT_TOKEN", default=None)
 BOT_ALIAS = config("BOT_ALIAS", default="Sayuniq")
 # Channels id
-CHANNEL_ID = config("CHANNEL_ID", default=None, cast=int)
+CHID = config("CHANNEL_ID", default=None)
 LOG_CHANNEL = config("LOG_CHANNEL", default=None, cast=int)
 TESTS_CHANNEL = config("TESTS_CHANNEL", default=None, cast=int)
 
@@ -32,3 +32,7 @@ HUMAN_HOUR_READABLE = datetime.now().strftime(
 # LOGGER
 LOGGING_LEVEL = config("LOGGING_LEVEL", default="WARNING")
 
+try:
+    CHANNEL_ID = int(CHID)
+except ValueError:
+    CHANNEL_ID = CHID

@@ -135,6 +135,7 @@ class SayuDownloader:
         }
 
     def iter_links(self, urls=None) -> Any:
+        urls = self.url or urls
         if isinstance(urls, list):
             _out = None
             for url in urls:
