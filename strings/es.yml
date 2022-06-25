@@ -1,0 +1,13 @@
+name: es
+natively: Español
+
+format_date: "%d/{}/%y"
+format_hour:
+  - "%I:%M:%S %p"
+  - "%H:%M:%S"
+log_channel: "**{} ha sido desplegado!**\n➖➖➖➖➖➖➖➖➖\n**Fecha:** {}"
+document_err: "**{} - Reporte de ERROR!!**\nPuedes ignorar esto o reportarlo a @SayuCodezupport."
+
+
+
+

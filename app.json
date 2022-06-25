@@ -1,0 +1,70 @@
+{
+    "name": "Sayuniq",
+    "description": "...",
+    "logo": "https://i.imgur.com/S4Zlx0G.png",
+    "keywords": [
+        "Sayuniq",
+        "Telegram Bot",
+        "SayuOgiwara"
+    ],
+    "repository": "https://github.com/TaprisSugarbell/Sayuniq",
+    "success_url": "https://telegram.dog/SayuCodez",
+    "env": {
+        "BOT_TOKEN": {
+            "description": "Tu Token de Telegram de @BotFather",
+            "value": ""
+        },
+        "BOT_ALIAS": {
+            "description": "Alias que asignaste al bot",
+            "value": ""
+        },
+        "API_ID": {
+            "description": "Obtener de my.telegram.org",
+            "value": ""
+        },
+        "API_HASH": {
+            "description": "Obtener de my.telegram.org",
+            "value": ""
+        },
+        "AUTH_USERS": {
+          "description": "Usuarios permitidos",
+          "value": "784148805"
+        },
+        "CHANNEL_ID": {
+            "description": "Canal (ID)",
+            "value": ""
+        },
+        "LOG_CHANNEL": {
+            "description": "Canal para los logs (ID)",
+            "value": ""
+        },
+        "TESTS_CHANNEL": {
+            "description": "Canal para los tests (ID)",
+            "value": ""
+        },
+        "BOT_NAME": {
+            "description": "Nombre del Bot",
+            "value": "Sayuniq",
+            "required": false
+        },
+        "HOUR_FORMAT": {
+            "description": "Formato de hora 24 o 12, por defecto 12",
+            "value": "0",
+            "required": false
+        }
+    },
+    "addons": [],
+    "buildpacks": [{
+        "url": "https://github.com/jonathanong/heroku-buildpack-ffmpeg-latest"
+    }, {
+        "url": "https://github.com/opendoor-labs/heroku-buildpack-p7zip"
+    }, {
+        "url": "heroku/python"
+    }],
+    "formation": {
+        "worker": {
+            "quantity": 1,
+            "size": "free"
+        }
+    }
+}

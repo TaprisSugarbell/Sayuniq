@@ -1,0 +1,11 @@
+aiofiles
+aiohttp[speedups]
+cloudscraper
+dnspython
+pymongo
+pyrogram
+python-decouple
+PyYAML
+TgCrypto
+yt-dlp
+
