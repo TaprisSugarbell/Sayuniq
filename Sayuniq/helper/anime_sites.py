@@ -165,7 +165,8 @@ class SitesAssistant:
             )
             await self.update_or_add_db()
         except Exception as e:
-            print(e)
+            app.run(logs_channel_update(sayureports(reason=e), "send_document",
+                                        caption=get_string("document_err").format(BOT_NAME)))
         try:
             await app.edit_message_reply_markup(
                 CHANNEL_ID,
