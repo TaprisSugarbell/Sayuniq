@@ -3,6 +3,7 @@ aiohttp[speedups]
 beautifulsoup4
 cloudscraper
 dnspython
+moviepy
 pymongo
 pyrogram
 python-decouple
