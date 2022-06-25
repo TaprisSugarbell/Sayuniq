@@ -191,7 +191,9 @@ class SitesAssistant:
 
 async def download_assistant(_app, urls, folder, caption, thumb=None):
     sd = SayuDownloader(urls, folder, thumb=thumb, _app=_app, filter_links=True)
+    logging_stream_info(urls)
     vide_file = sd.iter_links()
+    logging_stream_info(vide_file)
     # file, type, thumb
     clip = VideoFileClip(vide_file["file"])
     # Extraer información del video
