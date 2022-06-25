@@ -11,10 +11,8 @@ from urllib import parse
 from .utils import rankey
 import yt_dlp as youtube_dl
 from bs4 import BeautifulSoup
-from ..strings import get_string
-from .logs_utils import sayureports
+from .. import logging_stream_info
 from moviepy.editor import VideoFileClip
-from .. import logs_channel_update, logging_stream_info, app, BOT_NAME
 
 requests = cloudscraper.create_scraper(cloudscraper.Session)
 
@@ -126,11 +124,13 @@ class SayuDownloader:
     def iter_links(self, urls=None) -> Any:
         urls = urls or self.url
         if isinstance(urls, list):
+            _total_urls = len(urls)
             _out = None
-            for url in urls:
+            for _nn, url in enumerate(urls):
                 try:
                     _out = self.extractor(url)
                 except Exception as e:
+                    logging_stream_info(f'Fallo la descarga de {url}, {_nn}/{_total_urls}')
                     print(e)
                 if _out:
                     break

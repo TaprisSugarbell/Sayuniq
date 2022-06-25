@@ -193,7 +193,7 @@ async def download_assistant(_app, urls, folder, caption, thumb=None):
     sd = SayuDownloader(urls, folder, thumb=thumb, _app=_app, filter_links=True)
     logging_stream_info(urls)
     vide_file = sd.iter_links()
-    logging_stream_info(vide_file)
+    logging_stream_info(f"Se ha descargado {vide_file}")
     # file, type, thumb
     clip = VideoFileClip(vide_file["file"])
     # Extraer información del video
@@ -207,7 +207,8 @@ async def download_assistant(_app, urls, folder, caption, thumb=None):
                 caption,
                 duration=duration,
                 width=width,
-                height=height
+                height=height,
+                thumb=vide_file["thumb"]
             )
         case _:
             print(vide_file["type"])
