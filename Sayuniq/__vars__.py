@@ -19,7 +19,7 @@ API_HASH = config("API_HASH", default=None)
 BOT_TOKEN = config("BOT_TOKEN", default=None)
 BOT_ALIAS = config("BOT_ALIAS", default="Sayuniq")
 # Channels id
-CHANNEL_ID = config("CHANNEL_ID", default=None)
+CHANNEL_ID = config("CHANNEL_ID", default=None, cast=int)
 LOG_CHANNEL = config("LOG_CHANNEL", default=None, cast=int)
 TESTS_CHANNEL = config("TESTS_CHANNEL", default=None, cast=int)
 
