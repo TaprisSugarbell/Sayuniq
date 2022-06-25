@@ -52,10 +52,14 @@ async def logs_channel_update(
             HUMAN_HOUR_READABLE
         ),
         _mode: str = "send_message",
+        _app=None,
         *args,
         **kwargs
 ):
-    await getattr(app, _mode)(LOG_CHANNEL, message, *args, **kwargs)
+    if _app:
+        await getattr(_app, _mode)(LOG_CHANNEL, message, *args, **kwargs)
+    else:
+        await getattr(app, _mode)(LOG_CHANNEL, message, *args, **kwargs)
     if os.path.exists(message):
         os.remove(message)
 
