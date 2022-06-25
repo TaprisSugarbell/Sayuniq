@@ -6,6 +6,7 @@ dnspython
 pymongo
 pyrogram
 python-decouple
+Pillow
 PyYAML
 TgCrypto
 yt-dlp
