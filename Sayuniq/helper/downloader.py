@@ -51,8 +51,8 @@ class SayuDownloader:
         else:
             return None
 
-    def links_filter(self) -> str | Any:
-        _url = self.url
+    def links_filter(self, url=None) -> str | Any:
+        _url = url or self.url
         _r = self.requests.get(_url, allow_redirects=True)
         host = parse.urlparse(_r.url).netloc
         match host:
@@ -135,7 +135,7 @@ class SayuDownloader:
         }
 
     def iter_links(self, urls=None) -> Any:
-        urls = self.url or urls
+        urls = urls or self.url
         if isinstance(urls, list):
             _out = None
             for url in urls:
