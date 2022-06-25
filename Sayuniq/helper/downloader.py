@@ -92,7 +92,7 @@ class SayuDownloader:
         if self.filter_links:
             _url = self.links_filter(_url)
             if isinstance(_url, dict):
-                _url = _url["data"][-1]
+                _url = _url["data"][-1]["file"]
         video_info = youtube_dl.YoutubeDL().extract_info(_url, download=False)
         # Thumbnail?
         _thumb = self.get_thumbnail()
