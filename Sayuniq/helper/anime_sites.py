@@ -165,8 +165,8 @@ class SitesAssistant:
             )
             await self.update_or_add_db()
         except Exception as e:
-            app.run(logs_channel_update(sayureports(reason=e), "send_document",
-                                        caption=get_string("document_err").format(BOT_NAME)))
+            await logs_channel_update(sayureports(reason=e), "send_document",
+                                      caption=get_string("document_err").format(BOT_NAME))
         try:
             await app.edit_message_reply_markup(
                 CHANNEL_ID,
@@ -181,8 +181,8 @@ class SitesAssistant:
                 )
             )
         except Exception as e:
-            app.run(logs_channel_update(sayureports(reason=e), "send_document",
-                                        caption=get_string("document_err").format(BOT_NAME)))
+            await logs_channel_update(sayureports(reason=e), "send_document",
+                                      caption=get_string("document_err").format(BOT_NAME))
 
 
 async def download_assistant(_app, urls, folder, caption, thumb=None):
@@ -253,8 +253,8 @@ async def tioanime(app):
                             )
                             await _sa.buttons_replace(app)
                         except Exception as e:
-                            app.run(logs_channel_update(sayureports(reason=e), "send_document",
-                                                        caption=get_string("document_err").format(BOT_NAME)))
+                            await logs_channel_update(sayureports(reason=e), "send_document",
+                                                      caption=get_string("document_err").format(BOT_NAME))
                 else:
                     prk = rankey(10)
                     servers, _anime_uri = await get_tioanime_servers(chapter_url)
@@ -285,8 +285,8 @@ async def tioanime(app):
                         print(msg_)
                         await _sa.update_or_add_db()
                     except Exception as e:
-                        app.run(logs_channel_update(sayureports(reason=e), "send_document",
-                                                    caption=get_string("document_err").format(BOT_NAME)))
+                        await logs_channel_update(sayureports(reason=e), "send_document",
+                                                  caption=get_string("document_err").format(BOT_NAME))
                         await app.delete_messages(CHANNEL_ID, _msg_menu.id)
 
     shutil.rmtree(folder)
