@@ -87,7 +87,7 @@ class SayuDownloader:
             self.thumb
         )
         if self.filter_links:
-            _url = self.links_filter()
+            _url = self.links_filter(_url)
         video_info = youtube_dl.YoutubeDL().extract_info(_url, download=False)
         # Thumbnail?
         _thumb = thumb or f"{out}thumb-{rankey()}.jpg"
