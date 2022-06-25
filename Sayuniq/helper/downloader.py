@@ -91,6 +91,8 @@ class SayuDownloader:
         )
         if self.filter_links:
             _url = self.links_filter(_url)
+            if isinstance(_url, dict):
+                _url = _url["data"][-1]
         video_info = youtube_dl.YoutubeDL().extract_info(_url, download=False)
         # Thumbnail?
         _thumb = self.get_thumbnail()
@@ -130,7 +132,7 @@ class SayuDownloader:
                 try:
                     _out = self.extractor(url)
                 except Exception as e:
-                    logging_stream_info(f'Fallo la descarga de {url}, {_nn}/{_total_urls}')
+                    logging_stream_info(f'Fallo la descarga de {url} [{_nn}/{_total_urls}]')
                     print(e)
                 if _out:
                     break
