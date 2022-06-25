@@ -249,7 +249,7 @@ async def tioanime(app):
                         try:
                             servers, _anime_uri = await get_tioanime_servers(chapter_url)
                             anime_url = _url_base + _anime_uri
-                            msg_1 = await download_assistant(app, servers, folder, caption)
+                            msg_1 = await download_assistant(app, servers, folder, caption, thumb_url)
                             await _sa.update_property(
                                 anime_url=anime_url,
                                 message_id=msg_1.video.file_id,
@@ -280,13 +280,14 @@ async def tioanime(app):
                         )
                     )
                     try:
-                        msg_ = await download_assistant(app, servers, folder, caption)
+                        msg_ = await download_assistant(app, servers, folder, caption, thumb_url)
                         await _sa.update_property(
                             anime_url=anime_url,
                             msg=msg_,
                             message_id=msg_.id,
                             key_id=prk,
-                            menu_id=_msg_menu.id
+                            menu_id=_msg_menu.id,
+                            chapter_url=chapter_url
                         )
                         await _sa.update_or_add_db()
                     except Exception as e:

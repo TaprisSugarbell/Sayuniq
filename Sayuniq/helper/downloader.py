@@ -28,6 +28,8 @@ class SayuDownloader:
         self.thumb = thumb
         self.app = _app
         self.filter_links = filter_links
+        self.__rth = rankey()
+        self.__rthumb = "{}thumb-{}.jpg"
         self.requests = cloudscraper.create_scraper(cloudscraper.Session)
 
     @staticmethod
@@ -43,13 +45,16 @@ class SayuDownloader:
         if self.thumb:
             _scheme = parse.urlparse(self.thumb)
             if _scheme.scheme:
-                return wget.download(self.thumb, f"{self.out}thumb-{rankey()}.jpg")
+                _th = self.__rthumb.format(self.out, self.__rth)
+                if os.path.exists(_th):
+                    _th = self.__rthumb.format(self.out, rankey())
+                return wget.download(self.thumb, _th)
             elif os.path.exists(self.thumb):
                 return self.thumb
             else:
                 return self.app.download_media(_scheme.path, self.out)
         else:
-            return None
+            return self.__rthumb.format(self.out, rankey())
 
     def links_filter(self, url=None) -> str | Any:
         _url = url or self.url
@@ -90,23 +95,7 @@ class SayuDownloader:
             _url = self.links_filter(_url)
         video_info = youtube_dl.YoutubeDL().extract_info(_url, download=False)
         # Thumbnail?
-        _thumb = thumb or f"{out}thumb-{rankey()}.jpg"
-        if not thumb:
-            try:
-                try:
-                    thumbnail = video_info["thumbnail"]
-                except KeyError:
-                    thumbnail = video_info["entries"][0]["thumbnail"]
-                data = wget.download(thumbnail, out)
-                match data[-4:]:
-                    case "webp":
-                        image = Image.open(data).convert("RGB")
-                        image.save(_thumb, "jpeg")
-                        os.unlink(data)
-                    case _:
-                        os.rename(data, _thumb)
-            except Exception as e:
-                print(e)
+        _thumb = self.get_thumbnail()
         # Demás datos, title, ext
         _title = re.sub("/", "", custom or video_info["title"])
         try:
