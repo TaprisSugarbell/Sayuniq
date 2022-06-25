@@ -218,6 +218,7 @@ async def download_assistant(_app, urls, folder, caption, thumb=None):
 async def get_tioanime_servers(chapter_url):
     async with aiohttp.ClientSession() as session:
         async with session.get(chapter_url) as response:
+            logging_stream_info(f"Get {chapter_url} is \"{response.ok}\"")
             soup = BeautifulSoup(await response.content.read(), "html.parser")
             _script = soup.find_all("script")[-3].string
             _anime_uri = soup.find(
