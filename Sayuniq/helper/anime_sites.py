@@ -4,10 +4,13 @@ import aiohttp
 from typing import Any
 from .mongo_connect import *
 from bs4 import BeautifulSoup
+from ..strings import get_string
+from .logs_utils import sayureports
 from .downloader import SayuDownloader
 from .utils import create_folder, rankey
 from moviepy.editor import VideoFileClip
 from ..__vars__ import BOT_NAME, BOT_ALIAS, CHANNEL_ID
+from .. import logs_channel_update, logging_stream_info
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 
@@ -177,7 +180,8 @@ class SitesAssistant:
                 )
             )
         except Exception as e:
-            print(e)
+            app.run(logs_channel_update(sayureports(reason=e), "send_document",
+                                        caption=get_string("document_err").format(BOT_NAME)))
 
 
 async def download_assistant(_app, urls, folder, caption, thumb=None):
@@ -248,7 +252,8 @@ async def tioanime(app):
                             )
                             await _sa.buttons_replace(app)
                         except Exception as e:
-                            print(e)
+                            app.run(logs_channel_update(sayureports(reason=e), "send_document",
+                                                        caption=get_string("document_err").format(BOT_NAME)))
                 else:
                     prk = rankey(10)
                     servers, _anime_uri = await get_tioanime_servers(chapter_url)
@@ -279,7 +284,8 @@ async def tioanime(app):
                         print(msg_)
                         await _sa.update_or_add_db()
                     except Exception as e:
-                        print(e)
+                        app.run(logs_channel_update(sayureports(reason=e), "send_document",
+                                                    caption=get_string("document_err").format(BOT_NAME)))
                         await app.delete_messages(CHANNEL_ID, _msg_menu.id)
 
     shutil.rmtree(folder)
