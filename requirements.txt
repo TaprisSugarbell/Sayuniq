@@ -9,4 +9,4 @@ python-decouple
 PyYAML
 TgCrypto
 yt-dlp
-
+wget
