@@ -2,8 +2,8 @@ import asyncio
 from Sayuniq.strings import get_string
 from helper.logs_utils import sayureports
 from __vars__ import BOT_NAME, __version__
-from __init__ import app, logs_channel_update, logging_stream_info
 from helper.loop_in_thread import read_and_execute, run_asyncio
+from __init__ import app, logs_channel_update, logging_stream_info
 
 
 async def main():

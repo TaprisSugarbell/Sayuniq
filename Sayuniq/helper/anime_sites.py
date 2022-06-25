@@ -286,9 +286,8 @@ async def tioanime(app):
                             msg=msg_,
                             message_id=msg_.id,
                             key_id=prk,
-                            menu_id=_msg_menu
+                            menu_id=_msg_menu.id
                         )
-                        print(msg_)
                         await _sa.update_or_add_db()
                     except Exception as e:
                         await logs_channel_update(sayureports(reason=e), "send_document",

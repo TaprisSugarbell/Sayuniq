@@ -16,4 +16,4 @@ async def read_and_execute(app):
     while True:
         for site in sites:
             await site(app)
-        sleep(60)
+        await asyncio.sleep(60)
