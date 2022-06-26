@@ -153,6 +153,7 @@ class SitesAssistant:
             if _prev_chapter_nav_:
                 _btns1.append(await self.Ibtn(True, url=_base_channel_url(CHANNEL_ID, _prev_chapter_nav_)))
             _btns1.append(await self.Ibtn(url=_base_channel_url(CHANNEL_ID, now_chapter_id)))
+            _site_button = await self.Ibtn(msg_btn="Site Link", url=prev_chapter["url"])
             try:
                 await app.edit_message_reply_markup(
                     CHANNEL_ID,
