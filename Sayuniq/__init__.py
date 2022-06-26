@@ -6,6 +6,7 @@ from logging import handlers
 from strings import get_string
 from queue import PriorityQueue
 from helper.utils import create_folder
+from Sayuniq.helper.mongo_connect import Mongo, confirm
 
 __dr, __file = "./logs/", f"{BOT_NAME}.log"
 log_file = __dr + __file
@@ -43,6 +44,15 @@ plugins = dict(root=f"{BOT_NAME}/plugins")
 app = pyrogram.Client(BOT_NAME, bot_token=BOT_TOKEN, api_id=API_ID, api_hash=API_HASH, plugins=plugins)
 
 
+async def auth_users():
+    _u = Mongo(database=BOT_NAME, collection="users")
+    _c = await confirm(_u, {})
+    if _c:
+        return [i["user_id"] for i in _c]
+    else:
+        return []
+
+
 async def logs_channel_update(
         message: str =
         get_string(
@@ -60,7 +70,7 @@ async def logs_channel_update(
         await getattr(_app, _mode)(LOG_CHANNEL, message, *args, **kwargs)
     else:
         await getattr(app, _mode)(LOG_CHANNEL, message, *args, **kwargs)
-    if os.path.exists(message):
+    if os.path.exists(message) and message != log_file:
         os.remove(message)
 
 
