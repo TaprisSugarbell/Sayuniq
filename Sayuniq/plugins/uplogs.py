@@ -28,6 +28,8 @@ async def __ulgs__(bot, update):
                                       caption=get_string("document_log").format(BOT_NAME),
                                       _app=bot
                                       )
+    else:
+        print(user_id)
 
 
 
