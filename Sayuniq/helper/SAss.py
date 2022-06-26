@@ -2,10 +2,11 @@ import re
 from typing import Any
 from .utils import rankey
 from .mongo_connect import *
+from datetime import datetime
 from ..strings import get_string
+from .. import logs_channel_update
 from .logs_utils import sayureports
 from ..__vars__ import BOT_NAME, CHANNEL_ID
-from .. import logs_channel_update
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 
@@ -97,11 +98,12 @@ class SitesAssistant:
         title = title or self.title
         return re.sub(r"_+", "_", re.sub(r"\W", "_", title))
 
-    async def get_caption(self):
+    async def get_caption(self, extra_ch: str = ""):
         _filter_title = await self.filter_title()
-        return f"#{_filter_title}\n💮 {self.title}\n🗂 Capítulo {self.chapter_no}\n🌐 #{self.site}"
+        return f"#{_filter_title}\n💮 {self.title}\n🗂 Capítulo {self.chapter_no}{extra_ch}\n🌐 #{self.site}"
 
     async def update_or_add_db(self):
+        _now = datetime.now().strftime(get_string("format_date").format("%m"))
         _d = {
             "key_id": self.key_id or rankey(10),
             "site": self.site,
@@ -109,12 +111,14 @@ class SitesAssistant:
             "anime_url": self.anime_url,
             "thumb": self.thumb,
             "menu_id": self.menu_id,
+            "datetime": _now,
             "chapters": {
                 self.chapter_no: {
                     "url": self.chapter_url,
                     "chapter": self.chapter_no,
                     "file_id": self.msg.video.file_id,
                     "message_id": self.message_id,
+                    "datetime": _now,
                     "nav": {
                         "prev": self.prev,
                         "next": self.next
@@ -124,6 +128,7 @@ class SitesAssistant:
         }
         if self.update:
             await update_(self.database, self.anime_dict, _d["chapters"])
+            await update_(self.database, self.anime_dict, _d["datetime"])
         elif self.next:
             await update_(self.database,
                           self.anime_dict,
@@ -134,6 +139,7 @@ class SitesAssistant:
                               }
                           )
                           )
+            await update_(self.database, self.anime_dict, _d["datetime"])
         else:
             await add_(self.database, _d)
 
