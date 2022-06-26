@@ -127,8 +127,12 @@ class SitesAssistant:
             }
         }
         if self.update:
-            await update_(self.database, self.anime_dict, _d["chapters"])
-            await update_(self.database, self.anime_dict, _d["datetime"])
+            await update_(self.database,
+                          self.anime_dict,
+                          self.anime_dict["chapters"].update(_d["chapters"]))
+            await update_(self.database,
+                          self.anime_dict,
+                          self.anime_dict.update(_d["datetime"]))
         elif self.next:
             await update_(self.database,
                           self.anime_dict,
@@ -139,7 +143,9 @@ class SitesAssistant:
                               }
                           )
                           )
-            await update_(self.database, self.anime_dict, _d["datetime"])
+            await update_(self.database,
+                          self.anime_dict,
+                          self.anime_dict.update(_d["datetime"]))
         else:
             await add_(self.database, _d)
 

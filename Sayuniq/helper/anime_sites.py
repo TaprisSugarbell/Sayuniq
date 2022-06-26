@@ -37,7 +37,7 @@ async def tioanime(app):
                     get_prev_chapter = await _sa.get_prev_chapter()
                     get_chapter = await _sa.get_chapter()
                     if get_chapter:
-                        pass
+                        continue
                     else:
                         try:
                             servers, _anime_uri = await get_tioanime_servers(chapter_url)
@@ -118,7 +118,7 @@ async def jkanime(app):
                     get_prev_chapter = await _sa.get_prev_chapter()
                     get_chapter = await _sa.get_chapter()
                     if get_chapter:
-                        pass
+                        continue
                     else:
                         try:
                             servers = await get_jk_servers(chapter_url)
