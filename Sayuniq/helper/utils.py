@@ -13,7 +13,8 @@ def rankey(
 
 
 def create_folder(folder_name: Any = None, temp_folder: str = rankey()):
-    _user_id = "" if folder_name is None else f"Downloads/{folder_name}/"
+    _user_id = "" if folder_name is None else (
+        f"Downloads/{folder_name}" if temp_folder == "" else f"Downloads/{folder_name}/")
     tmp_directory = f"./{_user_id}{temp_folder}/"
     if not os.path.isdir(tmp_directory):
         os.makedirs(tmp_directory, exist_ok=True)
