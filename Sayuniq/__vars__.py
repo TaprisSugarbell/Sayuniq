@@ -25,10 +25,7 @@ TESTS_CHANNEL = config("TESTS_CHANNEL", default=None, cast=int)
 
 # DATETIME
 HOUR_FORMAT = 1 if config("HOUR_FORMAT", default=0, cast=int) == 24 else 0
-HUMAN_HOUR_READABLE = datetime.now().strftime(
-    f"{get_string('format_date').format(datetime.now().month)} "
-    f"{get_string('format_hour')[HOUR_FORMAT]}"
-)
+
 # LOGGER
 LOGGING_LEVEL = config("LOGGING_LEVEL", default="WARNING")
 
@@ -36,3 +33,9 @@ try:
     CHANNEL_ID = int(CHID)
 except ValueError:
     CHANNEL_ID = CHID
+
+
+def human_hour_readable(hformat=HOUR_FORMAT):
+    return datetime.now().strftime(
+        f"{get_string('format_date').format(datetime.now().month)} "
+        f"{get_string('format_hour')[hformat]}")

@@ -14,7 +14,7 @@ create_folder(temp_folder=__dr), create_folder(temp_folder="./sayureports/")
 # DEBUG
 _dbt = "-----------------------------------------------------------" \
        "------------------------------------------------------------"
-logging.basicConfig(format=f'{_dbt}\n[%(levelname)s || {HUMAN_HOUR_READABLE}] '
+logging.basicConfig(format=f'{_dbt}\n[%(levelname)s || {human_hour_readable()}] '
                            f'REASON = "%(message)s"\n',
                     level=getattr(logging, LOGGING_LEVEL),
                     handlers=[
@@ -49,7 +49,7 @@ async def logs_channel_update(
             "log_channel"
         ).format(
             BOT_NAME,
-            HUMAN_HOUR_READABLE
+            human_hour_readable()
         ),
         _mode: str = "send_message",
         _app=None,

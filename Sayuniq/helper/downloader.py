@@ -168,9 +168,13 @@ async def download_assistant(_app, urls, folder, caption, thumb=None):
                 height=height,
                 thumb=vide_file["thumb"]
             )
-            os.remove(vide_file["file"])
-            if thumb:
-                os.remove(vide_file["thumb"])
+            try:
+                os.remove(vide_file["file"])
+                if thumb:
+                    os.remove(vide_file["thumb"])
+            except Exception as e:
+                logging_stream_info(f'Fallo al eliminar video.')
+                logging_stream_info(f"{e}")
             return msg_f
         case _:
             print(vide_file["type"])

@@ -8,8 +8,6 @@ from ..__vars__ import BOT_NAME, CHANNEL_ID
 from .. import logs_channel_update
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-# db = Mongo(database=BOT_NAME, collection="japanemi")
-
 
 def _base_channel_url(
         channel_id: str | int,
@@ -70,7 +68,7 @@ class SitesAssistant:
 
     @staticmethod
     async def Ibtn(_p: bool = False, msg_btn=None, **kwargs):
-        msg_btn = msg_btn or "<<" if _p else ">>"
+        msg_btn = "<<" if _p else msg_btn or ">>"
         if _p:
             return InlineKeyboardButton(msg_btn, **kwargs)
         else:
