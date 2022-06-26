@@ -47,7 +47,6 @@ async def tioanime(app):
                 _c = await _sa.find_on_db()
                 caption = await _sa.get_caption()
                 if _c:
-                    _c = _c[0]
                     get_prev_chapter = await _sa.get_prev_chapter()
                     get_chapter = await _sa.get_chapter()
                     if get_chapter:
