@@ -168,6 +168,7 @@ async def download_assistant(_app, urls, folder, caption, thumb=None):
                 height=height,
                 thumb=thumb
             )
+            return msg_f
         case _:
             print(vide_file["type"])
             return None

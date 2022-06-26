@@ -3,6 +3,7 @@ import random
 import string
 from typing import Any
 
+
 def rankey(
         length: int = 5,
         _string: string = string.hexdigits
