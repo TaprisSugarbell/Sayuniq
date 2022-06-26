@@ -1,4 +1,5 @@
 import re
+import json
 import aiohttp
 
 
@@ -11,13 +12,13 @@ async def get_jk_anime(slug_title):
                 "q": slug_title
             }
         )
-        animes = await r.json()
+        animes = json.loads(await r.content.read())
         for anime in animes["animes"]:
             anime_slug = anime.get("slug")
             anime_title = anime.get("title")
 
             match anime_title:
-                case anime_title if re.findall(rf"{slug_title}", anime["title"].lower()):
+                case anime_title if re.findall(rf"{slug_title.lower()}", anime["title"].lower()):
                     return f"{_url_base}{anime_slug}/"
                 case _:
                     continue
