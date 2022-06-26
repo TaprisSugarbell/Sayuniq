@@ -126,7 +126,7 @@ class SitesAssistant:
                     "datetime": _now,
                     "nav": {
                         "prev": self.prev,
-                        "next": self.next
+                        "next": None
                     }
                 }
             }
@@ -139,14 +139,17 @@ class SitesAssistant:
                     }
                 )
             self.anime_dict["chapters"].update(_d["chapters"])
+            self.anime_dict.pop("_id")
             print(self.anime_dict)
             self.anime_dict.update({"datetime": _d["datetime"]})
             await update_(self.database,
                           {
-                              "site": self.site,
-                              "title": self.title
+                              "key_id": self.key_id
                           },
-                          self.anime_dict)
+                          {
+                              "chapters": self.anime_dict["chapters"]
+                          }
+                          )
         else:
             await add_(self.database, _d)
 
