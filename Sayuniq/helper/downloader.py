@@ -49,6 +49,7 @@ class SayuDownloader:
                     return wget.download(self.thumb, _th)
                 except Exception as e:
                     print(e)
+                    return _th
             elif os.path.exists(self.thumb):
                 return self.thumb
             else:
