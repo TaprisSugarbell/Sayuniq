@@ -300,7 +300,6 @@ async def tioanime(app):
                                                   _app=app
                                                   )
                         await app.delete_messages(CHANNEL_ID, _msg_menu.id)
-
     shutil.rmtree(folder)
 
 
