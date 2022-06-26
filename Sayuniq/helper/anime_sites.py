@@ -19,12 +19,12 @@ db = Mongo(database=BOT_NAME, collection="japanemi")
 async def tioanime(app):
     _site = "TioAnime"
     _url_base = "https://tioanime.com/"
-    folder = create_folder(temp_folder=_site)
     async with aiohttp.ClientSession() as session:
         async with session.get(_url_base) as result:
             soup = BeautifulSoup(await result.content.read(), "html.parser")
             list_of_a = soup.find("ul", attrs={"class": "episodes"}).find_all("a")
             for _a in list_of_a[::-1]:
+                folder = create_folder(_site, "")
                 chapter_url = _url_base + _a.get("href")
                 thumb_url = _url_base + _a.find("img").get("src").replace("//uploads", "/uploads")
                 chapter_no = [i for i in re.findall(r"[\d.]*", _a.find("h3").text) if i][-1]
@@ -94,18 +94,18 @@ async def tioanime(app):
                                                   _app=app
                                                   )
                         await app.delete_messages(CHANNEL_ID, _msg_menu.id)
-    shutil.rmtree(folder)
+                shutil.rmtree(folder)
 
 
 async def jkanime(app):
     _site = "Jkanime"
     _url_base = "https://jkanime.net/"
-    folder = create_folder(temp_folder=_site)
     async with aiohttp.ClientSession() as session:
         async with session.get(_url_base) as result:
             soup = BeautifulSoup(await result.content.read(), "html.parser")
             list_of_a = soup.find("div", attrs={"class": "maximoaltura"}).find_all("a")
             for _a in list_of_a[::-1]:
+                folder = create_folder(_site, "")
                 chapter_url = _a.get("href")
                 title = _a.find("h5").string
                 anime_url = await get_jk_anime(title)
