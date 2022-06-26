@@ -142,7 +142,10 @@ class SitesAssistant:
             print(self.anime_dict)
             self.anime_dict.update({"datetime": _d["datetime"]})
             await update_(self.database,
-                          self.dict_copy,
+                          {
+                              "site": self.site,
+                              "title": self.title
+                          },
                           self.anime_dict)
         else:
             await add_(self.database, _d)
@@ -176,6 +179,9 @@ class SitesAssistant:
                             ]
                         ]
                     )
+                )
+                await self.update_property(
+                    next=now_chapter_id
                 )
             except Exception as e:
                 await logs_channel_update(sayureports(reason=e), "send_document",
