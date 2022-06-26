@@ -45,6 +45,7 @@ async def tioanime(app):
                             msg_1 = await download_assistant(app, servers, folder, caption, thumb_url)
                             await _sa.update_property(
                                 anime_url=anime_url,
+                                chapter_url=chapter_url,
                                 msg=msg_1,
                                 message_id=msg_1.video.file_id,
                                 _prev=get_prev_chapter["message_id"],
