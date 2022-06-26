@@ -2,7 +2,6 @@ import os
 import re
 import wget
 import random
-import string
 import mimetypes
 import cloudscraper
 from PIL import Image
@@ -136,7 +135,6 @@ class SayuDownloader:
                     _out = self.extractor(url)
                 except Exception as e:
                     logging_stream_info(f'Fallo la descarga de {url} [{_nn}/{_total_urls}]')
-                    raise
                     print(e)
                 if _out:
                     break
