@@ -237,7 +237,7 @@ async def tioanime(app):
             list_of_a = soup.find("ul", attrs={"class": "episodes"}).find_all("a")
             for _a in list_of_a[::-1]:
                 chapter_url = _url_base + _a.get("href")
-                thumb_url = _url_base + _a.find("img").get("src")
+                thumb_url = _url_base + _a.find("img").get("src").replace("//uploads", "/uploads")
                 chapter_no = [i for i in re.findall(r"[\d.]*", _a.find("h3").text) if i][-1]
                 title = _a.find("h3").text.replace(chapter_no, "").strip()
                 _sa = SitesAssistant(_site, title, thumb_url, chapter_no, _database=db)

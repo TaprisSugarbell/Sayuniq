@@ -46,7 +46,10 @@ class SayuDownloader:
                 _th = self.__rthumb.format(self.out, self.__rth)
                 if os.path.exists(_th):
                     _th = self.__rthumb.format(self.out, rankey())
-                return wget.download(self.thumb, _th)
+                try:
+                    return wget.download(self.thumb, _th)
+                except Exception as e:
+                    print(e)
             elif os.path.exists(self.thumb):
                 return self.thumb
             else:
@@ -133,6 +136,7 @@ class SayuDownloader:
                     _out = self.extractor(url)
                 except Exception as e:
                     logging_stream_info(f'Fallo la descarga de {url} [{_nn}/{_total_urls}]')
+                    raise
                     print(e)
                 if _out:
                     break
