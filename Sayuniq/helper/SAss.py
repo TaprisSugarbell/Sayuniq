@@ -58,6 +58,7 @@ class SitesAssistant:
         self.app = app
 
         self.menu_id = ""
+        self.dict_copy = dict
         self.key_id = rankey()
 
         self.prev_chapter_digit = str(round(chapter_no)) if isinstance(
@@ -84,6 +85,7 @@ class SitesAssistant:
             }
         )
         if self.anime_dict:
+            self.dict_copy = self.anime_dict.copy()
             self.anime_url = self.anime_dict["anime_url"]
             self.thumb = self.anime_dict["thumb"] or self.thumb
         return self.anime_dict
@@ -128,25 +130,21 @@ class SitesAssistant:
             }
         }
         if self.update:
+            self.anime_dict["chapters"].update(_d["chapters"])
+            self.anime_dict.update({"datetime": _d["datetime"]})
             await update_(self.database,
-                          self.anime_dict,
-                          self.anime_dict["chapters"].update(_d["chapters"]))
-            await update_(self.database,
-                          self.anime_dict,
-                          self.anime_dict.update({"datetime": _d["datetime"]}))
+                          self.dict_copy,
+                          self.anime_dict)
         elif self.next:
+            self.anime_dict["chapters"][self.prev_chapter_digit]["nav"].update(
+                {
+                    "next": self.next
+                }
+            )
+            self.anime_dict.update({"datetime": _d["datetime"]})
             await update_(self.database,
-                          self.anime_dict,
-                          self.anime_dict["chapters"][self.prev_chapter_digit]["nav"].update(
-                              {
-                                  "prev": self.prev,
-                                  "next": self.next
-                              }
-                          )
-                          )
-            await update_(self.database,
-                          self.anime_dict,
-                          self.anime_dict.update({"datetime": _d["datetime"]}))
+                          self.dict_copy,
+                          self.anime_dict)
         else:
             await add_(self.database, _d)
 
@@ -181,7 +179,6 @@ class SitesAssistant:
                     )
                 )
                 await self.update_property(
-                    prev=_prev_chapter_nav_,
                     next=now_chapter_id
                 )
                 await self.update_or_add_db()
