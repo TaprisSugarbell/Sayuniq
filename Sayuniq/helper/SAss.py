@@ -95,7 +95,7 @@ class SitesAssistant:
 
     async def filter_title(self, title=None):
         title = title or self.title
-        return re.sub(r"\W", "", title.replace(" ", "_"))
+        return re.sub(r"\W", "", title.replace(" ", "_").replace("-", "_"))
 
     async def get_caption(self):
         _filter_title = await self.filter_title()
