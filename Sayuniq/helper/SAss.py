@@ -137,6 +137,7 @@ class SitesAssistant:
                     }
                 )
             self.anime_dict["chapters"].update(_d["chapters"])
+            print(self.anime_dict)
             self.anime_dict.update({"datetime": _d["datetime"]})
             await update_(self.database,
                           self.dict_copy,
