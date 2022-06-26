@@ -77,7 +77,13 @@ class SitesAssistant:
             return InlineKeyboardButton(msg_btn, **kwargs)
 
     async def find_on_db(self):
-        self.anime_dict = await confirm(self.database, {"site": self.site, "anime": self.title})
+        self.anime_dict = await confirm_one(
+            self.database,
+            {
+                "site": self.site,
+                "anime": self.title
+            }
+        )
         if self.anime_dict:
             self.anime_url = self.anime_dict["anime_url"]
             self.thumb = self.anime_dict["thumb"] or self.thumb

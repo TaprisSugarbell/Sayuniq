@@ -1,6 +1,3 @@
-import os
-import json
-import pymongo.errors
 from decouple import config
 from pymongo import MongoClient
 
@@ -78,6 +75,12 @@ async def confirm(user_db, data=None):
     if data is None:
         data = {}
     return user_db.find(data)
+
+
+async def confirm_one(user_db, data=None):
+    if data is None:
+        data = {}
+    return user_db.find_one(data)
 
 
 async def add_(user_db, data=None):
