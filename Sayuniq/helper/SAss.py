@@ -140,7 +140,6 @@ class SitesAssistant:
                 )
             self.anime_dict["chapters"].update(_d["chapters"])
             self.anime_dict.pop("_id")
-            print(self.anime_dict)
             self.anime_dict.update({"datetime": _d["datetime"]})
             await update_(self.database,
                           {
