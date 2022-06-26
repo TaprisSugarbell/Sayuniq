@@ -141,8 +141,7 @@ async def jkanime(app):
                                                       )
                 else:
                     prk = rankey(10)
-                    servers, _anime_uri = await get_tioanime_servers(chapter_url)
-                    anime_url = _url_base + _anime_uri
+                    servers = await get_jk_servers(chapter_url)
                     htitle = await _sa.filter_title(title)
                     _msg_menu = await app.send_message(
                         CHANNEL_ID,
@@ -177,4 +176,7 @@ async def jkanime(app):
                         await app.delete_messages(CHANNEL_ID, _msg_menu.id)
                 shutil.rmtree(folder)
 
-sites = [tioanime, jkanime]
+sites = [
+    # tioanime,
+    jkanime
+]
