@@ -47,7 +47,9 @@ async def tioanime(app):
                                 anime_url=anime_url,
                                 msg=msg_1,
                                 message_id=msg_1.video.file_id,
-                                _prev=get_prev_chapter["message_id"]
+                                _prev=get_prev_chapter["message_id"],
+                                next=msg_1.id,
+                                _update=True
                             )
                             await _sa.buttons_replace()
                             await _sa.update_or_add_db()
@@ -127,7 +129,9 @@ async def jkanime(app):
                                 anime_url=anime_url,
                                 msg=msg_1,
                                 message_id=msg_1.video.file_id,
-                                _prev=get_prev_chapter["message_id"]
+                                _prev=get_prev_chapter["message_id"],
+                                next=msg_1.id,
+                                _update=True
                             )
                             await _sa.buttons_replace()
                             await _sa.update_or_add_db()

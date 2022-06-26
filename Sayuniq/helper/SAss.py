@@ -130,17 +130,13 @@ class SitesAssistant:
             }
         }
         if self.update:
+            if self.next:
+                self.anime_dict["chapters"][self.prev_chapter_digit]["nav"].update(
+                    {
+                        "next": self.next
+                    }
+                )
             self.anime_dict["chapters"].update(_d["chapters"])
-            self.anime_dict.update({"datetime": _d["datetime"]})
-            await update_(self.database,
-                          self.dict_copy,
-                          self.anime_dict)
-        elif self.next:
-            self.anime_dict["chapters"][self.prev_chapter_digit]["nav"].update(
-                {
-                    "next": self.next
-                }
-            )
             self.anime_dict.update({"datetime": _d["datetime"]})
             await update_(self.database,
                           self.dict_copy,
@@ -178,10 +174,6 @@ class SitesAssistant:
                         ]
                     )
                 )
-                await self.update_property(
-                    next=now_chapter_id
-                )
-                await self.update_or_add_db()
             except Exception as e:
                 await logs_channel_update(sayureports(reason=e), "send_document",
                                           caption=get_string("document_err").format(BOT_NAME),
