@@ -15,8 +15,15 @@ async def __ulgs__(bot, update):
                                       caption=get_string("document_log").format(BOT_NAME),
                                       _app=bot
                                       )
-
+            await bot.send_message(
+                user_id,
+                "Listo."
+            )
         else:
+            await bot.send_message(
+                user_id,
+                f"No hay log.\n\"{os.listdir('./logs/')}\""
+            )
             await logs_channel_update(log_file, "send_document",
                                       caption=get_string("document_log").format(BOT_NAME),
                                       _app=bot
