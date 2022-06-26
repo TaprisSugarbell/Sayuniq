@@ -177,6 +177,6 @@ async def jkanime(app):
                 shutil.rmtree(folder)
 
 sites = [
-    # tioanime,
+    tioanime,
     jkanime
 ]
