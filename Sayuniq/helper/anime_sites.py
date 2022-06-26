@@ -53,8 +53,6 @@ async def tioanime(app):
                         try:
                             servers, _anime_uri = await get_tioanime_servers(chapter_url)
                             anime_url = _url_base + _anime_uri
-                            # msg_1 = await download_assistant(app, servers, folder, caption, thumb_url)
-                            servers = ["https://cdn.donmai.us/original/39/27/__izayoi_sakuya_touhou__39279272c19a06b268fd40931ff29317.mp4"]
                             msg_1 = await download_assistant(app, servers, folder, caption, thumb_url)
                             await _sa.update_property(
                                 anime_url=anime_url,
