@@ -10,6 +10,7 @@ from urllib import parse
 from .utils import rankey
 import yt_dlp as youtube_dl
 from bs4 import BeautifulSoup
+from ..__vars__ import CHANNEL_ID
 from .. import logging_stream_info
 from moviepy.editor import VideoFileClip
 
@@ -141,4 +142,36 @@ class SayuDownloader:
                     break
             return _out
         else:
+            return None
+
+
+async def download_assistant(_app, urls, folder, caption, thumb=None):
+    sd = SayuDownloader(urls, folder, thumb=thumb, _app=_app, filter_links=True)
+    logging_stream_info(urls)
+    vide_file = sd.iter_links()
+    file_video = vide_file["file"]
+    thumb = vide_file["thumb"]
+    logging_stream_info(f"Se ha descargado {vide_file}")
+    # file, type, thumb
+    clip = VideoFileClip(vide_file["file"])
+    # Extraer información del video
+    width, height = clip.size
+    duration = int(clip.duration)
+    match vide_file["type"]:
+        case "video/mp4":
+            msg_f = await _app.send_video(
+                CHANNEL_ID,
+                vide_file["file"],
+                caption,
+                duration=duration,
+                width=width,
+                height=height,
+                thumb=vide_file["thumb"]
+            )
+            os.remove(vide_file["file"])
+            if thumb:
+                os.remove(vide_file["thumb"])
+            return msg_f
+        case _:
+            print(vide_file["type"])
             return None
