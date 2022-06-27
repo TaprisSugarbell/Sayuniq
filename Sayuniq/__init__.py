@@ -54,18 +54,19 @@ async def auth_users():
 
 
 async def logs_channel_update(
-        message: str =
-        get_string(
-            "log_channel"
-        ).format(
-            BOT_NAME,
-            human_hour_readable()
-        ),
+        message: str = None,
         _mode: str = "send_message",
         _app=None,
         *args,
         **kwargs
 ):
+    if message is None:
+        message = get_string(
+            "log_channel"
+        ).format(
+            BOT_NAME,
+            human_hour_readable()
+        )
     if _app:
         await getattr(_app, _mode)(LOG_CHANNEL, message, *args, **kwargs)
     else:

@@ -36,7 +36,7 @@ async def tioanime(app):
                 if _c:
                     get_prev_chapter = await _sa.get_prev_chapter()
                     get_chapter = await _sa.get_chapter()
-                    if get_chapter:
+                    if get_chapter or _c.get("is_banned"):
                         continue
                     else:
                         try:
@@ -119,7 +119,7 @@ async def jkanime(app):
                 if _c:
                     get_prev_chapter = await _sa.get_prev_chapter()
                     get_chapter = await _sa.get_chapter()
-                    if get_chapter:
+                    if get_chapter or _c.get("is_banned"):
                         continue
                     else:
                         try:

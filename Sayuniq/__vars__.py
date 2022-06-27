@@ -1,6 +1,6 @@
 from decouple import config
-from datetime import datetime
 from strings import get_string
+from datetime import datetime, timedelta, timezone
 
 # Version
 __version__tuple__ = ("0", "0", "1")
@@ -19,6 +19,7 @@ API_HASH = config("API_HASH", default=None)
 BOT_TOKEN = config("BOT_TOKEN", default=None)
 BOT_ALIAS = config("BOT_ALIAS", default="Sayuniq")
 # Channels id
+UTC = config("UTC", default=-6)
 CHID = config("CHANNEL_ID", default=None)
 LOG_CHANNEL = config("LOG_CHANNEL", default=None, cast=int)
 TESTS_CHANNEL = config("TESTS_CHANNEL", default=None, cast=int)
@@ -35,7 +36,11 @@ except ValueError:
     CHANNEL_ID = CHID
 
 
-def human_hour_readable(hformat=HOUR_FORMAT):
-    return datetime.now().strftime(
+def human_hour_readable(hformat=HOUR_FORMAT, _utc=UTC):
+    if ":" in UTC:
+        _hours, _minutes = UTC.split(":")
+    else:
+        _hours, _minutes = UTC, 0
+    return datetime.now(timezone(timedelta(hours=int(_hours), minutes=int(_minutes)))).strftime(
         f"{get_string('format_date').format(datetime.now().month)} "
         f"{get_string('format_hour')[hformat]}")

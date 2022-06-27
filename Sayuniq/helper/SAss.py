@@ -117,6 +117,7 @@ class SitesAssistant:
             "thumb": self.thumb,
             "menu_id": self.menu_id,
             "datetime": _now,
+            "is_banned": False,
             "chapters": {
                 self.chapter_no: {
                     "url": self.chapter_url,
