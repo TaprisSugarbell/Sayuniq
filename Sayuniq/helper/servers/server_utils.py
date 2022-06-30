@@ -1,10 +1,11 @@
 import json
 import re
-
 import aiohttp
+import cloudscraper
 from bs4 import BeautifulSoup
 
 PARSER = "html.parser"
+requests = cloudscraper.create_scraper(cloudscraper.Session)
 
 
 async def get_jk_anime(slug_title):
@@ -29,7 +30,6 @@ async def get_jk_anime(slug_title):
 
 
 async def get_mc_anime(_url):
-    async with aiohttp.ClientSession() as requests:
-        async with requests.get(_url) as r:
-            soup = BeautifulSoup(await r.content.read(), PARSER)
-            return soup.find("div", attrs={"class": "lista"}).find("a").get("href")
+        r = requests.get(_url)
+        soup = BeautifulSoup(r.content, PARSER)
+        return soup.find("div", attrs={"class": "lista"}).find("a").get("href")
