@@ -183,6 +183,7 @@ async def monoschinos(app):
     _url_base = "https://monoschinos2.com/"
     async with aiohttp.ClientSession() as session:
         async with session.get(_url_base) as result:
+            logging_stream_info(result.ok)
             soup = BeautifulSoup(await result.content.read(), "html.parser")
             list_of_a = soup.find("div", attrs={"class": "row row-cols-5"}).find_all("a")
             for _a in list_of_a[::-1]:
@@ -257,7 +258,7 @@ async def monoschinos(app):
 
 
 sites = [
-    tioanime,
-    jkanime,
+    # tioanime,
+    # jkanime,
     monoschinos
 ]
