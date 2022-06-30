@@ -186,7 +186,7 @@ async def monoschinos(app):
     r = requests.get(_url_base)
     # async with aiohttp.ClientSession() as session:
     #     async with session.get(_url_base) as result:
-    soup = BeautifulSoup(r.content.read(), "html.parser")
+    soup = BeautifulSoup(r.content, "html.parser")
     list_of_a = soup.find("div", attrs={"class": "row row-cols-5"}).find_all("a")
     for _a in list_of_a[::-1]:
         folder = create_folder(_site, "")
