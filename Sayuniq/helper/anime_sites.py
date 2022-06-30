@@ -262,5 +262,5 @@ async def monoschinos(app):
 sites = [
     tioanime,
     jkanime,
-    # monoschinos
+    monoschinos
 ]
