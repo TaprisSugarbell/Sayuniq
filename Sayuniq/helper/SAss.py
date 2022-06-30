@@ -194,7 +194,8 @@ class SitesAssistant:
                 )
             except Exception as e:
                 sayulog.error(f"CHANNEL_ID: {CHANNEL_ID}\n"
-                              f"PrevMessageId: {prev_message_id}")
+                              f"PrevMessageId: {prev_message_id}\n"
+                              f"NowChapterId: {now_chapter_id}")
                 await logs_channel_update(sayureports(reason=e), "send_document",
                                           caption=get_string("document_err").format(BOT_NAME),
                                           _app=app
