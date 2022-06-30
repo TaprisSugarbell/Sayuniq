@@ -1,6 +1,8 @@
-from decouple import config
-from strings import get_string
 from datetime import datetime, timedelta, timezone
+
+from decouple import config
+
+from strings import get_string
 
 # Version
 __version__tuple__ = ("0", "0", "1")
@@ -19,7 +21,7 @@ API_HASH = config("API_HASH", default=None)
 BOT_TOKEN = config("BOT_TOKEN", default=None)
 BOT_ALIAS = config("BOT_ALIAS", default="Sayuniq")
 # Channels id
-UTC = config("UTC", default=-6)
+UTC = config("UTC", default="-6")
 CHID = config("CHANNEL_ID", default=None)
 LOG_CHANNEL = config("LOG_CHANNEL", default=None, cast=int)
 TESTS_CHANNEL = config("TESTS_CHANNEL", default=None, cast=int)

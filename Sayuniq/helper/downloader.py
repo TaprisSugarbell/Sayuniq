@@ -1,18 +1,21 @@
-import os
-import re
-import wget
-import random
 import mimetypes
-import cloudscraper
-from PIL import Image
+import os
+import random
+import re
 from typing import Any
 from urllib import parse
-from .utils import rankey
+
+import aiofiles
+import aiohttp
+import cloudscraper
 import yt_dlp as youtube_dl
+from PIL import Image
 from bs4 import BeautifulSoup
-from ..__vars__ import CHANNEL_ID
-from .. import logging_stream_info
 from moviepy.editor import VideoFileClip
+
+from .utils import rankey
+from .. import logging_stream_info
+from ..__vars__ import CHANNEL_ID
 
 requests = cloudscraper.create_scraper(cloudscraper.Session)
 
@@ -31,7 +34,7 @@ class SayuDownloader:
         self.requests = cloudscraper.create_scraper(cloudscraper.Session)
 
     @staticmethod
-    def generate_screenshot(file, name: str = "./thumb.jpg"):
+    async def generate_screenshot(file, name: str = "./thumb.jpg"):
         clip = VideoFileClip(file)
         ss_img = int(clip.duration / random.randint(15, 30))
         frame = clip.get_frame(ss_img)
@@ -39,7 +42,15 @@ class SayuDownloader:
         nimage.save(name)
         return name
 
-    def get_thumbnail(self):
+    async def download_thumb(self, _th=None, _url=None):
+        _th = self.__rthumb.format(self.out, rankey()) if _th is None else _th
+        async with aiohttp.ClientSession() as session:
+            async with session.get(self.thumb or _url) as r:
+                async with aiofiles.open(_th, "wb") as af:
+                    await af.write(await r.content.read())
+        return _th
+
+    async def get_thumbnail(self):
         if self.thumb:
             _scheme = parse.urlparse(self.thumb)
             if _scheme.scheme:
@@ -47,7 +58,7 @@ class SayuDownloader:
                 if os.path.exists(_th):
                     _th = self.__rthumb.format(self.out, rankey())
                 try:
-                    return wget.download(self.thumb, _th)
+                    return await self.download_thumb(_th)
                 except Exception as e:
                     print(e)
                     return _th
@@ -58,7 +69,7 @@ class SayuDownloader:
         else:
             return self.__rthumb.format(self.out, rankey())
 
-    def links_filter(self, url=None) -> str | Any:
+    async def links_filter(self, url=None) -> str | Any:
         _url = url or self.url
         _r = self.requests.get(_url, allow_redirects=True)
         host = parse.urlparse(_r.url).netloc
@@ -85,7 +96,7 @@ class SayuDownloader:
             case _:
                 return _url
 
-    def extractor(self, url=None):
+    async def extractor(self, url=None):
         _url, out, custom, ext, thumb = (
             url or self.url,
             self.out,
@@ -94,12 +105,12 @@ class SayuDownloader:
             self.thumb
         )
         if self.filter_links:
-            _url = self.links_filter(_url)
+            _url = await self.links_filter(_url)
             if isinstance(_url, dict):
                 _url = _url["data"][-1]["file"]
         video_info = youtube_dl.YoutubeDL().extract_info(_url, download=False)
         # Thumbnail?
-        _thumb = self.get_thumbnail()
+        _thumb = await self.get_thumbnail()
         # Demás datos, title, ext
         _title = re.sub("/", "", custom or video_info["title"])
         try:
@@ -116,7 +127,7 @@ class SayuDownloader:
         file_type = mimetypes.guess_type(out_)[0]
         # Si es video trata de obtener capturas
         if "video" in file_type and not os.path.exists(_thumb):
-            yes_thumb = self.generate_screenshot(out_, _thumb)
+            yes_thumb =  await self.generate_screenshot(out_, _thumb)
         elif os.path.exists(_thumb):
             yes_thumb = _thumb
         else:
@@ -127,16 +138,19 @@ class SayuDownloader:
             "thumb": yes_thumb
         }
 
-    def iter_links(self, urls=None) -> Any:
+    async def iter_links(self, urls=None) -> Any:
         urls = urls or self.url
         if isinstance(urls, list):
             _total_urls = len(urls)
             _out = None
             for _nn, url in enumerate(urls):
                 try:
-                    _out = self.extractor(url)
+                    _out = await self.extractor(url)
                 except Exception as e:
                     logging_stream_info(f'Fallo la descarga de {url} [{_nn}/{_total_urls}]')
+                    if self.thumb:
+                        if os.path.exists(self.thumb):
+                            os.remove(self.thumb)
                     print(e)
                 if _out:
                     break
@@ -148,7 +162,7 @@ class SayuDownloader:
 async def download_assistant(_app, urls, folder, caption, thumb=None):
     sd = SayuDownloader(urls, folder, thumb=thumb, _app=_app, filter_links=True)
     logging_stream_info(urls)
-    vide_file = sd.iter_links()
+    vide_file = await sd.iter_links()
     file_video = vide_file["file"]
     thumb = vide_file["thumb"]
     logging_stream_info(f"Se ha descargado {vide_file}")

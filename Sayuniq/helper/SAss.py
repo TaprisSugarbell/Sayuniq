@@ -1,13 +1,15 @@
 import re
-from typing import Any
-from .utils import rankey
-from .mongo_connect import *
 from datetime import datetime
-from ..strings import get_string
-from .. import logs_channel_update
-from .logs_utils import sayureports
-from ..__vars__ import BOT_NAME, CHANNEL_ID
+from typing import Any
+
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+
+from .logs_utils import sayureports
+from .mongo_connect import *
+from .utils import rankey
+from .. import logs_channel_update
+from ..__vars__ import BOT_NAME, CHANNEL_ID
+from ..strings import get_string
 
 
 def _base_channel_url(
@@ -58,11 +60,15 @@ class SitesAssistant:
         self.app = app
 
         self.menu_id = ""
+        self.key_id = None
         self.dict_copy = dict
-        self.key_id = rankey()
 
         self.prev_chapter_digit = str(round(chapter_no)) if isinstance(
             chapter_no, float) else str(int(chapter_no) - 1)
+
+    @property
+    async def thumbnail(self):
+        return self.thumb
 
     async def update_property(self, **kwargs):
         for i, j in kwargs.items():

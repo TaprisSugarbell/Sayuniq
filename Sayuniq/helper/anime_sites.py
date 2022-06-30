@@ -1,17 +1,17 @@
 import shutil
-import asyncio
-from .servers import *
-from .mongo_connect import *
-from bs4 import BeautifulSoup
-from ..strings import get_string
-from .SAss import SitesAssistant
-from .. import logs_channel_update
-from .logs_utils import sayureports
-from .utils import create_folder, rankey
-from .downloader import download_assistant
-from .servers.server_utils import get_jk_anime
-from ..__vars__ import BOT_NAME, BOT_ALIAS, CHANNEL_ID
+
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+
+from .SAss import SitesAssistant
+from .downloader import download_assistant
+from .logs_utils import sayureports
+from .mongo_connect import *
+from .servers import *
+from .servers.server_utils import get_jk_anime, get_mc_anime
+from .utils import create_folder, rankey
+from .. import logs_channel_update
+from ..__vars__ import BOT_NAME, BOT_ALIAS, CHANNEL_ID
+from ..strings import get_string
 
 db = Mongo(database=BOT_NAME, collection="japanemi")
 
@@ -32,6 +32,7 @@ async def tioanime(app):
                 _sa = SitesAssistant(_site, title, thumb_url,
                                      chapter_no, _database=db, app=app)
                 _c = await _sa.find_on_db()
+                thumb_url = await _sa.thumbnail
                 caption = await _sa.get_caption()
                 if _c:
                     get_prev_chapter = await _sa.get_prev_chapter()
@@ -41,7 +42,7 @@ async def tioanime(app):
                     else:
                         try:
                             servers, _anime_uri = await get_tioanime_servers(chapter_url)
-                            anime_url = _url_base + _anime_uri
+                            anime_url = _url_base[:-1] + _anime_uri
                             msg_1 = await download_assistant(app, servers, folder, caption, thumb_url)
                             await _sa.update_property(
                                 anime_url=anime_url,
@@ -61,11 +62,11 @@ async def tioanime(app):
                 else:
                     prk = rankey(10)
                     servers, _anime_uri = await get_tioanime_servers(chapter_url)
-                    anime_url = _url_base + _anime_uri
+                    anime_url = _url_base[:-1] + _anime_uri
                     htitle = await _sa.filter_title(title)
                     _msg_menu = await app.send_message(
                         CHANNEL_ID,
-                        f"#{htitle}\n",
+                        f"#{htitle}\n🌐 #{_site}",
                         reply_markup=InlineKeyboardMarkup(
                             [
                                 [
@@ -145,7 +146,7 @@ async def jkanime(app):
                     htitle = await _sa.filter_title(title)
                     _msg_menu = await app.send_message(
                         CHANNEL_ID,
-                        f"#{htitle}\n",
+                        f"#{htitle}\n🌐 #{_site}",
                         reply_markup=InlineKeyboardMarkup(
                             [
                                 [
@@ -176,7 +177,87 @@ async def jkanime(app):
                         await app.delete_messages(CHANNEL_ID, _msg_menu.id)
                 shutil.rmtree(folder)
 
+
+async def monoschinos(app):
+    _site = "MonosChinos"
+    _url_base = "https://monoschinos2.com/"
+    async with aiohttp.ClientSession() as session:
+        async with session.get(_url_base) as result:
+            soup = BeautifulSoup(await result.content.read(), "html.parser")
+            list_of_a = soup.find("div", attrs={"class": "row row-cols-5"}).find_all("a")
+            for _a in list_of_a[::-1]:
+                folder = create_folder(_site, "")
+                chapter_url = _a.get("href")
+                title = _a.find("p", attrs={"class": "animetitles"}).string
+                anime_url = await get_mc_anime(chapter_url)
+                chapter_no = _a.find("h5").string
+                _sa = SitesAssistant(_site, title, None,
+                                     chapter_no, _database=db, app=app)
+                _c = await _sa.find_on_db()
+                caption = await _sa.get_caption()
+                if _c:
+                    get_prev_chapter = await _sa.get_prev_chapter()
+                    get_chapter = await _sa.get_chapter()
+                    if get_chapter or _c.get("is_banned"):
+                        continue
+                    else:
+                        try:
+                            servers = await get_mc_servers(chapter_url)
+                            msg_1 = await download_assistant(app, servers, folder, caption)
+                            await _sa.update_property(
+                                anime_url=anime_url,
+                                msg=msg_1,
+                                message_id=msg_1.video.file_id,
+                                prev=get_prev_chapter["message_id"],
+                                update=True
+                            )
+                            await _sa.buttons_replace()
+                            await _sa.update_or_add_db()
+                        except Exception as e:
+                            await logs_channel_update(sayureports(reason=e), "send_document",
+                                                      caption=get_string("document_err").format(BOT_NAME),
+                                                      _app=app
+                                                      )
+                else:
+                    prk = rankey(10)
+                    servers = await get_mc_servers(chapter_url)
+                    htitle = await _sa.filter_title(title)
+                    _msg_menu = await app.send_message(
+                        CHANNEL_ID,
+                        f"#{htitle}\n🌐 #{_site}",
+                        reply_markup=InlineKeyboardMarkup(
+                            [
+                                [
+                                    InlineKeyboardButton(
+                                        "Listado",
+                                        url=f"https://t.me/{BOT_ALIAS}?start=mty_{prk}")
+                                ]
+                            ]
+                        )
+                    )
+                    try:
+                        msg_ = await download_assistant(app, servers, folder, caption)
+                        await _sa.update_property(
+                            anime_url=anime_url,
+                            msg=msg_,
+                            message_id=msg_.id,
+                            key_id=prk,
+                            menu_id=_msg_menu.id,
+                            chapter_url=chapter_url
+                        )
+                        await _sa.buttons_replace()
+                        await _sa.update_or_add_db()
+                    except Exception as e:
+                        await logs_channel_update(sayureports(reason=e), "send_document",
+                                                  caption=get_string("document_err").format(BOT_NAME),
+                                                  _app=app
+                                                  )
+                        await app.delete_messages(CHANNEL_ID, _msg_menu.id)
+                shutil.rmtree(folder)
+
+
 sites = [
     tioanime,
-    jkanime
+    jkanime,
+    monoschinos
 ]

@@ -1,5 +1,5 @@
 import asyncio
-from Sayuniq import logging_stream_info
+
 from Sayuniq.helper.anime_sites import *
 from Sayuniq.helper.mongo_connect import *
 from Sayuniq.helper.utils import create_folder
@@ -15,6 +15,12 @@ def run_asyncio(obj, app):
 async def read_and_execute(app):
     while True:
         for site in sites:
-            await site(app)
+            try:
+                await site(app)
+            except Exception as e:
+                await logs_channel_update(sayureports(reason=e), "send_document",
+                                          caption=get_string("document_err").format(BOT_NAME),
+                                          _app=app
+                                          )
         logging_stream_info("Todo subido :3")
         await asyncio.sleep(300)

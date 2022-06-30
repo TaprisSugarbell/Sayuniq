@@ -20,8 +20,8 @@ async def __queue__(bot, update):
     )
 
 
-@Client.on_callback_query(filters.regex("mty_.*"))
-async def __mty__(bot, update):
-    print(update)
+# @Client.on_callback_query(filters.regex("mty_.*"))
+# async def __mty__(bot, update):
+#     print(update)
 
 

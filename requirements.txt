@@ -6,6 +6,7 @@ dnspython
 moviepy
 pymongo
 pyrogram
+pyromod
 python-decouple
 Pillow
 PyYAML

@@ -1,4 +1,5 @@
 import asyncio
+import pyromod.listen
 from Sayuniq.strings import get_string
 from helper.logs_utils import sayureports
 from __vars__ import BOT_NAME, __version__
