@@ -7,7 +7,7 @@ from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from .logs_utils import sayureports
 from .mongo_connect import *
 from .utils import rankey
-from .. import logs_channel_update
+from .. import logs_channel_update, sayulog
 from ..__vars__ import BOT_NAME, CHANNEL_ID
 from ..strings import get_string
 
@@ -193,6 +193,8 @@ class SitesAssistant:
                     next=now_chapter_id
                 )
             except Exception as e:
+                sayulog.error(f"CHANNEL_ID: {CHANNEL_ID}\n"
+                              f"PrevMessageId: {prev_message_id}")
                 await logs_channel_update(sayureports(reason=e), "send_document",
                                           caption=get_string("document_err").format(BOT_NAME),
                                           _app=app
