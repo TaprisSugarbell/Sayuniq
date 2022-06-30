@@ -1,10 +1,12 @@
 import re
 import base64
 import aiohttp
+import cloudscraper
 from bs4 import BeautifulSoup
 from ... import logging_stream_info
 
 PARSER = "html.parser"
+requests = cloudscraper.create_scraper(cloudscraper.Session)
 
 
 async def get_tioanime_servers(chapter_url):
@@ -95,14 +97,13 @@ async def get_jk_servers(url):
 
 
 async def get_mc_servers(url):
-    async with aiohttp.ClientSession() as requests:
-        async with requests.get(url) as r:
-            soup = BeautifulSoup(await r.content.read(), PARSER)
-            _bb = [oei.get("data-player") for oei in
-                   soup.find("div", attrs={"class": "playother"}).find_all("p")]
+    r = requests.get(url)
+    soup = BeautifulSoup(r.content, PARSER)
+    _bb = [oei.get("data-player") for oei in
+           soup.find("div", attrs={"class": "playother"}).find_all("p")]
 
-            b64_decoded = [oy.split("?url=")[-1] for oy in [base64.b64decode(oe).decode() for oe in _bb]]
-            b64_decoded.extend(
-                [ei.get("href") for ei in soup.find("div", attrs={"class": "downbtns"}).find_all("a")]
-            )
-            return b64_decoded
+    b64_decoded = [oy.split("?url=")[-1] for oy in [base64.b64decode(oe).decode() for oe in _bb]]
+    b64_decoded.extend(
+        [ei.get("href") for ei in soup.find("div", attrs={"class": "downbtns"}).find_all("a")]
+    )
+    return b64_decoded
