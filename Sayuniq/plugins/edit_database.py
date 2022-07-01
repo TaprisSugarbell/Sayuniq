@@ -26,7 +26,7 @@ async def __edb__(bot, update):
         if chat_id in AUTH_USERS:
             await bot.send_message(
                 chat_id,
-                f'**{anime}**\nCapítulos subidos: **{len(chapters)}**',
+                f'`{key_id}`\n**{anime}**\nCapítulos subidos: **{len(chapters)}**',
                 reply_markup=InlineKeyboardMarkup(
                     [
                         [
