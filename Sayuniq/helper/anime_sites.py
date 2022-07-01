@@ -48,6 +48,7 @@ async def tioanime(app):
                             await _sa.update_property(
                                 anime_url=anime_url,
                                 chapter_url=chapter_url,
+                                caption=caption,
                                 msg=msg_1,
                                 message_id=msg_1.id,
                                 prev=get_prev_chapter["message_id"],
@@ -67,6 +68,7 @@ async def tioanime(app):
                         msg_ = await download_assistant(app, servers, folder, caption, thumb_url)
                         await _sa.update_property(
                             anime_url=anime_url,
+                            caption=caption,
                             msg=msg_,
                             message_id=msg_.id,
                             chapter_url=chapter_url
@@ -112,6 +114,7 @@ async def jkanime(app):
                             await _sa.update_property(
                                 anime_url=anime_url,
                                 chapter_url=chapter_url,
+                                caption=caption,
                                 msg=msg_1,
                                 message_id=msg_1.id,
                                 prev=get_prev_chapter["message_id"],
@@ -174,6 +177,7 @@ async def monoschinos(app):
                     await _sa.update_property(
                         anime_url=anime_url,
                         chapter_url=chapter_url,
+                        caption=caption,
                         msg=msg_1,
                         message_id=msg_1.id,
                         prev=get_prev_chapter["message_id"],
@@ -193,6 +197,7 @@ async def monoschinos(app):
                 await _sa.update_property(
                     anime_url=anime_url,
                     chapter_url=chapter_url,
+                    caption=caption,
                     msg=msg_,
                     message_id=msg_.id,
                 )

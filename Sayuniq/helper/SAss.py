@@ -58,6 +58,7 @@ class SitesAssistant:
         self.app = app
 
         self.key_id = None or rankey(10)
+        self.caption = ""
         self.dict_copy = dict
 
         self.prev_chapter_digit = str(round(chapter_no)) if isinstance(
@@ -131,6 +132,7 @@ class SitesAssistant:
                 self.chapter_no: {
                     "url": self.chapter_url,
                     "chapter": self.chapter_no,
+                    "caption": self.caption,
                     "file_id": self.msg.video.file_id,
                     "message_id": self.message_id,
                     "datetime": _now,
