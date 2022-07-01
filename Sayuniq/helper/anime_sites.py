@@ -108,12 +108,7 @@ async def jkanime(app):
                     else:
                         try:
                             servers = await get_jk_servers(chapter_url)
-                            # msg_1 = await download_assistant(app, servers, folder, caption)
-                            msg_1 = await app.send_video(
-                                CHANNEL_ID,
-                                "BAACAgEAAx0ESO9jKQADN2K-d-_9CsptI1VmtiaZPmaIZdmsAAIMAgACcd35RcE34GHmPTwKHgQ",
-                                caption
-                            )
+                            msg_1 = await download_assistant(app, servers, folder, caption)
                             await _sa.update_property(
                                 anime_url=anime_url,
                                 chapter_url=chapter_url,
