@@ -39,6 +39,7 @@ async def __edb__(bot, update):
                             InlineKeyboardButton("Chapters", f'chps_{key_id}')
                         ],
                         [
+                            InlineKeyboardButton("Pause Anime", f'pam_{key_id}'),
                             InlineKeyboardButton("Ban Anime", f'bam_{key_id}'),
                         ]
                     ]
@@ -113,7 +114,7 @@ async def __edit_thumb__(bot, update):
     await bot.delete_messages(chat_id, msg.request.id)
 
 
-@Client.on_callback_query(filters.regex(r"bam.*"))
+@Client.on_callback_query(filters.regex(r"[pb]am_.*"))
 async def __ban_anime__(bot, update):
     print(update)
     chat_id = update.from_user.id
@@ -124,9 +125,12 @@ async def __ban_anime__(bot, update):
     _c = await confirm_one(db, ky_id)
     _tt = _c.get("is_banned")
     tre = True if _tt is False else (True if _tt is None else False)
-    await update_many(db, {"anime": _c["anime"]}, {"is_banned": tre, "chapters": {}})
+    _txt_inf, _chng_inf_is = ("baneado",
+                              {"is_banned": tre, "chapters": {}}) if data == "bam" else ("pausado",
+                                                                                         {"is_paused": tre})
+    await update_many(db, {"anime": _c["anime"]}, _chng_inf_is)
     if _tt:
-        await bot.send_message(chat_id, f'**{_c["anime"]}** ha sido desbaneado!')
+        await bot.send_message(chat_id, f'**{_c["anime"]}** ha sido {_txt_inf}!')
     else:
-        await bot.send_message(chat_id, f'**{_c["anime"]}** ha sido baneado!')
+        await bot.send_message(chat_id, f'**{_c["anime"]}** ha sido {_txt_inf}!')
 

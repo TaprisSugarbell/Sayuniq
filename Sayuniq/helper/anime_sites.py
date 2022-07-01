@@ -38,7 +38,7 @@ async def tioanime(app):
                 if _c:
                     get_prev_chapter = await _sa.get_prev_chapter()
                     get_chapter = await _sa.get_chapter()
-                    if get_chapter or _c.get("is_banned"):
+                    if get_chapter or _c.get("is_banned") or _c.get("is_paused"):
                         continue
                     else:
                         try:
@@ -51,7 +51,7 @@ async def tioanime(app):
                                 caption=caption,
                                 msg=msg_1,
                                 message_id=msg_1.id,
-                                prev=get_prev_chapter["message_id"],
+                                prev=get_prev_chapter.get("message_id"),
                                 update=True
                             )
                             await _sa.buttons_replace()
@@ -117,7 +117,7 @@ async def jkanime(app):
                                 caption=caption,
                                 msg=msg_1,
                                 message_id=msg_1.id,
-                                prev=get_prev_chapter["message_id"],
+                                prev=get_prev_chapter.get("message_id"),
                                 update=True
                             )
                             await _sa.buttons_replace()
@@ -180,7 +180,7 @@ async def monoschinos(app):
                         caption=caption,
                         msg=msg_1,
                         message_id=msg_1.id,
-                        prev=get_prev_chapter["message_id"],
+                        prev=get_prev_chapter.get("message_id"),
                         update=True
                     )
                     await _sa.buttons_replace()
