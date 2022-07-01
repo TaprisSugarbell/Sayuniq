@@ -15,7 +15,6 @@ async def __edb__(bot, update):
     message_id = update.id
     AUTH_USERS = await auth_users()
     c, key_id = update.text.split()[1].split("_")
-    await bot.delete_messages(chat_id, message_id)
     _c = await confirm_one(db, {"key_id": key_id})
     if _c:
         site = _c["site"]
@@ -55,6 +54,7 @@ async def __edb__(bot, update):
             )
     else:
         await bot.send_message(chat_id, "No hay capítulos subidos...")
+    await bot.delete_messages(chat_id, message_id)
 
 
 @Client.on_callback_query(filters.regex(r"chps_.*"))
@@ -101,15 +101,25 @@ async def __edit_thumb__(bot, update):
     ky_id = {
         "key_id": key_id
     }
+    _c = await confirm_one(db, ky_id)
     msg = await bot.ask(chat_id, 'Envía link o imagen')
     if getattr(msg, "photo"):
-        await update_one(db, ky_id, {
-            "thumb": msg.photo.file_id
-        })
+        await update_many(db,
+                          {
+                              "anime": _c.get("anime")
+                          }, {
+                              "thumb": msg.photo.file_id
+                          }
+                          )
     else:
-        await update_one(db, ky_id, {
-            "thumb": msg.text
-        })
+        await update_many(db,
+                          {
+                              "anime": _c.get("anime")
+                          },
+                          {
+                              "thumb": msg.text
+                          }
+                          )
     await bot.send_message(chat_id, "Thumb updated!")
     await bot.delete_messages(chat_id, msg.request.id)
 
@@ -136,4 +146,3 @@ async def __ban_anime__(bot, update):
         await bot.send_message(chat_id, _arm_txt_inf)
     else:
         await bot.send_message(chat_id, _arm_txt_inf)
-
