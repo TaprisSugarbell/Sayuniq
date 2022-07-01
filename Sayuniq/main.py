@@ -15,7 +15,8 @@ async def main():
 if __name__ == "__main__":
     logging_stream_info(f"Starting {BOT_NAME}, version - {__version__}")
     try:
-        app.run(main())
+        app.run()
+        # app.run(main())
     except Exception as e:
         app.run(logs_channel_update(sayureports(reason=e), "send_document",
                                     caption=get_string("document_err").format(BOT_NAME)))
