@@ -61,7 +61,8 @@ class SitesAssistant:
         self.caption = ""
         self.dict_copy = dict
 
-        self.prev_chapter_digit = str(round(chapter_no)) if isinstance(
+        self.prev_chapter_digit = str(
+            round(chapter_no)) if isinstance(
             chapter_no, float) else str(int(chapter_no) - 1)
 
     @property
@@ -92,6 +93,7 @@ class SitesAssistant:
             self.dict_copy = self.anime_dict.copy()
             self.key_id = self.anime_dict["key_id"]
             self.anime_url = self.anime_dict["anime_url"]
+            self.prev_chapter_digit = self.anime_dict["last_chapter"]
             self.thumb = self.anime_dict["thumb"] or self.thumb
         return self.anime_dict
 
@@ -128,6 +130,7 @@ class SitesAssistant:
             "thumb": self.thumb,
             "datetime": _now,
             "is_banned": False,
+            "last_chapter": self.chapter_no,
             "chapters": {
                 self.chapter_no: {
                     "url": self.chapter_url,
@@ -175,7 +178,7 @@ class SitesAssistant:
                                   url=f"https://t.me/{BOT_ALIAS}?start=mty_{self.key_id}")
         _site_button = await self.Ibtn(msg_btn="Site Link", url=self.chapter_url)
 
-        if prev_chapter:
+        if float(prev_chapter.get("chapter")) < float(self.chapter_no):
             prev_message_id = prev_chapter.get("message_id")
             self.prev = prev_message_id
             _prev_chapter_nav_ = prev_chapter["nav"].get("prev")

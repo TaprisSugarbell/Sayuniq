@@ -17,11 +17,11 @@ def chapter_title(item, page):
     return f'Capítulo {item["chapter"]}'
 
 
-async def chapters_ikb(obj):
+async def chapters_ikb(obj, index=0):
     global key_id
     key_id = obj["key_id"]
     chapters = obj["chapters"]
-    chapters = [oy for ei, oy in chapters.items()]
+    chapters = [chapters[oy] for oy in sorted(chapters, key=lambda x: float(x))]
     page = Pagination(
         chapters,
         page_data=page_data,
@@ -29,7 +29,6 @@ async def chapters_ikb(obj):
         item_title=chapter_title,
         _type="url"
     )
-    index = 0
     lines = 5
     columns = 3
     return ikb(page.create(index, lines, columns))
