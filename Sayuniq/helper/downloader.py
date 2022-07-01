@@ -152,7 +152,8 @@ class SayuDownloader:
                     if self.thumb:
                         if os.path.exists(self.thumb):
                             os.remove(self.thumb)
-                    await sayu_error(e, self.app)
+                    await sayu_error(send_document=False,
+                                     url=url, dif=_nn, total=_total_urls, _app=self.app)
                 if _out:
                     break
             return _out

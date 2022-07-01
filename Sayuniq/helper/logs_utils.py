@@ -31,14 +31,24 @@ def sayureports(extra_info: str = "", reason: Any = None):
     return _sc
 
 
-async def sayu_error(e, app=None):
-    return await logs_channel_update(sayureports(reason=e), "send_document",
-                                     caption=get_string("document_err").format(
-                                         BOT_NAME,
-                                         human_hour_readable()
-                                     ),
-                                     _app=app
-                                     )
+async def sayu_error(e=None, app=None, send_document=True, **kwargs):
+    if send_document:
+        return await logs_channel_update(sayureports(reason=e), "send_document",
+                                         caption=get_string("document_err").format(
+                                             BOT_NAME,
+                                             human_hour_readable()
+                                         ),
+                                         _app=app
+                                         )
+    else:
+        return await logs_channel_update(
+            get_string(
+                "URL_DWN_ERR").format(
+                **kwargs,
+                date=human_hour_readable()
+            ),
+            _app=app
+        )
 
 
 
