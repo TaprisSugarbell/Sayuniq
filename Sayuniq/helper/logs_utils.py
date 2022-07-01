@@ -22,8 +22,8 @@ def sayureports(extra_info: str = "", reason: Any = None):
     _txt += "Traceback info:\nTraceback (most recent call last):\n"
     for _ in streport:
         _txt += _
-    if reason and exc_info:
-        sayulog.error(reason, exc_info=exc_info)
+    if reason:
+        sayulog.error(reason, exc_info=exc_info, extra={"hhr": human_hour_readable()})
         _txt += f"\n\nREASON:\n{reason}\n"
     _txt += f"\n--------FINISH {BOT_NAME.upper()} CRASH LOG--------\n"
     with open(_sc, "w") as wfr:
