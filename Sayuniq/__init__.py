@@ -38,7 +38,7 @@ def logging_stream_info(msg):
         sayulog.info(msg, extra={"hhr": human_hour_readable()})
         sayulog.setLevel(LOGGING_LEVEL)
     else:
-        sayulog.info(msg)
+        sayulog.info(msg, extra={"hhr": human_hour_readable()})
 
 
 # Client
