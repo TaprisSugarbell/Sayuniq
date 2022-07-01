@@ -1,6 +1,6 @@
 from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-
+from pyrogram.enums import ParseMode
 from .. import BOT_NAME, auth_users
 from ..helper.chapters.chapters_pg import chapters_ikb
 from ..helper.mongo_connect import *
@@ -50,6 +50,7 @@ async def __edb__(bot, update):
                 chat_id,
                 message_id,
                 f'**{anime}**\nCapítulos subidos: **{len(chapters)}**',
+                parse_mode=ParseMode.MARKDOWN,
                 reply_markup=chikb
             )
     else:
@@ -72,6 +73,7 @@ async def __chps__(bot, update):
     await bot.send_message(
         chat_id,
         f'**{anime}**\nCapítulos subidos: **{len(chapters)}**',
+        parse_mode=ParseMode.MARKDOWN,
         reply_markup=chikb
     )
 
