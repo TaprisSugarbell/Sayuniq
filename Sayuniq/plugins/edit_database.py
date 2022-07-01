@@ -20,7 +20,6 @@ async def __edb__(bot, update):
         site = _c["site"]
         thumb = _c["thumb"]
         anime = _c["anime"]
-        menu_id = _c["menu_id"]
         chapters = _c["chapters"]
         anime_url = _c["anime_url"]
         print(_c)
@@ -65,7 +64,6 @@ async def __chps__(bot, update):
     site = _c["site"]
     thumb = _c["thumb"]
     anime = _c["anime"]
-    menu_id = _c["menu_id"]
     chapters = _c["chapters"]
     anime_url = _c["anime_url"]
     chikb = await chapters_ikb(_c)
