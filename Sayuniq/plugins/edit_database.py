@@ -15,6 +15,7 @@ async def __edb__(bot, update):
     message_id = update.id
     AUTH_USERS = await auth_users()
     c, key_id = update.text.split()[1].split("_")
+    await bot.delete_messages(chat_id, message_id)
     _c = await confirm_one(db, {"key_id": key_id})
     if _c:
         site = _c["site"]
