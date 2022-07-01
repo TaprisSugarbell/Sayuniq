@@ -17,7 +17,7 @@ create_folder(temp_folder=__dr), create_folder(temp_folder="./sayureports/")
 # DEBUG
 _dbt = "-----------------------------------------------------------" \
        "------------------------------------------------------------"
-logging.basicConfig(format=f'{_dbt}\n[%(levelname)s || {human_hour_readable()}] '
+logging.basicConfig(format=f'{_dbt}\n[%(levelname)s || %(hhr)s] '
                            f'REASON = "%(message)s"\n',
                     level=getattr(logging, LOGGING_LEVEL),
                     handlers=[
@@ -35,7 +35,7 @@ sayulog = logging.getLogger(BOT_NAME)
 def logging_stream_info(msg):
     if LOGGING_LEVEL != "INFO":
         sayulog.setLevel("INFO")
-        sayulog.info(msg)
+        sayulog.info(msg, extra={"hhr": human_hour_readable})
         sayulog.setLevel(LOGGING_LEVEL)
     else:
         sayulog.info(msg)

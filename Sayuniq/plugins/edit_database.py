@@ -11,8 +11,8 @@ db = Mongo(database=BOT_NAME, collection="japanemi")
 @Client.on_message(filters.regex("mty_.*") & filters.private)
 async def __edb__(bot, update):
     print(update)
-    chat_id = update.from_user.id
     message_id = update.id
+    chat_id = update.from_user.id
     AUTH_USERS = await auth_users()
     c, key_id = update.text.split()[1].split("_")
     _c = await confirm_one(db, {"key_id": key_id})
@@ -48,9 +48,7 @@ async def __edb__(bot, update):
             chikb = await chapters_ikb(_c)
             await bot.send_message(
                 chat_id,
-                message_id,
                 f'**{anime}**\nCapítulos subidos: **{len(chapters)}**',
-                parse_mode=ParseMode.MARKDOWN,
                 reply_markup=chikb
             )
     else:
