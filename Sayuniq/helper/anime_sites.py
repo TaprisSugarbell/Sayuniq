@@ -44,12 +44,7 @@ async def tioanime(app):
                         try:
                             servers, _anime_uri = await get_tioanime_servers(chapter_url)
                             anime_url = _url_base[:-1] + _anime_uri
-                            # msg_1 = await download_assistant(app, servers, folder, caption, thumb_url)
-                            msg_1 = await app.send_video(
-                                CHANNEL_ID,
-                                "BAACAgEAAx0ESO9jKQADF2K-QEXFuLdtIoiQVN15pniujNoZAALxAQACcd35RVEILp4ChA4THgQ",
-                                caption
-                            )
+                            msg_1 = await download_assistant(app, servers, folder, caption, thumb_url)
                             await _sa.update_property(
                                 anime_url=anime_url,
                                 chapter_url=chapter_url,
@@ -135,7 +130,7 @@ async def jkanime(app):
                             await _sa.update_property(
                                 anime_url=anime_url,
                                 msg=msg_1,
-                                message_id=msg_1.video.file_id,
+                                message_id=msg_1.id,
                                 prev=get_prev_chapter["message_id"],
                                 update=True
                             )
@@ -214,7 +209,7 @@ async def monoschinos(app):
                     await _sa.update_property(
                         anime_url=anime_url,
                         msg=msg_1,
-                        message_id=msg_1.video.file_id,
+                        message_id=msg_1.id,
                         prev=get_prev_chapter["message_id"],
                         update=True
                     )
