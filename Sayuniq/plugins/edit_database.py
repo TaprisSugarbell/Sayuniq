@@ -16,41 +16,44 @@ async def __edb__(bot, update):
     AUTH_USERS = await auth_users()
     c, key_id = update.text.split()[1].split("_")
     _c = await confirm_one(db, {"key_id": key_id})
-    site = _c["site"]
-    thumb = _c["thumb"]
-    anime = _c["anime"]
-    menu_id = _c["menu_id"]
-    chapters = _c["chapters"]
-    anime_url = _c["anime_url"]
-    print(_c)
-    if chat_id in AUTH_USERS:
-        await bot.send_message(
-            chat_id,
-            f'**{anime}**\nCapítulos subidos: **{len(chapters)}**',
-            reply_markup=InlineKeyboardMarkup(
-                [
+    if _c:
+        site = _c["site"]
+        thumb = _c["thumb"]
+        anime = _c["anime"]
+        menu_id = _c["menu_id"]
+        chapters = _c["chapters"]
+        anime_url = _c["anime_url"]
+        print(_c)
+        if chat_id in AUTH_USERS:
+            await bot.send_message(
+                chat_id,
+                f'**{anime}**\nCapítulos subidos: **{len(chapters)}**',
+                reply_markup=InlineKeyboardMarkup(
                     [
-                        InlineKeyboardButton("Title", f'ttl_{key_id}'),
-                        InlineKeyboardButton("Thumb", f'thb_{key_id}')
-                    ],
-                    [
-                        InlineKeyboardButton("Menu ID", f'mid_{key_id}'),
-                        InlineKeyboardButton("Chapters", f'chps_{key_id}')
-                    ],
-                    [
-                        InlineKeyboardButton("Ban Anime", f'bam_{key_id}'),
+                        [
+                            InlineKeyboardButton("Title", f'ttl_{key_id}'),
+                            InlineKeyboardButton("Thumb", f'thb_{key_id}')
+                        ],
+                        [
+                            InlineKeyboardButton("Menu ID", f'mid_{key_id}'),
+                            InlineKeyboardButton("Chapters", f'chps_{key_id}')
+                        ],
+                        [
+                            InlineKeyboardButton("Ban Anime", f'bam_{key_id}'),
+                        ]
                     ]
-                ]
+                )
             )
-        )
+        else:
+            chikb = await chapters_ikb(_c)
+            await bot.send_message(
+                chat_id,
+                message_id,
+                f'**{anime}**\nCapítulos subidos: **{len(chapters)}**',
+                reply_markup=chikb
+            )
     else:
-        chikb = await chapters_ikb(_c)
-        await bot.send_message(
-            chat_id,
-            message_id,
-            f'**{anime}**\nCapítulos subidos: **{len(chapters)}**',
-            reply_markup=chikb
-        )
+        await bot.send_message(chat_id, "No hay capítulos subidos...")
 
 
 @Client.on_callback_query(filters.regex(r"chps_.*"))
