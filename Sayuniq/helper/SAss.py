@@ -57,7 +57,6 @@ class SitesAssistant:
         self.database = _database
         self.app = app
 
-        self.menu_id = ""
         self.key_id = None
         self.dict_copy = dict
 
@@ -121,13 +120,13 @@ class SitesAssistant:
                 timedelta(
                     hours=int(_hours),
                     minutes=int(_minutes)))).strftime(get_string("format_date").format("%m"))
+        _key_id = self.key_id or rankey(10)
         _d = {
-            "key_id": self.key_id or rankey(10),
+            "key_id": _key_id,
             "site": self.site,
             "anime": self.title,
             "anime_url": self.anime_url,
             "thumb": self.thumb,
-            "menu_id": self.menu_id,
             "datetime": _now,
             "is_banned": False,
             "chapters": {
