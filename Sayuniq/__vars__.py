@@ -22,7 +22,7 @@ BOT_TOKEN = config("BOT_TOKEN", default=None)
 BOT_ALIAS = config("BOT_ALIAS", default="Sayuniq")
 # Channels id
 UTC = config("UTC", default="-6")
-CHID = config("CHANNEL_ID", default=None)
+CHANNEL_ID = config("CHANNEL_ID", default=None)
 LOG_CHANNEL = config("LOG_CHANNEL", default=None, cast=int)
 TESTS_CHANNEL = config("TESTS_CHANNEL", default=None, cast=int)
 
@@ -31,11 +31,6 @@ HOUR_FORMAT = 1 if config("HOUR_FORMAT", default=0, cast=int) == 24 else 0
 
 # LOGGER
 LOGGING_LEVEL = config("LOGGING_LEVEL", default="WARNING")
-
-try:
-    CHANNEL_ID = int(CHID)
-except ValueError:
-    CHANNEL_ID = CHID
 
 
 def human_hour_readable(hformat=HOUR_FORMAT, _utc=UTC):

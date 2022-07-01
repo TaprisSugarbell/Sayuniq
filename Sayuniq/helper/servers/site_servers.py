@@ -1,8 +1,10 @@
-import re
 import base64
+import re
+
 import aiohttp
 import cloudscraper
 from bs4 import BeautifulSoup
+
 from ... import logging_stream_info
 
 PARSER = "html.parser"

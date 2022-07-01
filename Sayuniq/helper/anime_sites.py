@@ -1,6 +1,5 @@
 import shutil
 
-import cloudscraper
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 from .SAss import SitesAssistant

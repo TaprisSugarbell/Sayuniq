@@ -17,12 +17,10 @@ def _base_channel_url(
         message_id: str | int = None
 ):
     message_id = message_id or ""
-    if isinstance(channel_id, str):
-        return f"https://t.me/{channel_id}/{message_id}"
-    elif isinstance(channel_id, int):
+    if re.match(r"-\d*", channel_id):
         return f"https://t.me/c/{str(channel_id).replace('-100', '')}/{message_id}"
     else:
-        return channel_id
+        return f"https://t.me/{channel_id}/{message_id}"
 
 
 class SitesAssistant:
