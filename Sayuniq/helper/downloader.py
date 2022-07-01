@@ -13,6 +13,7 @@ from PIL import Image
 from bs4 import BeautifulSoup
 from moviepy.editor import VideoFileClip
 
+from ..helper.logs_utils import sayu_error
 from .utils import rankey
 from .. import logging_stream_info
 from ..__vars__ import CHANNEL_ID
@@ -127,7 +128,7 @@ class SayuDownloader:
         file_type = mimetypes.guess_type(out_)[0]
         # Si es video trata de obtener capturas
         if "video" in file_type and not os.path.exists(_thumb):
-            yes_thumb =  await self.generate_screenshot(out_, _thumb)
+            yes_thumb = await self.generate_screenshot(out_, _thumb)
         elif os.path.exists(_thumb):
             yes_thumb = _thumb
         else:
@@ -151,7 +152,7 @@ class SayuDownloader:
                     if self.thumb:
                         if os.path.exists(self.thumb):
                             os.remove(self.thumb)
-                    print(e)
+                    await sayu_error(e, self.app)
                 if _out:
                     break
             return _out

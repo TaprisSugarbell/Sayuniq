@@ -1,17 +1,13 @@
 import shutil
 
-from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-
 from .SAss import SitesAssistant
 from .downloader import download_assistant
-from .logs_utils import sayureports
+from .logs_utils import sayu_error
 from .mongo_connect import *
 from .servers import *
 from .servers.server_utils import get_jk_anime, get_mc_anime
-from .utils import create_folder, rankey
-from .. import logs_channel_update
-from ..__vars__ import BOT_NAME, BOT_ALIAS, CHANNEL_ID
-from ..strings import get_string
+from .utils import create_folder
+from ..__vars__ import BOT_NAME
 
 db = Mongo(database=BOT_NAME, collection="japanemi")
 requests = cloudscraper.create_scraper(cloudscraper.Session)
@@ -55,10 +51,7 @@ async def tioanime(app):
                             await _sa.buttons_replace()
                             await _sa.update_or_add_db()
                         except Exception as e:
-                            await logs_channel_update(sayureports(reason=e), "send_document",
-                                                      caption=get_string("document_err").format(BOT_NAME),
-                                                      _app=app
-                                                      )
+                            await sayu_error(e, app)
                 else:
                     servers, _anime_uri = await get_tioanime_servers(chapter_url)
                     anime_url = _url_base[:-1] + _anime_uri
@@ -74,10 +67,7 @@ async def tioanime(app):
                         await _sa.buttons_replace()
                         await _sa.update_or_add_db()
                     except Exception as e:
-                        await logs_channel_update(sayureports(reason=e), "send_document",
-                                                  caption=get_string("document_err").format(BOT_NAME),
-                                                  _app=app
-                                                  )
+                        await sayu_error(e, app)
                 shutil.rmtree(folder)
 
 
@@ -119,10 +109,7 @@ async def jkanime(app):
                             await _sa.buttons_replace()
                             await _sa.update_or_add_db()
                         except Exception as e:
-                            await logs_channel_update(sayureports(reason=e), "send_document",
-                                                      caption=get_string("document_err").format(BOT_NAME),
-                                                      _app=app
-                                                      )
+                            await sayu_error(e, app)
                 else:
                     servers = await get_jk_servers(chapter_url)
                     try:
@@ -136,10 +123,7 @@ async def jkanime(app):
                         await _sa.buttons_replace()
                         await _sa.update_or_add_db()
                     except Exception as e:
-                        await logs_channel_update(sayureports(reason=e), "send_document",
-                                                  caption=get_string("document_err").format(BOT_NAME),
-                                                  _app=app
-                                                  )
+                        await sayu_error(e, app)
                 shutil.rmtree(folder)
 
 
@@ -180,10 +164,7 @@ async def monoschinos(app):
                     await _sa.buttons_replace()
                     await _sa.update_or_add_db()
                 except Exception as e:
-                    await logs_channel_update(sayureports(reason=e), "send_document",
-                                              caption=get_string("document_err").format(BOT_NAME),
-                                              _app=app
-                                              )
+                    await sayu_error(e, app)
         else:
             servers = await get_mc_servers(chapter_url)
             try:
@@ -198,10 +179,7 @@ async def monoschinos(app):
                 await _sa.buttons_replace()
                 await _sa.update_or_add_db()
             except Exception as e:
-                await logs_channel_update(sayureports(reason=e), "send_document",
-                                          caption=get_string("document_err").format(BOT_NAME),
-                                          _app=app
-                                          )
+                await sayu_error(e, app)
         shutil.rmtree(folder)
 
 

@@ -4,11 +4,11 @@ from typing import Any
 
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-from .logs_utils import sayureports
+from .logs_utils import sayu_error
 from .mongo_connect import *
 from .utils import rankey
-from .. import logs_channel_update, sayulog
-from ..__vars__ import BOT_ALIAS, BOT_NAME, CHANNEL_ID, UTC
+from .. import sayulog
+from ..__vars__ import BOT_ALIAS, CHANNEL_ID, UTC
 from ..strings import get_string
 
 
@@ -205,10 +205,7 @@ class SitesAssistant:
                 sayulog.error(f"CHANNEL_ID: {CHANNEL_ID}\n"
                               f"PrevMessageId: {prev_message_id}\n"
                               f"NowChapterId: {now_chapter_id}")
-                await logs_channel_update(sayureports(reason=e), "send_document",
-                                          caption=get_string("document_err").format(BOT_NAME),
-                                          _app=app
-                                          )
+                await sayu_error(e, app)
         try:
             await app.edit_message_reply_markup(
                 CHANNEL_ID,
@@ -229,7 +226,4 @@ class SitesAssistant:
                 )
             )
         except Exception as e:
-            await logs_channel_update(sayureports(reason=e), "send_document",
-                                      caption=get_string("document_err").format(BOT_NAME),
-                                      _app=app
-                                      )
+            await sayu_error(e, app)

@@ -4,6 +4,8 @@ import traceback
 from typing import Any
 from Sayuniq import sayulog
 from Sayuniq.__vars__ import BOT_NAME
+from Sayuniq.strings import get_string
+from Sayuniq import logs_channel_update, human_hour_readable
 
 
 def sayureports(extra_info: str = "", reason: Any = None):
@@ -27,4 +29,23 @@ def sayureports(extra_info: str = "", reason: Any = None):
     with open(_sc, "w") as wfr:
         wfr.write(_txt)
     return _sc
+
+
+async def sayu_error(e, app):
+    return await logs_channel_update(sayureports(reason=e), "send_document",
+                                     caption=get_string("document_err").format(
+                                         BOT_NAME,
+                                         human_hour_readable()
+                                     ),
+                                     _app=app
+                                     )
+
+
+
+
+
+
+
+
+
 
