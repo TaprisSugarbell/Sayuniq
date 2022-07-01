@@ -93,7 +93,7 @@ async def update_(user_db, old_data=None, new_data=None):
         old_data = {}
     if new_data is None:
         new_data = {}
-    return user_db.update_one(old_data, new_data)
+    return user_db.update(old_data, new_data)
 
 
 async def update_many(user_db, old_data=None, new_data=None):
