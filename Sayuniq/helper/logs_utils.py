@@ -31,7 +31,7 @@ def sayureports(extra_info: str = "", reason: Any = None):
     return _sc
 
 
-async def sayu_error(e, app):
+async def sayu_error(e, app=None):
     return await logs_channel_update(sayureports(reason=e), "send_document",
                                      caption=get_string("document_err").format(
                                          BOT_NAME,

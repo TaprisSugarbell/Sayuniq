@@ -35,7 +35,7 @@ sayulog = logging.getLogger(BOT_NAME)
 def logging_stream_info(msg):
     if LOGGING_LEVEL != "INFO":
         sayulog.setLevel("INFO")
-        sayulog.info(msg, extra={"hhr": human_hour_readable})
+        sayulog.info(msg, extra={"hhr": human_hour_readable()})
         sayulog.setLevel(LOGGING_LEVEL)
     else:
         sayulog.info(msg)
