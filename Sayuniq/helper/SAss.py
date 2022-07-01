@@ -93,7 +93,7 @@ class SitesAssistant:
             self.dict_copy = self.anime_dict.copy()
             self.key_id = self.anime_dict["key_id"]
             self.anime_url = self.anime_dict["anime_url"]
-            self.prev_chapter_digit = self.anime_dict["last_chapter"]
+            self.prev_chapter_digit = self.anime_dict.get("last_chapter") or self.prev_chapter_digit
             self.thumb = self.anime_dict["thumb"] or self.thumb
         return self.anime_dict
 
