@@ -177,6 +177,7 @@ class SitesAssistant:
 
         if prev_chapter:
             prev_message_id = prev_chapter.get("message_id")
+            self.prev = prev_message_id
             _prev_chapter_nav_ = prev_chapter["nav"].get("prev")
             _btns.append(await self.Ibtn(True, url=_base_channel_url(CHANNEL_ID, prev_message_id)))
             if _prev_chapter_nav_:
