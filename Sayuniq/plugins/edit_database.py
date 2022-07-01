@@ -84,13 +84,9 @@ async def __edit_title__(bot, update):
     }
     msg = await bot.ask(chat_id, 'Envía el nuevo titulo')
     print(msg)
-    await update_(
-        db,
-        ky_id,
-        {
-            "title": msg.text
-        }
-    )
+    await update_one(db, ky_id, {
+        "title": msg.text
+    })
     await bot.send_message(chat_id, "Title updated!")
     await bot.delete_messages(chat_id, msg.request.id)
 
@@ -105,21 +101,13 @@ async def __edit_thumb__(bot, update):
     }
     msg = await bot.ask(chat_id, 'Envía link o imagen')
     if getattr(msg, "photo"):
-        await update_(
-            db,
-            ky_id,
-            {
-                "thumb": msg.photo.file_id
-            }
-        )
+        await update_one(db, ky_id, {
+            "thumb": msg.photo.file_id
+        })
     else:
-        await update_(
-            db,
-            ky_id,
-            {
-                "thumb": msg.text
-            }
-        )
+        await update_one(db, ky_id, {
+            "thumb": msg.text
+        })
     await bot.send_message(chat_id, "Thumb updated!")
     await bot.delete_messages(chat_id, msg.request.id)
 
