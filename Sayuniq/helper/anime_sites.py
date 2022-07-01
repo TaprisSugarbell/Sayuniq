@@ -26,7 +26,7 @@ async def tioanime(app):
             list_of_a = soup.find("ul", attrs={"class": "episodes"}).find_all("a")
             for _a in list_of_a[::-1]:
                 folder = create_folder(_site, "")
-                chapter_url = _url_base + _a.get("href")
+                chapter_url = _url_base[:-1] + _a.get("href")
                 thumb_url = _url_base + _a.find("img").get("src").replace("//uploads", "/uploads")
                 chapter_no = [i for i in re.findall(r"[\d.]*", _a.find("h3").text) if i][-1]
                 title = _a.find("h3").text.replace(chapter_no, "").strip()
@@ -44,12 +44,17 @@ async def tioanime(app):
                         try:
                             servers, _anime_uri = await get_tioanime_servers(chapter_url)
                             anime_url = _url_base[:-1] + _anime_uri
-                            msg_1 = await download_assistant(app, servers, folder, caption, thumb_url)
+                            # msg_1 = await download_assistant(app, servers, folder, caption, thumb_url)
+                            msg_1 = await app.send_video(
+                                CHANNEL_ID,
+                                "BAACAgEAAx0ESO9jKQADF2K-QEXFuLdtIoiQVN15pniujNoZAALxAQACcd35RVEILp4ChA4THgQ",
+                                caption
+                            )
                             await _sa.update_property(
                                 anime_url=anime_url,
                                 chapter_url=chapter_url,
                                 msg=msg_1,
-                                message_id=msg_1.video.file_id,
+                                message_id=msg_1.id,
                                 prev=get_prev_chapter["message_id"],
                                 update=True
                             )

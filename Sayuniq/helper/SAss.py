@@ -1,5 +1,5 @@
 import re
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from typing import Any
 
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
@@ -8,7 +8,7 @@ from .logs_utils import sayureports
 from .mongo_connect import *
 from .utils import rankey
 from .. import logs_channel_update, sayulog
-from ..__vars__ import BOT_NAME, CHANNEL_ID
+from ..__vars__ import BOT_NAME, CHANNEL_ID, UTC
 from ..strings import get_string
 
 
@@ -112,7 +112,15 @@ class SitesAssistant:
         return f"#{_filter_title}\n💮 {self.title}\n🗂 Capítulo {self.chapter_no}{extra_ch}\n🌐 #{self.site}"
 
     async def update_or_add_db(self):
-        _now = datetime.now().strftime(get_string("format_date").format("%m"))
+        if ":" in UTC:
+            _hours, _minutes = UTC.split(":")
+        else:
+            _hours, _minutes = UTC, 0
+        _now = datetime.now(
+            timezone(
+                timedelta(
+                    hours=int(_hours),
+                    minutes=int(_minutes)))).strftime(get_string("format_date").format("%m"))
         _d = {
             "key_id": self.key_id or rankey(10),
             "site": self.site,
@@ -173,7 +181,7 @@ class SitesAssistant:
             if _prev_chapter_nav_:
                 _btns1.append(await self.Ibtn(True, url=_base_channel_url(CHANNEL_ID, _prev_chapter_nav_)))
             _btns1.append(await self.Ibtn(url=_base_channel_url(CHANNEL_ID, now_chapter_id)))
-            _site_button = await self.Ibtn(msg_btn="Site Link", url=prev_chapter["url"])
+            prev_site_button = await self.Ibtn(msg_btn="Site Link", url=prev_chapter["url"])
             try:
                 await app.edit_message_reply_markup(
                     CHANNEL_ID,
@@ -182,7 +190,7 @@ class SitesAssistant:
                         [
                             _btns1,
                             [
-                                _site_button
+                                prev_site_button
                             ]
                         ]
                     )
