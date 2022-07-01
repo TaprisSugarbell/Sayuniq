@@ -124,12 +124,6 @@ async def __edit_thumb__(bot, update):
     await bot.delete_messages(chat_id, msg.request.id)
 
 
-@Client.on_callback_query(filters.regex(r"mid_.*"))
-async def __edit_menu_id__(bot, update):
-    print(update)
-    data, key_id = update.data.split("_")
-
-
 @Client.on_callback_query(filters.regex(r"bam.*"))
 async def __ban_anime__(bot, update):
     print(update)
