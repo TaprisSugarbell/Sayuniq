@@ -57,7 +57,7 @@ class SitesAssistant:
         self.database = _database
         self.app = app
 
-        self.key_id = None
+        self.key_id = None or rankey(10)
         self.dict_copy = dict
 
         self.prev_chapter_digit = str(round(chapter_no)) if isinstance(
@@ -120,9 +120,8 @@ class SitesAssistant:
                 timedelta(
                     hours=int(_hours),
                     minutes=int(_minutes)))).strftime(get_string("format_date").format("%m"))
-        _key_id = self.key_id or rankey(10)
         _d = {
-            "key_id": _key_id,
+            "key_id": self.key_id,
             "site": self.site,
             "anime": self.title,
             "anime_url": self.anime_url,
