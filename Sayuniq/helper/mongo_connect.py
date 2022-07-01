@@ -45,12 +45,12 @@ class Mongo:
         elif isinstance(self.data, dict):
             return self.collect.insert_one(self.data)
 
-    def update(self, old_data=None, new_data=None):
+    def update_many(self, old_data=None, new_data=None):
         if new_data is None:
             new_data = {}
         if old_data is None:
             old_data = {}
-        return self.collect.update(old_data, {'$set': new_data})
+        return self.collect.update_many(old_data, {'$set': new_data})
 
     def update_one(self, old_data=None, new_data=None):
         if new_data is None:
@@ -93,7 +93,7 @@ async def update_one(user_db, old_data=None, new_data=None):
         old_data = {}
     if new_data is None:
         new_data = {}
-    return user_db.update_one(old_data, {'$set': new_data})
+    return user_db.update_one(old_data, new_data)
 
 
 async def update_many(user_db, old_data=None, new_data=None):
@@ -101,7 +101,7 @@ async def update_many(user_db, old_data=None, new_data=None):
         old_data = {}
     if new_data is None:
         new_data = {}
-    return user_db.update(old_data, {'$set': new_data})
+    return user_db.update_many(old_data, new_data)
 
 
 async def remove_(user_db, data=None):
