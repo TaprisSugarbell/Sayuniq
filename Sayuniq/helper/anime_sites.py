@@ -61,31 +61,14 @@ async def tioanime(app):
                                                       _app=app
                                                       )
                 else:
-                    prk = rankey(10)
                     servers, _anime_uri = await get_tioanime_servers(chapter_url)
                     anime_url = _url_base[:-1] + _anime_uri
-                    htitle = await _sa.filter_title(title)
-                    _msg_menu = await app.send_message(
-                        CHANNEL_ID,
-                        f"#{htitle}\n🌐 #{_site}",
-                        reply_markup=InlineKeyboardMarkup(
-                            [
-                                [
-                                    InlineKeyboardButton(
-                                        "Listado",
-                                        url=f"https://t.me/{BOT_ALIAS}?start=mty_{prk}")
-                                ]
-                            ]
-                        )
-                    )
                     try:
                         msg_ = await download_assistant(app, servers, folder, caption, thumb_url)
                         await _sa.update_property(
                             anime_url=anime_url,
                             msg=msg_,
                             message_id=msg_.id,
-                            key_id=prk,
-                            menu_id=_msg_menu.id,
                             chapter_url=chapter_url
                         )
                         await _sa.buttons_replace()
@@ -95,7 +78,6 @@ async def tioanime(app):
                                                   caption=get_string("document_err").format(BOT_NAME),
                                                   _app=app
                                                   )
-                        await app.delete_messages(CHANNEL_ID, _msg_menu.id)
                 shutil.rmtree(folder)
 
 
@@ -142,30 +124,13 @@ async def jkanime(app):
                                                       _app=app
                                                       )
                 else:
-                    prk = rankey(10)
                     servers = await get_jk_servers(chapter_url)
-                    htitle = await _sa.filter_title(title)
-                    _msg_menu = await app.send_message(
-                        CHANNEL_ID,
-                        f"#{htitle}\n🌐 #{_site}",
-                        reply_markup=InlineKeyboardMarkup(
-                            [
-                                [
-                                    InlineKeyboardButton(
-                                        "Listado",
-                                        url=f"https://t.me/{BOT_ALIAS}?start=mty_{prk}")
-                                ]
-                            ]
-                        )
-                    )
                     try:
                         msg_ = await download_assistant(app, servers, folder, caption)
                         await _sa.update_property(
                             anime_url=anime_url,
                             msg=msg_,
                             message_id=msg_.id,
-                            key_id=prk,
-                            menu_id=_msg_menu.id,
                             chapter_url=chapter_url
                         )
                         await _sa.buttons_replace()
@@ -175,7 +140,6 @@ async def jkanime(app):
                                                   caption=get_string("document_err").format(BOT_NAME),
                                                   _app=app
                                                   )
-                        await app.delete_messages(CHANNEL_ID, _msg_menu.id)
                 shutil.rmtree(folder)
 
 
@@ -221,30 +185,13 @@ async def monoschinos(app):
                                               _app=app
                                               )
         else:
-            prk = rankey(10)
             servers = await get_mc_servers(chapter_url)
-            htitle = await _sa.filter_title(title)
-            _msg_menu = await app.send_message(
-                CHANNEL_ID,
-                f"#{htitle}\n🌐 #{_site}",
-                reply_markup=InlineKeyboardMarkup(
-                    [
-                        [
-                            InlineKeyboardButton(
-                                "Listado",
-                                url=f"https://t.me/{BOT_ALIAS}?start=mty_{prk}")
-                        ]
-                    ]
-                )
-            )
             try:
                 msg_ = await download_assistant(app, servers, folder, caption)
                 await _sa.update_property(
                     anime_url=anime_url,
                     msg=msg_,
                     message_id=msg_.id,
-                    key_id=prk,
-                    menu_id=_msg_menu.id,
                     chapter_url=chapter_url
                 )
                 await _sa.buttons_replace()
@@ -254,7 +201,6 @@ async def monoschinos(app):
                                           caption=get_string("document_err").format(BOT_NAME),
                                           _app=app
                                           )
-                await app.delete_messages(CHANNEL_ID, _msg_menu.id)
         shutil.rmtree(folder)
 
 

@@ -8,7 +8,7 @@ from .logs_utils import sayureports
 from .mongo_connect import *
 from .utils import rankey
 from .. import logs_channel_update, sayulog
-from ..__vars__ import BOT_NAME, CHANNEL_ID, UTC
+from ..__vars__ import BOT_ALIAS, BOT_NAME, CHANNEL_ID, UTC
 from ..strings import get_string
 
 
@@ -172,6 +172,8 @@ class SitesAssistant:
         now_chapter = self.msg
         now_chapter_id = now_chapter.id
         prev_chapter = self.anime_dict["chapters"].get(self.prev_chapter_digit) if self.anime_dict else None
+        _lstado = await self.Ibtn(msg_btn="Listado",
+                                  url=f"https://t.me/{BOT_ALIAS}?start=mty_{self.key_id}")
         _site_button = await self.Ibtn(msg_btn="Site Link", url=self.chapter_url)
 
         if prev_chapter:
@@ -190,6 +192,7 @@ class SitesAssistant:
                         [
                             _btns1,
                             [
+                                _lstado,
                                 prev_site_button
                             ]
                         ]
@@ -214,10 +217,12 @@ class SitesAssistant:
                     [
                         _btns,
                         [
+                            _lstado,
                             _site_button
                         ]
                     ] if _btns else [
                         [
+                            _lstado,
                             _site_button
                         ]
                     ]
