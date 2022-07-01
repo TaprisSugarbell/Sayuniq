@@ -139,5 +139,5 @@ async def __ban_anime__(bot, update):
         await bot.send_message(chat_id, f'**{_c["anime"]}** ha sido desbaneado!')
     else:
         await bot.send_message(chat_id, f'**{_c["anime"]}** ha sido baneado!')
-    await update_(db, ky_id, {"is_banned": tre})
+    await update_many(db, {"anime": _c["anime"]}, {"is_banned": tre})
 
