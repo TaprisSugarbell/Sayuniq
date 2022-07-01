@@ -108,9 +108,15 @@ async def jkanime(app):
                     else:
                         try:
                             servers = await get_jk_servers(chapter_url)
-                            msg_1 = await download_assistant(app, servers, folder, caption)
+                            # msg_1 = await download_assistant(app, servers, folder, caption)
+                            msg_1 = await app.send_video(
+                                CHANNEL_ID,
+                                "BAACAgEAAx0ESO9jKQADN2K-d-_9CsptI1VmtiaZPmaIZdmsAAIMAgACcd35RcE34GHmPTwKHgQ",
+                                caption
+                            )
                             await _sa.update_property(
                                 anime_url=anime_url,
+                                chapter_url=chapter_url,
                                 msg=msg_1,
                                 message_id=msg_1.id,
                                 prev=get_prev_chapter["message_id"],
@@ -172,6 +178,7 @@ async def monoschinos(app):
                     msg_1 = await download_assistant(app, servers, folder, caption)
                     await _sa.update_property(
                         anime_url=anime_url,
+                        chapter_url=chapter_url,
                         msg=msg_1,
                         message_id=msg_1.id,
                         prev=get_prev_chapter["message_id"],
@@ -190,9 +197,9 @@ async def monoschinos(app):
                 msg_ = await download_assistant(app, servers, folder, caption)
                 await _sa.update_property(
                     anime_url=anime_url,
+                    chapter_url=chapter_url,
                     msg=msg_,
                     message_id=msg_.id,
-                    chapter_url=chapter_url
                 )
                 await _sa.buttons_replace()
                 await _sa.update_or_add_db()

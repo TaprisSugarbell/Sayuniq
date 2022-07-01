@@ -95,7 +95,7 @@ async def get_jk_servers(url):
                         _servers.append("https://mixdrop.co/e/" + _link.split("u=")[-1])
                     case _:
                         _servers.append(_link)
-            return _servers
+            return [_s for _s in _servers if _s]
 
 
 async def get_mc_servers(url):
