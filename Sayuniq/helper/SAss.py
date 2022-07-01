@@ -90,7 +90,6 @@ class SitesAssistant:
         if self.anime_dict:
             self.dict_copy = self.anime_dict.copy()
             self.key_id = self.anime_dict["key_id"]
-            self.menu_id = self.anime_dict["menu_id"]
             self.anime_url = self.anime_dict["anime_url"]
             self.thumb = self.anime_dict["thumb"] or self.thumb
         return self.anime_dict
