@@ -7,7 +7,7 @@ from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from .logs_utils import sayu_error
 from .mongo_connect import *
 from .utils import rankey
-from .. import sayulog
+from .. import sayulog, human_hour_readable
 from ..__vars__ import BOT_ALIAS, CHANNEL_ID, UTC
 from ..strings import get_string
 
@@ -210,7 +210,8 @@ class SitesAssistant:
                 except Exception as e:
                     sayulog.error(f"CHANNEL_ID: {CHANNEL_ID}\n"
                                   f"PrevMessageId: {prev_message_id}\n"
-                                  f"NowChapterId: {now_chapter_id}")
+                                  f"NowChapterId: {now_chapter_id}",
+                                  extra={"hhr": human_hour_readable()})
                     await sayu_error(e, app)
         try:
             await app.edit_message_reply_markup(

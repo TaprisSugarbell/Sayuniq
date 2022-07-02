@@ -1,11 +1,10 @@
 import shutil
 
 from .SAss import SitesAssistant
-from .downloader import download_assistant
+from .database_utils import database_assistant
 from .logs_utils import sayu_error
 from .mongo_connect import *
 from .servers import *
-from .database_utils import database_assistant
 from .servers.server_utils import get_jk_anime, get_mc_anime
 from .utils import create_folder
 from ..__vars__ import BOT_NAME
