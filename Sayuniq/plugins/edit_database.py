@@ -62,18 +62,34 @@ async def __chps__(bot, update):
     chat_id = update.from_user.id
     c, key_id = update.data.split("_")
     _c = await confirm_one(db, {"key_id": key_id})
-    site = _c["site"]
-    thumb = _c["thumb"]
-    anime = _c["anime"]
-    chapters = _c["chapters"]
-    anime_url = _c["anime_url"]
-    chikb = await chapters_ikb(_c)
-    await bot.send_message(
-        chat_id,
-        f'**{anime}**\nCapítulos subidos: **{len(chapters)}**',
-        parse_mode=ParseMode.MARKDOWN,
-        reply_markup=chikb
-    )
+    if _c:
+
+        chapters = _c.get("chapters")
+        anime = _c["anime"]
+        if chapters:
+            site = _c["site"]
+            thumb = _c["thumb"]
+            anime_url = _c["anime_url"]
+            chikb = await chapters_ikb(_c)
+            await bot.send_message(
+                chat_id,
+                f'**{anime}**\nCapítulos subidos: **{len(chapters)}**',
+                parse_mode=ParseMode.MARKDOWN,
+                reply_markup=chikb
+            )
+        else:
+            _txt = "No hay capítulos subidos.\n"
+            if _c.get("is_banned"):
+                _txt += f"\"**{anime}**\" esta baneado."
+            await bot.send_message(
+                chat_id,
+                _txt
+            )
+    else:
+        await bot.send_message(
+            chat_id,
+            "No existe este anime."
+        )
 
 
 @Client.on_callback_query(filters.regex(r"ttl_.*"))
