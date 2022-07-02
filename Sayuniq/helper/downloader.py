@@ -145,6 +145,11 @@ class SayuDownloader:
         if isinstance(urls, list):
             _total_urls = len(urls)
             _out = None
+            if self._message_id:
+                pass
+            else:
+                msh_ = await self.app.send_message(LOG_CHANNEL, ".")
+                self._message_id = msh_.id
             for _nn, url in enumerate(urls):
                 try:
                     _out = await self.extractor(url)
@@ -153,11 +158,6 @@ class SayuDownloader:
                     if self.thumb:
                         if os.path.exists(self.thumb):
                             os.remove(self.thumb)
-                    if self._message_id:
-                        pass
-                    else:
-                        msh_ = await self.app.send_message(LOG_CHANNEL, ".")
-                        self._message_id = msh_.id
                     _dats = dict(url=url, dif=_nn, total=_total_urls)
                     await sayu_error(send_document=False, _mode="edit_message_text",
                                      _dats=_dats, app=self.app, disable_web_page_preview=True,
