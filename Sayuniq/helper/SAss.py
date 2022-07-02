@@ -130,6 +130,7 @@ class SitesAssistant:
             "anime_url": self.anime_url,
             "thumb": self.thumb,
             "datetime": _now,
+            "is_paused": False,
             "is_banned": False,
             "last_chapter": self.chapter_no,
             "chapters": {

@@ -73,6 +73,7 @@ async def logs_channel_update(
     t__ = {"text": message} if _mode in _snd_Txt else {_mode.split("_")[-1]: message}
     kwargs.update(t__)
     if _app:
+        logging_stream_info((args, kwargs))
         await getattr(_app, _mode)(LOG_CHANNEL, *args, **kwargs)
     else:
         await getattr(app, _mode)(LOG_CHANNEL, *args, **kwargs)
