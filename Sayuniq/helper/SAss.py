@@ -60,6 +60,7 @@ class SitesAssistant:
         self.key_id = None or rankey(10)
         self.caption = ""
         self.dict_copy = dict
+        self.last_chapter = None
 
         self.prev_chapter_digit = str(
             round(chapter_no)) if isinstance(
@@ -93,7 +94,7 @@ class SitesAssistant:
             self.dict_copy = self.anime_dict.copy()
             self.key_id = self.anime_dict["key_id"]
             self.anime_url = self.anime_dict["anime_url"]
-            self.prev_chapter_digit = self.anime_dict.get("last_chapter") or self.prev_chapter_digit
+            self.last_chapter = self.anime_dict.get("last_chapter")
             self.thumb = self.anime_dict["thumb"] or self.thumb
         return self.anime_dict
 
@@ -178,37 +179,39 @@ class SitesAssistant:
                                   url=f"https://t.me/{BOT_ALIAS}?start=mty_{self.key_id}")
         _site_button = await self.Ibtn(msg_btn="Site Link", url=self.chapter_url)
 
-        if float(prev_chapter.get("chapter")) < float(self.chapter_no):
-            prev_message_id = prev_chapter.get("message_id")
-            self.prev = prev_message_id
-            _prev_chapter_nav_ = prev_chapter["nav"].get("prev")
-            _btns.append(await self.Ibtn(True, url=_base_channel_url(CHANNEL_ID, prev_message_id)))
-            if _prev_chapter_nav_:
-                _btns1.append(await self.Ibtn(True, url=_base_channel_url(CHANNEL_ID, _prev_chapter_nav_)))
-            _btns1.append(await self.Ibtn(url=_base_channel_url(CHANNEL_ID, now_chapter_id)))
-            prev_site_button = await self.Ibtn(msg_btn="Site Link", url=prev_chapter["url"])
-            try:
-                await app.edit_message_reply_markup(
-                    CHANNEL_ID,
-                    prev_message_id,
-                    reply_markup=InlineKeyboardMarkup(
-                        [
-                            _btns1,
+        if prev_chapter:
+            if float(prev_chapter.get("chapter")) < float(self.chapter_no) and \
+                    self.last_chapter == prev_chapter.get("chapter"):
+                prev_message_id = prev_chapter.get("message_id")
+                self.prev = prev_message_id
+                _prev_chapter_nav_ = prev_chapter["nav"].get("prev")
+                _btns.append(await self.Ibtn(True, url=_base_channel_url(CHANNEL_ID, prev_message_id)))
+                if _prev_chapter_nav_:
+                    _btns1.append(await self.Ibtn(True, url=_base_channel_url(CHANNEL_ID, _prev_chapter_nav_)))
+                _btns1.append(await self.Ibtn(url=_base_channel_url(CHANNEL_ID, now_chapter_id)))
+                prev_site_button = await self.Ibtn(msg_btn="Site Link", url=prev_chapter["url"])
+                try:
+                    await app.edit_message_reply_markup(
+                        CHANNEL_ID,
+                        prev_message_id,
+                        reply_markup=InlineKeyboardMarkup(
                             [
-                                _lstado,
-                                prev_site_button
+                                _btns1,
+                                [
+                                    _lstado,
+                                    prev_site_button
+                                ]
                             ]
-                        ]
+                        )
                     )
-                )
-                await self.update_property(
-                    next=now_chapter_id
-                )
-            except Exception as e:
-                sayulog.error(f"CHANNEL_ID: {CHANNEL_ID}\n"
-                              f"PrevMessageId: {prev_message_id}\n"
-                              f"NowChapterId: {now_chapter_id}")
-                await sayu_error(e, app)
+                    await self.update_property(
+                        next=now_chapter_id
+                    )
+                except Exception as e:
+                    sayulog.error(f"CHANNEL_ID: {CHANNEL_ID}\n"
+                                  f"PrevMessageId: {prev_message_id}\n"
+                                  f"NowChapterId: {now_chapter_id}")
+                    await sayu_error(e, app)
         try:
             await app.edit_message_reply_markup(
                 CHANNEL_ID,
