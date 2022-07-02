@@ -70,7 +70,7 @@ async def logs_channel_update(
             human_hour_readable()
         )
     _snd_Txt = ["send_message", "edit_message_text"]
-    t__ = {"text": message} if _mode in _snd_Txt else {"caption": message}
+    t__ = {"text": message} if _mode in _snd_Txt else {_mode.split("_")[-1]: message}
     kwargs.update(t__)
     if _app:
         await getattr(_app, _mode)(LOG_CHANNEL, *args, **kwargs)
