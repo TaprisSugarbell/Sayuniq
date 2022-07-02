@@ -38,8 +38,8 @@ async def sayu_error(e=None, app=None, send_document=True, **kwargs):
                                              BOT_NAME,
                                              human_hour_readable()
                                          ),
-                                         _app=app
-                                         )
+                                         _app=app,
+                                         **kwargs)
     else:
         return await logs_channel_update(
             get_string(
