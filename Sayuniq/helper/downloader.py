@@ -16,7 +16,7 @@ from moviepy.editor import VideoFileClip
 from ..helper.logs_utils import sayu_error
 from .utils import rankey
 from .. import logging_stream_info
-from ..__vars__ import CHANNEL_ID
+from ..__vars__ import CHANNEL_ID, LOG_CHANNEL
 
 requests = cloudscraper.create_scraper(cloudscraper.Session)
 
@@ -32,6 +32,7 @@ class SayuDownloader:
         self.filter_links = filter_links
         self.__rth = rankey()
         self.__rthumb = "{}thumb-{}.jpg"
+        self._message_id = None
         self.requests = cloudscraper.create_scraper(cloudscraper.Session)
 
     @staticmethod
@@ -152,9 +153,15 @@ class SayuDownloader:
                     if self.thumb:
                         if os.path.exists(self.thumb):
                             os.remove(self.thumb)
-                    await sayu_error(send_document=False,
-                                     url=url, dif=_nn, total=_total_urls,
-                                     app=self.app, disable_web_page_preview=True)
+                    if self._message_id:
+                        pass
+                    else:
+                        msh_ = await self.app.send_message(LOG_CHANNEL, ".")
+                        self._message_id = msh_.id
+                    _dats = dict(url=url, dif=_nn, total=_total_urls)
+                    await sayu_error(send_document=False, _mode="edit_message_text",
+                                     _dats=_dats, app=self.app, disable_web_page_preview=True,
+                                     message_id=self._message_id)
                 if _out:
                     break
             return _out

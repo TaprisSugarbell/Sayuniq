@@ -31,7 +31,7 @@ def sayureports(extra_info: str = "", reason: Any = None):
     return _sc
 
 
-async def sayu_error(e=None, app=None, send_document=True, **kwargs):
+async def sayu_error(e=None, app=None, send_document=True, _mode="send_message", _dats=None, **kwargs):
     if send_document:
         return await logs_channel_update(sayureports(reason=e), "send_document",
                                          caption=get_string("document_err").format(
@@ -44,10 +44,12 @@ async def sayu_error(e=None, app=None, send_document=True, **kwargs):
         return await logs_channel_update(
             get_string(
                 "URL_DWN_ERR").format(
-                **kwargs,
+                **_dats,
                 date=human_hour_readable()
             ),
-            _app=app
+            _mode=_mode,
+            _app=app,
+            **kwargs
         )
 
 
