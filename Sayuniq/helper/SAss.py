@@ -173,7 +173,7 @@ class SitesAssistant:
 
         now_chapter = self.msg
         now_chapter_id = now_chapter.id
-        prev_chapter = self.anime_dict["chapters"].get(self.prev_chapter_digit) if self.anime_dict else None
+        prev_chapter = self.anime_dict["chapters"].get(self.prev_chapter_digit) if self.anime_dict else {}
         _lstado = await self.Ibtn(msg_btn="Listado",
                                   url=f"https://t.me/{BOT_ALIAS}?start=mty_{self.key_id}")
         _site_button = await self.Ibtn(msg_btn="Site Link", url=self.chapter_url)
