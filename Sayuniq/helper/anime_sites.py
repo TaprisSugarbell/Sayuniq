@@ -5,6 +5,7 @@ from .downloader import download_assistant
 from .logs_utils import sayu_error
 from .mongo_connect import *
 from .servers import *
+from .database_utils import database_assistant
 from .servers.server_utils import get_jk_anime, get_mc_anime
 from .utils import create_folder
 from ..__vars__ import BOT_NAME
@@ -39,33 +40,20 @@ async def tioanime(app):
                         try:
                             servers, _anime_uri = await get_tioanime_servers(chapter_url)
                             anime_url = _url_base[:-1] + _anime_uri
-                            msg_1 = await download_assistant(app, servers, folder, caption, thumb_url)
-                            await _sa.update_property(
-                                anime_url=anime_url,
-                                chapter_url=chapter_url,
-                                caption=caption,
-                                msg=msg_1,
-                                message_id=msg_1.id,
-                                update=True
-                            )
-                            await _sa.buttons_replace()
-                            await _sa.update_or_add_db()
+                            await database_assistant(
+                                _sa, app, servers, folder,
+                                caption, thumb_url, anime_url,
+                                chapter_url, True)
                         except Exception as e:
                             await sayu_error(e, app)
                 else:
                     servers, _anime_uri = await get_tioanime_servers(chapter_url)
                     anime_url = _url_base[:-1] + _anime_uri
                     try:
-                        msg_ = await download_assistant(app, servers, folder, caption, thumb_url)
-                        await _sa.update_property(
-                            anime_url=anime_url,
-                            caption=caption,
-                            msg=msg_,
-                            message_id=msg_.id,
-                            chapter_url=chapter_url
-                        )
-                        await _sa.buttons_replace()
-                        await _sa.update_or_add_db()
+                        await database_assistant(
+                            _sa, app, servers, folder,
+                            caption, thumb_url, anime_url,
+                            chapter_url)
                     except Exception as e:
                         await sayu_error(e, app)
                 shutil.rmtree(folder)
@@ -97,31 +85,18 @@ async def jkanime(app):
                     else:
                         try:
                             servers = await get_jk_servers(chapter_url)
-                            msg_1 = await download_assistant(app, servers, folder, caption)
-                            await _sa.update_property(
-                                anime_url=anime_url,
-                                chapter_url=chapter_url,
-                                caption=caption,
-                                msg=msg_1,
-                                message_id=msg_1.id,
-                                update=True
-                            )
-                            await _sa.buttons_replace()
-                            await _sa.update_or_add_db()
+                            await database_assistant(
+                                _sa, app, servers, folder,
+                                caption, None, anime_url,
+                                chapter_url, True)
                         except Exception as e:
                             await sayu_error(e, app)
                 else:
                     servers = await get_jk_servers(chapter_url)
                     try:
-                        msg_ = await download_assistant(app, servers, folder, caption)
-                        await _sa.update_property(
-                            anime_url=anime_url,
-                            msg=msg_,
-                            message_id=msg_.id,
-                            chapter_url=chapter_url
-                        )
-                        await _sa.buttons_replace()
-                        await _sa.update_or_add_db()
+                        await database_assistant(
+                            _sa, app, servers, folder,
+                            caption, None, anime_url, chapter_url)
                     except Exception as e:
                         await sayu_error(e, app)
                 shutil.rmtree(folder)
@@ -152,32 +127,18 @@ async def monoschinos(app):
             else:
                 try:
                     servers = await get_mc_servers(chapter_url)
-                    msg_1 = await download_assistant(app, servers, folder, caption)
-                    await _sa.update_property(
-                        anime_url=anime_url,
-                        chapter_url=chapter_url,
-                        caption=caption,
-                        msg=msg_1,
-                        message_id=msg_1.id,
-                        update=True
-                    )
-                    await _sa.buttons_replace()
-                    await _sa.update_or_add_db()
+                    await database_assistant(
+                        _sa, app, servers, folder,
+                        caption, None, anime_url,
+                        chapter_url, True)
                 except Exception as e:
                     await sayu_error(e, app)
         else:
             servers = await get_mc_servers(chapter_url)
             try:
-                msg_ = await download_assistant(app, servers, folder, caption)
-                await _sa.update_property(
-                    anime_url=anime_url,
-                    chapter_url=chapter_url,
-                    caption=caption,
-                    msg=msg_,
-                    message_id=msg_.id,
-                )
-                await _sa.buttons_replace()
-                await _sa.update_or_add_db()
+                await database_assistant(
+                    _sa, app, servers, folder,
+                    caption, None, anime_url, chapter_url)
             except Exception as e:
                 await sayu_error(e, app)
         shutil.rmtree(folder)

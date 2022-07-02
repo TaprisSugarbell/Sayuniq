@@ -1,17 +1,14 @@
 import json
 import re
 import aiohttp
-import cloudscraper
 from bs4 import BeautifulSoup
-
-PARSER = "html.parser"
-requests = cloudscraper.create_scraper(cloudscraper.Session)
+from .. import requests, PARSER
 
 
 async def get_jk_anime(slug_title):
-    async with aiohttp.ClientSession() as requests:
+    async with aiohttp.ClientSession() as request:
         _url_base = "https://jkanime.net/"
-        r = await requests.get(
+        r = await request.get(
             "https://jkanime.net/ajax/ajax_search/",
             params={
                 "q": slug_title
@@ -30,6 +27,6 @@ async def get_jk_anime(slug_title):
 
 
 async def get_mc_anime(_url):
-        r = requests.get(_url)
-        soup = BeautifulSoup(r.content, PARSER)
-        return soup.find("div", attrs={"class": "lista"}).find("a").get("href")
+    r = requests.get(_url)
+    soup = BeautifulSoup(r.content, PARSER)
+    return soup.find("div", attrs={"class": "lista"}).find("a").get("href")
