@@ -69,10 +69,11 @@ async def logs_channel_update(
             BOT_NAME,
             human_hour_readable()
         )
+    t__ = {"text": message} if _mode == "send_message" else {"caption": message}
     if _app:
-        await getattr(_app, _mode)(LOG_CHANNEL, message, *args, **kwargs)
+        await getattr(_app, _mode)(LOG_CHANNEL, t__, *args, **kwargs)
     else:
-        await getattr(app, _mode)(LOG_CHANNEL, message, *args, **kwargs)
+        await getattr(app, _mode)(LOG_CHANNEL, t__, *args, **kwargs)
     if os.path.exists(message) and message != log_file:
         os.remove(message)
 
