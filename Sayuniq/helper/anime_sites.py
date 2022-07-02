@@ -1,16 +1,12 @@
-import shutil
-
 from .SAss import SitesAssistant
 from .database_utils import database_assistant
 from .logs_utils import sayu_error
 from .mongo_connect import *
 from .servers import *
 from .servers.server_utils import get_jk_anime, get_mc_anime
-from .utils import create_folder
-from ..__vars__ import BOT_NAME
+from ..__vars__ import BOT_NAME, USER_AGENT
 
 db = Mongo(database=BOT_NAME, collection="japanemi")
-requests = cloudscraper.create_scraper(cloudscraper.Session)
 
 
 async def tioanime(app):
@@ -21,16 +17,13 @@ async def tioanime(app):
             soup = BeautifulSoup(await result.content.read(), "html.parser")
             list_of_a = soup.find("ul", attrs={"class": "episodes"}).find_all("a")
             for _a in list_of_a[::-1]:
-                folder = create_folder(_site, "")
-                chapter_url = _url_base[:-1] + _a.get("href")
-                thumb_url = _url_base + _a.find("img").get("src").replace("//uploads", "/uploads")
                 chapter_no = [i for i in re.findall(r"[\d.]*", _a.find("h3").text) if i][-1]
                 title = _a.find("h3").text.replace(chapter_no, "").strip()
-                _sa = SitesAssistant(_site, title, thumb_url,
+                chapter_url = _url_base[:-1] + _a.get("href")
+                _sa = SitesAssistant(_site, title, None,
                                      chapter_no, _database=db, app=app)
                 _c = await _sa.find_on_db()
-                thumb_url = await _sa.thumbnail
-                caption = await _sa.get_caption()
+                await _sa.get_caption()
                 if _c:
                     get_chapter = await _sa.get_chapter()
                     if get_chapter or _c.get("is_banned") or _c.get("is_paused"):
@@ -40,9 +33,7 @@ async def tioanime(app):
                             servers, _anime_uri = await get_tioanime_servers(chapter_url)
                             anime_url = _url_base[:-1] + _anime_uri
                             await database_assistant(
-                                _sa, app, servers, folder,
-                                caption, thumb_url, anime_url,
-                                chapter_url, True)
+                                _sa, servers, anime_url, chapter_url, True)
                         except Exception as e:
                             await sayu_error(e, app)
                 else:
@@ -50,12 +41,9 @@ async def tioanime(app):
                     anime_url = _url_base[:-1] + _anime_uri
                     try:
                         await database_assistant(
-                            _sa, app, servers, folder,
-                            caption, thumb_url, anime_url,
-                            chapter_url)
+                            _sa, servers, anime_url, chapter_url)
                     except Exception as e:
                         await sayu_error(e, app)
-                shutil.rmtree(folder)
 
 
 async def jkanime(app):
@@ -66,85 +54,111 @@ async def jkanime(app):
             soup = BeautifulSoup(await result.content.read(), "html.parser")
             list_of_a = soup.find("div", attrs={"class": "maximoaltura"}).find_all("a")
             for _a in list_of_a[::-1]:
-                folder = create_folder(_site, "")
-                chapter_url = _a.get("href")
                 title = _a.find("h5").string
-                anime_url = await get_jk_anime(title)
                 chapter_no = chapter_url.split("/")[-2]
+                chapter_url = _a.get("href")
+                anime_url = await get_jk_anime(title)
                 _h6 = _a.find("h6").string.lower()
                 extra_caption = " Final" if "final" in _h6 else (" ONA" if "ona" in _h6 else "")
                 _sa = SitesAssistant(_site, title, None,
                                      chapter_no, _database=db, app=app)
                 _c = await _sa.find_on_db()
-                caption = await _sa.get_caption(extra_caption)
+                await _sa.get_caption(extra_caption)
                 if _c:
                     get_chapter = await _sa.get_chapter()
-                    if get_chapter or _c.get("is_banned"):
+                    if get_chapter or _c.get("is_banned") or _c.get("is_paused"):
                         continue
                     else:
                         try:
                             servers = await get_jk_servers(chapter_url)
                             await database_assistant(
-                                _sa, app, servers, folder,
-                                caption, None, anime_url,
-                                chapter_url, True)
+                                _sa, servers, anime_url, chapter_url, True)
                         except Exception as e:
                             await sayu_error(e, app)
                 else:
                     servers = await get_jk_servers(chapter_url)
                     try:
                         await database_assistant(
-                            _sa, app, servers, folder,
-                            caption, None, anime_url, chapter_url)
+                            _sa, servers, anime_url, chapter_url)
                     except Exception as e:
                         await sayu_error(e, app)
-                shutil.rmtree(folder)
 
 
 async def monoschinos(app):
     _site = "MonosChinos"
     _url_base = "https://monoschinos2.com/"
-    r = requests.get(_url_base)
-    # async with aiohttp.ClientSession() as session:
-    #     async with session.get(_url_base) as result:
-    soup = BeautifulSoup(r.content, "html.parser")
-    list_of_a = soup.find("div", attrs={"class": "row row-cols-5"}).find_all("a")
-    for _a in list_of_a[::-1]:
-        folder = create_folder(_site, "")
-        chapter_url = _a.get("href")
-        title = _a.find("p", attrs={"class": "animetitles"}).string
-        anime_url = await get_mc_anime(chapter_url)
-        chapter_no = _a.find("h5").string
-        _sa = SitesAssistant(_site, title, None,
-                             chapter_no, _database=db, app=app)
-        _c = await _sa.find_on_db()
-        caption = await _sa.get_caption()
-        if _c:
-            get_chapter = await _sa.get_chapter()
-            if get_chapter or _c.get("is_banned"):
-                continue
-            else:
-                try:
+    async with aiohttp.ClientSession(headers=USER_AGENT) as session:
+        async with session.get(_url_base) as r:
+            soup = BeautifulSoup(await r.content.read(), "html.parser")
+            list_of_a = soup.find("div", attrs={"class": "row row-cols-5"}).find_all("a")
+            for _a in list_of_a[::-1]:
+                title = _a.find("p", attrs={"class": "animetitles"}).string
+                chapter_no = _a.find("h5").string
+                chapter_url = _a.get("href")
+                anime_url = await get_mc_anime(chapter_url)
+                _sa = SitesAssistant(_site, title, None,
+                                     chapter_no, _database=db, app=app)
+                _c = await _sa.find_on_db()
+                await _sa.get_caption()
+                if _c:
+                    get_chapter = await _sa.get_chapter()
+                    if get_chapter or _c.get("is_banned") or _c.get("is_paused"):
+                        continue
+                    else:
+                        try:
+                            servers = await get_mc_servers(chapter_url)
+                            await database_assistant(
+                                _sa, servers, anime_url, chapter_url, True)
+                        except Exception as e:
+                            await sayu_error(e, app)
+                else:
                     servers = await get_mc_servers(chapter_url)
-                    await database_assistant(
-                        _sa, app, servers, folder,
-                        caption, None, anime_url,
-                        chapter_url, True)
-                except Exception as e:
-                    await sayu_error(e, app)
-        else:
-            servers = await get_mc_servers(chapter_url)
-            try:
-                await database_assistant(
-                    _sa, app, servers, folder,
-                    caption, None, anime_url, chapter_url)
-            except Exception as e:
-                await sayu_error(e, app)
-        shutil.rmtree(folder)
+                    try:
+                        await database_assistant(
+                            _sa, servers, anime_url, chapter_url)
+                    except Exception as e:
+                        await sayu_error(e, app)
+
+
+async def animeflv(app):
+    _site = "AnimeFLV"
+    _url_base = "https://www3.animeflv.net/"
+    async with aiohttp.ClientSession(headers=USER_AGENT) as session:
+        async with session.get(_url_base) as r:
+            soup = BeautifulSoup(await r.content.read(), "html.parser")
+            list_of_a = soup.find("ul", {"class": "ListEpisodios AX Rows A06 C04 D03"}).find_all("a")
+            for _a in list_of_a[::-1]:
+                title = _a.find("strong", attrs={"class": "Title"}).string
+                chapter_no = _a.find("span", attrs={"class": "Capi"}).string.split()[-1]
+                chapter_url = _url_base[:-1] + _a.get("href")
+                anime_url = "-".join(chapter_url.split("-")[:-1]).replace("/ver/", "/anime/")
+                _sa = SitesAssistant(_site, title, None,
+                                     chapter_no, _database=db, app=app)
+                _c = await _sa.find_on_db()
+                await _sa.get_caption()
+                if _c:
+                    get_chapter = await _sa.get_chapter()
+                    if get_chapter or _c.get("is_banned") or _c.get("is_paused"):
+                        continue
+                    else:
+                        try:
+                            servers = await get_flv_servers(chapter_url)
+                            await database_assistant(
+                                _sa, servers, anime_url, chapter_url, True)
+                        except Exception as e:
+                            await sayu_error(e, app)
+                else:
+                    servers = await get_flv_servers(chapter_url)
+                    try:
+                        await database_assistant(
+                            _sa, servers, anime_url, chapter_url)
+                    except Exception as e:
+                        await sayu_error(e, app)
 
 
 sites = [
-    tioanime,
+    animeflv,
     jkanime,
-    monoschinos
+    monoschinos,
+    tioanime
 ]

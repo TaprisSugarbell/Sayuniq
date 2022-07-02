@@ -32,6 +32,9 @@ HOUR_FORMAT = 1 if config("HOUR_FORMAT", default=0, cast=int) == 24 else 0
 # LOGGER
 LOGGING_LEVEL = config("LOGGING_LEVEL", default="WARNING")
 
+# SCRAPPER
+USER_AGENT = {"user-agent": config("USER_AGENT", default=f"{BOT_ALIAS}/{__version__}")}
+
 
 def human_hour_readable(hformat=HOUR_FORMAT, _utc=UTC):
     if ":" in UTC:

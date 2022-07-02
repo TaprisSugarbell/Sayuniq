@@ -1,14 +1,14 @@
 import base64
+import json
 import re
 
 import aiohttp
-import cloudscraper
 from bs4 import BeautifulSoup
 
 from ... import logging_stream_info
+from ...__vars__ import USER_AGENT
 
 PARSER = "html.parser"
-requests = cloudscraper.create_scraper(cloudscraper.Session)
 
 
 async def get_tioanime_servers(chapter_url):
@@ -99,13 +99,25 @@ async def get_jk_servers(url):
 
 
 async def get_mc_servers(url):
-    r = requests.get(url)
-    soup = BeautifulSoup(r.content, PARSER)
-    _bb = [oei.get("data-player") for oei in
-           soup.find("div", attrs={"class": "playother"}).find_all("p")]
+    async with aiohttp.ClientSession() as requests:
+        async with requests.get(url) as r:
+            soup = BeautifulSoup(await r.content.read(), PARSER)
+            _bb = [oei.get("data-player") for oei in
+                   soup.find("div", attrs={"class": "playother"}).find_all("p")]
 
-    b64_decoded = [oy.split("?url=")[-1] for oy in [base64.b64decode(oe).decode() for oe in _bb]]
-    b64_decoded.extend(
-        [ei.get("href") for ei in soup.find("div", attrs={"class": "downbtns"}).find_all("a")]
-    )
-    return b64_decoded
+            b64_decoded = [oy.split("?url=")[-1] for oy in [base64.b64decode(oe).decode() for oe in _bb]]
+            b64_decoded.extend(
+                [ei.get("href") for ei in soup.find("div", attrs={"class": "downbtns"}).find_all("a")]
+            )
+            return b64_decoded
+
+
+async def get_flv_servers(_chapter_url):
+    async with aiohttp.ClientSession(headers=USER_AGENT) as session:
+        async with session.get(_chapter_url) as r:
+            soup = BeautifulSoup(await r.content.read(), "html.parser")
+    return [
+        ou.get("code") for ou in json.loads(
+            re.findall(r"\{\"SUB.*}", soup.find_all("script")[-7].string)[0])["SUB"]
+    ]
+

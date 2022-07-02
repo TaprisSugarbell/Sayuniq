@@ -6,7 +6,7 @@ from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 from .logs_utils import sayu_error
 from .mongo_connect import *
-from .utils import rankey
+from .utils import rankey, create_folder
 from .. import sayulog, human_hour_readable
 from ..__vars__ import BOT_ALIAS, CHANNEL_ID, UTC
 from ..strings import get_string
@@ -59,6 +59,7 @@ class SitesAssistant:
 
         self.key_id = None or rankey(10)
         self.caption = ""
+        self.folder = create_folder(self.site, "")
         self.dict_copy = dict
         self.last_chapter = None
 
@@ -111,7 +112,9 @@ class SitesAssistant:
 
     async def get_caption(self, extra_ch: str = ""):
         _filter_title = await self.filter_title()
-        return f"#{_filter_title}\n💮 {self.title}\n🗂 Capítulo {self.chapter_no}{extra_ch}\n🌐 #{self.site}"
+        self.caption = f"#{_filter_title}\n💮 {self.title}\n" \
+                       f"🗂 Capítulo {self.chapter_no}{extra_ch}\n🌐 #{self.site}"
+        return self.caption
 
     async def update_or_add_db(self):
         if ":" in UTC:
