@@ -163,11 +163,10 @@ class SayuDownloader:
                                      _dats=_dats, app=self.app, disable_web_page_preview=True,
                                      message_id=self._message_id)
                 if _out:
-                    _dats = dict(url=url, dif=_nn, total=_total_urls)
+                    _dats = dict(url=url, dif=_nn, total=_total_urls, **kwargs)
                     await sayu_error(send_document=False, _mode="edit_message_text",
                                      _dats=_dats, app=self.app, _get_string="URL_UPLOADED",
-                                     disable_web_page_preview=True, message_id=self._message_id,
-                                     **kwargs)
+                                     disable_web_page_preview=True, message_id=self._message_id)
                     break
             return _out
         else:
