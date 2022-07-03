@@ -4,7 +4,7 @@ import random
 import re
 from typing import Any
 from urllib import parse
-
+import asyncio
 import aiofiles
 import aiohttp
 import cloudscraper
@@ -152,7 +152,12 @@ class SayuDownloader:
                 self._message_id = msh_.id
             for _nn, url in enumerate(urls):
                 try:
-                    _out = await self.extractor(url)
+                    if isinstance(url, tuple):
+                        _out = await self.extractor(url[0])
+                    else:
+                        _out = await asyncio.wait_for(self.extractor(url), 180)
+                except asyncio.TimeoutError:
+                    urls.append((url,))
                 except Exception as e:
                     logging_stream_info(f'Fallo la descarga de {url} [{_nn}/{_total_urls}]')
                     if self.thumb:

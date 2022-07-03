@@ -3,15 +3,10 @@ import shutil
 import time
 
 from Sayuniq.helper.anime_sites import *
-from Sayuniq.helper.mongo_connect import *
-from Sayuniq.helper.utils import create_folder
-
-folder = create_folder(temp_folder="DBooru")
-img_uploaded = Mongo(database="Sayuniq", collection="booru")
 
 
-def run_asyncio(obj, app):
-    asyncio.run(obj(app))
+def run_asyncio(obj, *args, **kwargs):
+    asyncio.run(obj(*args, **kwargs))
 
 
 async def read_and_execute(app):
