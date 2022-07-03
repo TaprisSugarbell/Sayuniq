@@ -6,6 +6,7 @@ from typing import Any
 from urllib import parse
 import asyncio
 import aiofiles
+from urllib.parse import urlparse
 import aiohttp
 import cloudscraper
 import yt_dlp as youtube_dl
@@ -155,6 +156,9 @@ class SayuDownloader:
                     if isinstance(url, tuple):
                         _out = await self.extractor(url[0])
                     else:
+                        if urlparse(url).netloc == "www.yourupload.com":
+                            urls.append((url,))
+                            continue
                         _out = await asyncio.wait_for(self.extractor(url), 180)
                 except asyncio.TimeoutError:
                     urls.append((url,))
