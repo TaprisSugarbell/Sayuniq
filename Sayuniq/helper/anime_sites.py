@@ -55,8 +55,8 @@ async def jkanime(app):
             list_of_a = soup.find("div", attrs={"class": "maximoaltura"}).find_all("a")
             for _a in list_of_a[::-1]:
                 title = _a.find("h5").string
-                chapter_no = chapter_url.split("/")[-2]
                 chapter_url = _a.get("href")
+                chapter_no = chapter_url.split("/")[-2]
                 anime_url = await get_jk_anime(title)
                 _h6 = _a.find("h6").string.lower()
                 extra_caption = " Final" if "final" in _h6 else (" ONA" if "ona" in _h6 else "")
