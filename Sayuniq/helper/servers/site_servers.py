@@ -12,7 +12,7 @@ PARSER = "html.parser"
 
 
 async def get_tioanime_servers(chapter_url):
-    async with aiohttp.ClientSession() as session:
+    async with aiohttp.ClientSession(headers=USER_AGENT) as session:
         async with session.get(chapter_url) as r:
             logging_stream_info(f"Get {chapter_url} is \"{r.ok}\"")
             soup = BeautifulSoup(await r.content.read(), PARSER)
@@ -24,8 +24,8 @@ async def get_tioanime_servers(chapter_url):
 
 
 async def get_jk_servers(chapter_url):
-    async with aiohttp.ClientSession() as requests:
-        async with requests.get(chapter_url) as r:
+    async with aiohttp.ClientSession(headers=USER_AGENT) as session:
+        async with session.get(chapter_url) as r:
             logging_stream_info(f"Get {chapter_url} is \"{r.ok}\"")
             soup = BeautifulSoup(await r.content.read(), PARSER)
             _script = soup.find_all("script")
@@ -37,7 +37,7 @@ async def get_jk_servers(chapter_url):
                 mode = _link.split("/")[3].split("?")[0]
                 match mode:
                     case "um2.php":
-                        _r = await requests.get(
+                        _r = await session.get(
                             _link,
                             headers={
                                 "referer": chapter_url
@@ -48,7 +48,7 @@ async def get_jk_servers(chapter_url):
                             PARSER
                         )
                         _value = _soup.find("input").get("value")
-                        _r1 = await requests.post(
+                        _r1 = await session.post(
                             "https://jkanime.net/gsplay/redirect_post.php",
                             data={
                                 "data": _value
@@ -61,7 +61,7 @@ async def get_jk_servers(chapter_url):
                             allow_redirects=False
                         )
                         _v = _r1.headers["location"].replace("/gsplay/player.html#", "")
-                        _r2 = await requests.post(
+                        _r2 = await session.post(
                             "https://jkanime.net/gsplay/api.php",
                             data={
                                 "v": _v
@@ -69,7 +69,7 @@ async def get_jk_servers(chapter_url):
                         )
                         _servers.append([await _r2.json()][0]["file"])
                     case "um.php":
-                        _r = await requests.get(
+                        _r = await session.get(
                             _link
                         )
                         _soup = BeautifulSoup(
@@ -78,7 +78,7 @@ async def get_jk_servers(chapter_url):
                         )
                         _servers.append(_lnks.findall(_soup.find_all("script")[-1].string)[0])
                     case "jk.php":
-                        _r = await requests.get(
+                        _r = await session.get(
                             _link
                         )
                         _soup = BeautifulSoup(
@@ -86,7 +86,7 @@ async def get_jk_servers(chapter_url):
                             PARSER
                         )
                         _lnk = _lnks.findall(_soup.find_all("script")[-1].string)[0]
-                        _r1 = await requests.get(_lnk, allow_redirects=False)
+                        _r1 = await session.get(_lnk, allow_redirects=False)
                         _servers.append(_r1.headers["location"])
                     case "jkokru.php":
                         _servers.append("https://ok.ru/videoembed/" + _link.split("u=")[-1])
@@ -100,8 +100,8 @@ async def get_jk_servers(chapter_url):
 
 
 async def get_mc_servers(chapter_url):
-    async with aiohttp.ClientSession(headers=USER_AGENT) as requests:
-        async with requests.get(chapter_url) as r:
+    async with aiohttp.ClientSession(headers=USER_AGENT) as session:
+        async with session.get(chapter_url) as r:
             logging_stream_info(f"Get {chapter_url} is \"{r.ok}\"")
             soup = BeautifulSoup(await r.content.read(), PARSER)
             _bb = [oei.get("data-player") for oei in
