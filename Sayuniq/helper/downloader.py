@@ -13,11 +13,11 @@ import yt_dlp as youtube_dl
 from PIL import Image
 from bs4 import BeautifulSoup
 from moviepy.editor import VideoFileClip
-
+from ..strings import get_string
 from ..helper.logs_utils import sayu_error
 from .utils import rankey
 from .. import logging_stream_info
-from ..__vars__ import CHANNEL_ID, LOG_CHANNEL
+from ..__vars__ import CHANNEL_ID, LOG_CHANNEL, human_hour_readable
 
 requests = cloudscraper.create_scraper(cloudscraper.Session)
 
@@ -152,6 +152,14 @@ class SayuDownloader:
                 msh_ = await self.app.send_message(LOG_CHANNEL, ".")
                 self._message_id = msh_.id
             for _nn, url in enumerate(urls):
+                _dats = dict(url=url, dif=_nn, total=_total_urls,
+                             date=human_hour_readable(), **kwargs)
+                if self._message_id:
+                    pass
+                else:
+                    msh_ = await self.app.send_message(
+                        LOG_CHANNEL, get_string("URL_UP_LOADING").format(**_dats))
+                    self._message_id = msh_.id
                 try:
                     if isinstance(url, tuple):
                         _out = await self.extractor(url[0])
@@ -162,22 +170,26 @@ class SayuDownloader:
                         _out = await asyncio.wait_for(self.extractor(url), 180)
                 except asyncio.TimeoutError:
                     urls.append((url,))
-                    logging_stream_info(f"Fallo la descarga de [link]({url}) por \"TimeoutError\"")
+                    logging_stream_info(
+                        f"Fallo la descarga de - [{_nn}/{_total_urls}] - [link]({url}) por \"TimeoutError\"")
                     _total_urls += 1
                 except Exception as e:
                     logging_stream_info(f'Fallo la descarga de {url} [{_nn}/{_total_urls}]')
                     if self.thumb:
                         if os.path.exists(self.thumb):
                             os.remove(self.thumb)
-                    _dats = dict(url=url, dif=_nn, total=_total_urls)
-                    await sayu_error(send_document=False, _mode="edit_message_text",
-                                     _dats=_dats, app=self.app, disable_web_page_preview=True,
-                                     message_id=self._message_id)
+                    await self.app.edit_message_text(
+                        LOG_CHANNEL,
+                        self._message_id,
+                        get_string("URL_DWN_ERR").format(**_dats),
+                        disable_web_page_preview=True)
                 if _out:
                     _dats = dict(url=url, dif=_nn, total=_total_urls, **kwargs)
-                    await sayu_error(app=self.app, _get_string="URL_UPLOADED", send_document=False,
-                                     _mode="edit_message_text", _dats=_dats,
-                                     disable_web_page_preview=True, message_id=self._message_id)
+                    await self.app.edit_message_text(
+                        LOG_CHANNEL,
+                        self._message_id,
+                        get_string("URL_UPLOADED").format(**_dats),
+                        disable_web_page_preview=True)
                     break
             return _out
         else:
