@@ -146,16 +146,15 @@ class SayuDownloader:
         if isinstance(urls, list):
             _total_urls = len(urls)
             _out = None
-            if self._message_id:
-                pass
-            else:
-                msh_ = await self.app.send_message(LOG_CHANNEL, ".")
-                self._message_id = msh_.id
             for _nn, url in enumerate(urls):
                 _dats = dict(url=url, dif=_nn, total=_total_urls,
                              date=human_hour_readable(), **kwargs)
                 if self._message_id:
-                    pass
+                    await self.app.edit_message_text(
+                        LOG_CHANNEL,
+                        self._message_id,
+                        get_string("URL_UP_LOADING").format(**_dats),
+                        disable_web_page_preview=True)
                 else:
                     msh_ = await self.app.send_message(
                         LOG_CHANNEL, get_string("URL_UP_LOADING").format(**_dats))
