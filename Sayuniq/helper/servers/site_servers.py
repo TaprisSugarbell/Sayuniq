@@ -13,9 +13,9 @@ PARSER = "html.parser"
 
 async def get_tioanime_servers(chapter_url):
     async with aiohttp.ClientSession() as session:
-        async with session.get(chapter_url) as response:
-            logging_stream_info(f"Get {chapter_url} is \"{response.ok}\"")
-            soup = BeautifulSoup(await response.content.read(), PARSER)
+        async with session.get(chapter_url) as r:
+            logging_stream_info(f"Get {chapter_url} is \"{r.ok}\"")
+            soup = BeautifulSoup(await r.content.read(), PARSER)
             _script = soup.find_all("script")[-3].string
             _anime_uri = soup.find(
                 "div",
@@ -23,9 +23,10 @@ async def get_tioanime_servers(chapter_url):
             return re.findall(r"https?://[\w/.?#=!-]*", _script.replace("\\", "")), _anime_uri
 
 
-async def get_jk_servers(url):
+async def get_jk_servers(chapter_url):
     async with aiohttp.ClientSession() as requests:
-        async with requests.get(url) as r:
+        async with requests.get(chapter_url) as r:
+            logging_stream_info(f"Get {chapter_url} is \"{r.ok}\"")
             soup = BeautifulSoup(await r.content.read(), PARSER)
             _script = soup.find_all("script")
             _lnks = re.compile(r'https?://[\w./?=#-]*')
@@ -39,7 +40,7 @@ async def get_jk_servers(url):
                         _r = await requests.get(
                             _link,
                             headers={
-                                "referer": url
+                                "referer": chapter_url
                             }
                         )
                         _soup = BeautifulSoup(
@@ -98,9 +99,10 @@ async def get_jk_servers(url):
             return [_s for _s in _servers if _s]
 
 
-async def get_mc_servers(url):
+async def get_mc_servers(chapter_url):
     async with aiohttp.ClientSession() as requests:
-        async with requests.get(url) as r:
+        async with requests.get(chapter_url) as r:
+            logging_stream_info(f"Get {chapter_url} is \"{r.ok}\"")
             soup = BeautifulSoup(await r.content.read(), PARSER)
             _bb = [oei.get("data-player") for oei in
                    soup.find("div", attrs={"class": "playother"}).find_all("p")]
@@ -112,9 +114,10 @@ async def get_mc_servers(url):
             return b64_decoded
 
 
-async def get_flv_servers(_chapter_url):
+async def get_flv_servers(chapter_url):
     async with aiohttp.ClientSession(headers=USER_AGENT) as session:
-        async with session.get(_chapter_url) as r:
+        async with session.get(chapter_url) as r:
+            logging_stream_info(f"Get {chapter_url} is \"{r.ok}\"")
             soup = BeautifulSoup(await r.content.read(), "html.parser")
     return [
         ou.get("code") for ou in json.loads(
