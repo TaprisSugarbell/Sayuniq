@@ -147,7 +147,8 @@ class SayuDownloader:
             _total_urls = len(urls)
             _out = None
             for _nn, url in enumerate(urls):
-                _dats = dict(url=url, dif=_nn, total=_total_urls,
+                _rl_ps = urlparse(url).netloc
+                _dats = dict(url=url, dif=_nn, total=_total_urls, netloc=_rl_ps,
                              date=human_hour_readable(), **kwargs)
                 if self._message_id:
                     await self.app.edit_message_text(
@@ -163,7 +164,7 @@ class SayuDownloader:
                     if isinstance(url, tuple):
                         _out = await self.extractor(url[0])
                     else:
-                        if urlparse(url).netloc == "www.yourupload.com" and _nn != _total_urls:
+                        if _rl_ps == "www.yourupload.com" and _nn != _total_urls:
                             urls.append((url,))
                             continue
                         _out = await asyncio.wait_for(self.extractor(url), 180)
