@@ -184,7 +184,6 @@ class SayuDownloader:
                         get_string("URL_DWN_ERR").format(**_dats),
                         disable_web_page_preview=True)
                 if _out:
-                    _dats = dict(url=url, dif=_nn, total=_total_urls, **kwargs)
                     await self.app.edit_message_text(
                         LOG_CHANNEL,
                         self._message_id,
