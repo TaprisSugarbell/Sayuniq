@@ -156,7 +156,7 @@ class SayuDownloader:
                     if isinstance(url, tuple):
                         _out = await self.extractor(url[0])
                     else:
-                        if urlparse(url).netloc == "www.yourupload.com":
+                        if urlparse(url).netloc == "www.yourupload.com" and _nn != _total_urls:
                             urls.append((url,))
                             continue
                         _out = await asyncio.wait_for(self.extractor(url), 180)
