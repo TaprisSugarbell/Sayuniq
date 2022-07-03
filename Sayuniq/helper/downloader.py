@@ -158,7 +158,7 @@ class SayuDownloader:
                         _out = await asyncio.wait_for(self.extractor(url), 180)
                 except asyncio.TimeoutError:
                     urls.append((url,))
-                    logging_stream_info("Fallo la descarga de [link]({url}) por \"TimeoutError\"")
+                    logging_stream_info(f"Fallo la descarga de [link]({url}) por \"TimeoutError\"")
                     _total_urls += 1
                 except Exception as e:
                     logging_stream_info(f'Fallo la descarga de {url} [{_nn}/{_total_urls}]')
