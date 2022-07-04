@@ -20,7 +20,7 @@ _dbt = "-----------------------------------------------------------" \
 dictConfig(
     {
         "version": 1,
-        # "disable_existing_loggers": True,
+        "disable_existing_loggers": True,
         "formatters": {
             "default": {
                 "format": f"{_dbt}\n[%(levelname)s || %(hhr)s] REASON = \"%(message)s\"\n"
