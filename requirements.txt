@@ -4,6 +4,7 @@ beautifulsoup4
 cloudscraper
 dnspython
 moviepy
+opencv-python
 pymongo
 pyrogram
 pyromod
