@@ -23,6 +23,9 @@ dictConfig(
         "disable_existing_loggers": True,
         "formatters": {
             "default": {
+                "format": "[%(levelname)s || %(asctime)s] %(name)s: %(message)s"
+            },
+            BOT_NAME: {
                 "format": f"{_dbt}\n[%(levelname)s || %(hhr)s] REASON = \"%(message)s\"\n"
             }
         },
@@ -32,6 +35,11 @@ dictConfig(
                 "formatter": "default",
                 "class": "logging.StreamHandler",
                 # "stream": "ext://sys.stdout"
+            },
+            BOT_NAME: {
+                "level": "INFO",
+                "formatter": "default",
+                "class": "logging.StreamHandler",
             },
             "file": {
                   "class": "logging.handlers.RotatingFileHandler",
@@ -46,16 +54,16 @@ dictConfig(
                 "handlers": [
                     "default"
                 ],
-                "level": "WARNING",
+                "level": "INFO",
                 "propagate": False
             },
-            # "my.packg": {
-            #     "handlers": [
-            #         "default"
-            #     ],
-            #     "level": "INFO",
-            #     "propagate": False
-            # },
+            f"{BOT_NAME}": {
+                "handlers": [
+                    BOT_NAME
+                ],
+                "level": LOGGING_LEVEL,
+                "propagate": False
+            },
             # "__main__": {
             #     "handlers": [
             #         "default"
@@ -78,7 +86,8 @@ dictConfig(
 #                         logging.StreamHandler()
 #                     ]
 #                     )
-sayulog = logging.getLogger(__name__)
+root_logger = logging.getLogger(__name__)
+sayulog = logging.getLogger(BOT_NAME)
 
 
 def logging_stream_info(msg):
