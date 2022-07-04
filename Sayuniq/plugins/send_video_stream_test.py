@@ -4,6 +4,12 @@ from .. import TESTS_CHANNEL
 from pyrogram import Client, filters
 
 
+class NamedBytesIO(BytesIO):
+    def __init__(self, content: bytes, name: str) -> None:
+        super().__init__(content)
+        self.name = name
+
+
 @Client.on_message(filters.command(["up"]))
 async def __svst__(bot, update):
     print(update)
@@ -12,7 +18,7 @@ async def __svst__(bot, update):
         async with request.get(_orl) as r:
             await bot.send_video(
                 TESTS_CHANNEL,
-                BytesIO(await r.content.read())
+                NamedBytesIO(await r.content.read(), "file")
             )
 
 
