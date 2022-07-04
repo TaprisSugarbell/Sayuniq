@@ -16,7 +16,7 @@ async def get_tioanime_servers(chapter_url):
         async with session.get(chapter_url) as r:
             logging_stream_info(f"Get {chapter_url} is \"{r.ok}\"")
             soup = BeautifulSoup(await r.content.read(), PARSER)
-            _script = soup.find_all("script")[-3].string
+            _script = "".join(_ist.string for _ist in soup.find_all("script")[10:] if getattr(_ist, "string"))
             _anime_uri = soup.find(
                 "div",
                 attrs={"class": "episodes-nav d-flex justify-content-center mb-4"}).find_all("a")[1].get("href")
