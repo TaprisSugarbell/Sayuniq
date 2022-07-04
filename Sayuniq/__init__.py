@@ -66,8 +66,8 @@ async def logs_channel_update(
         message = get_string(
             "log_channel"
         ).format(
-            BOT_NAME,
-            human_hour_readable()
+            bot_name=BOT_NAME,
+            date=human_hour_readable()
         )
     _snd_Txt = ["send_message", "edit_message_text"]
     t__ = {"text": message} if _mode in _snd_Txt else {_mode.split("_")[-1]: message}
