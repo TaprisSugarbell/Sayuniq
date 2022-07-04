@@ -2,6 +2,7 @@ import aiohttp
 from io import BytesIO
 from .. import TESTS_CHANNEL
 from pyrogram import Client, filters
+from moviepy.video.io.VideoFileClip import VideoFileClip
 
 
 class NamedBytesIO(BytesIO):
@@ -21,11 +22,21 @@ async def __svst__(bot, update):
             rspns_json = await r.json()
             _orl = rspns_json["data"][-1]["file"]
         async with request.get(_orl) as r2:
+            print(r2.headers)
+            print(r2.content_length)
+            print(r2.request_info)
+            clip = VideoFileClip(_orl)
+            # Extraer información del video
+            width, height = clip.size
+            duration = int(clip.duration)
             await bot.send_video(
                 TESTS_CHANNEL,
                 # NamedBytesIO(await r.content.read(), "file")
                 BytesIO(await r2.content.read()),
-                file_name="@Japanemision"
+                file_name="@Japanemision",
+                duration=duration,
+                width=width,
+                height=height,
             )
 
     # _orl = "https://cdn.donmai.us/original/39/27/__izayoi_sakuya_touhou__39279272c19a06b268fd40931ff29317.mp4"
