@@ -4,7 +4,7 @@ beautifulsoup4
 cloudscraper
 dnspython
 moviepy
-opencv-python-headless==4.2.0.32
+opencv-python-headless
 pymongo
 pyrogram
 pyromod
