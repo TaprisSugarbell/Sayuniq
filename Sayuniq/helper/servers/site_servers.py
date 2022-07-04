@@ -123,4 +123,3 @@ async def get_flv_servers(chapter_url):
         ou.get("code") for ou in json.loads(
             re.findall(r"\{\"SUB.*}", soup.find_all("script")[-7].string)[0])["SUB"]
     ]
-

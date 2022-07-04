@@ -5,9 +5,14 @@ format_date: "%d/{}/%y"
 format_hour:
   - "%I:%M:%S %p"
   - "%H:%M:%S"
-log_channel: "**{} ha sido desplegado!**\n➖➖➖➖➖➖➖➖➖\n**Fecha:** {}"
-document_err: "**{} - Reporte de ERROR!!**\nPuedes ignorar esto o reportarlo a @SayuCodezupport."
-document_log: "**{} - LOGGER!!**\n➖➖➖➖➖➖➖➖➖\n**Fecha:** {}"
+log_channel:
+  "**{bot_name} ha sido desplegado!**\n➖➖➖➖➖➖➖➖➖\n**Fecha:** {date}"
+document_err:
+  "**{bot_name} - Reporte de ERROR!!**\n
+  **Razón:** {reason}\n
+  **Fecha:** {date}\n
+  Puedes ignorar esto o reportarlo a @SayuCodezupport."
+document_log: "**{bot_name} - LOGGER!!**\n➖➖➖➖➖➖➖➖➖\n**Fecha:** {date}"
 URL_UP_LOADING:
   "Comenzo la descarga de - [{dif}/{total}] -\n\"**[{netloc}]({url})**\"\n
   **Fecha:** {date}\n**{anime}** [**{site}**]"

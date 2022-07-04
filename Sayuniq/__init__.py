@@ -1,7 +1,7 @@
+import asyncio
 import logging
 import os
 from logging import handlers
-from queue import PriorityQueue
 
 import pyrogram
 
@@ -80,5 +80,5 @@ async def logs_channel_update(
         os.remove(message)
 
 
-queue_ = PriorityQueue()
+queue_ = asyncio.PriorityQueue()
 

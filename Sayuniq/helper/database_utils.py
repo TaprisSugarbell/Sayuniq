@@ -20,18 +20,3 @@ async def database_assistant(_sa, servers, anime_url, chapter_url, _update=None)
     )
     await _sa.buttons_replace()
     await _sa.update_or_add_db()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
