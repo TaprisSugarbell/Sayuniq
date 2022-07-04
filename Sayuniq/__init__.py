@@ -2,7 +2,7 @@ import asyncio
 import logging
 import os
 from logging import handlers
-
+from logging.config import dictConfig
 import pyrogram
 
 from Sayuniq.helper.mongo_connect import Mongo, confirm
@@ -17,19 +17,68 @@ create_folder(temp_folder=__dr), create_folder(temp_folder="./sayureports/")
 # DEBUG
 _dbt = "-----------------------------------------------------------" \
        "------------------------------------------------------------"
-logging.basicConfig(format=f'{_dbt}\n[%(levelname)s || %(hhr)s] '
-                           f'REASON = "%(message)s"\n',
-                    level=getattr(logging, LOGGING_LEVEL),
-                    handlers=[
-                        handlers.RotatingFileHandler(
-                            filename=log_file,
-                            maxBytes=3145728,
-                            backupCount=1
-                        ),
-                        logging.StreamHandler()
-                    ]
-                    )
-sayulog = logging.getLogger(BOT_NAME)
+dictConfig(
+    {
+        "version": 1,
+        # "disable_existing_loggers": True,
+        "formatters": {
+            "default": {
+                "format": f"{_dbt}\n[%(levelname)s || %(hhr)s] REASON = \"%(message)s\"\n"
+            }
+        },
+        "handlers": {
+            "default": {
+                "level": "INFO",
+                "formatter": "default",
+                "class": "logging.StreamHandler",
+                # "stream": "ext://sys.stdout"
+            },
+            "file": {
+                  "class": "logging.handlers.RotatingFileHandler",
+                  "filename": log_file,
+                  "maxBytes": 3145728,
+                  "backupCount": 1,
+                  "formatter": "default"
+                }
+        },
+        "loggers": {
+            "": {
+                "handlers": [
+                    "default"
+                ],
+                "level": "WARNING",
+                "propagate": False
+            },
+            # "my.packg": {
+            #     "handlers": [
+            #         "default"
+            #     ],
+            #     "level": "INFO",
+            #     "propagate": False
+            # },
+            # "__main__": {
+            #     "handlers": [
+            #         "default"
+            #     ],
+            #     "level": "DEBUG",
+            #     "propagate": False
+            # }
+        }
+    }
+)
+# logging.basicConfig(format=f'{_dbt}\n[%(levelname)s || %(hhr)s] '
+#                            f'REASON = "%(message)s"\n',
+#                     level=getattr(logging, LOGGING_LEVEL),
+#                     handlers=[
+#                         handlers.RotatingFileHandler(
+#                             filename=log_file,
+#                             maxBytes=3145728,
+#                             backupCount=1
+#                         ),
+#                         logging.StreamHandler()
+#                     ]
+#                     )
+sayulog = logging.getLogger(__name__)
 
 
 def logging_stream_info(msg):
