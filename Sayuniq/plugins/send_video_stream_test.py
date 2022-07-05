@@ -29,12 +29,11 @@ async def __svst__(bot, update):
             rspns_json = await r.json()
             _orl = rspns_json["data"][-1]["file"]
         async with request.get(_orl) as r2:
-            print(_orl)
             print(r2.headers)
             print(r2.request_info)
             print(r2.content_length)
             _start = time.time()
-            _data = ffmpeg.probe(r2.request_info.url)
+            _data = ffmpeg.probe(_orl)
             _data_of_video = [stream for stream in _data["streams"] if stream["codec_type"] == "video"][0]
             print(_data)
             print(_data_of_video)
