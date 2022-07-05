@@ -92,7 +92,7 @@ async def monoschinos(app):
             soup = BeautifulSoup(await r.content.read(), "html.parser")
             list_of_a = soup.find("div", attrs={"class": "row row-cols-5"}).find_all("a")
             for _a in list_of_a[::-1]:
-                title = _a.find("p", attrs={"class": "animetitles"}).string
+                title = _a.find("h2", attrs={"class": "animetitles"}).string
                 chapter_no = _a.find("h5").string
                 chapter_url = _a.get("href")
                 anime_url = await get_mc_anime(chapter_url)
