@@ -4,7 +4,6 @@ import os
 from logging import handlers
 from logging.config import dictConfig
 import pyrogram
-
 from Sayuniq.helper.mongo_connect import Mongo, confirm
 from __vars__ import *
 from helper.utils import create_folder
@@ -17,63 +16,6 @@ create_folder(temp_folder=__dr), create_folder(temp_folder="./sayureports/")
 # DEBUG
 _dbt = "-----------------------------------------------------------" \
        "------------------------------------------------------------"
-dictConfig(
-    {
-        "version": 1,
-        "disable_existing_loggers": True,
-        "formatters": {
-            "default": {
-                "format": "[%(levelname)s || %(asctime)s] %(name)s: %(message)s"
-            },
-            BOT_NAME: {
-                "format": f"{_dbt}\n[%(levelname)s || %(hhr)s] REASON = \"%(message)s\"\n"
-            }
-        },
-        "handlers": {
-            "default": {
-                "level": "INFO",
-                "formatter": "default",
-                "class": "logging.StreamHandler",
-                # "stream": "ext://sys.stdout"
-            },
-            BOT_NAME: {
-                "level": "INFO",
-                "formatter": "default",
-                "class": "logging.StreamHandler",
-            },
-            "file": {
-                  "class": "logging.handlers.RotatingFileHandler",
-                  "filename": log_file,
-                  "maxBytes": 3145728,
-                  "backupCount": 1,
-                  "formatter": "default"
-                }
-        },
-        "loggers": {
-            "": {
-                "handlers": [
-                    "default"
-                ],
-                "level": "INFO",
-                "propagate": False
-            },
-            f"{BOT_NAME}": {
-                "handlers": [
-                    BOT_NAME
-                ],
-                "level": LOGGING_LEVEL,
-                "propagate": False
-            },
-            # "__main__": {
-            #     "handlers": [
-            #         "default"
-            #     ],
-            #     "level": "DEBUG",
-            #     "propagate": False
-            # }
-        }
-    }
-)
 # logging.basicConfig(format=f'{_dbt}\n[%(levelname)s || %(hhr)s] '
 #                            f'REASON = "%(message)s"\n',
 #                     level=getattr(logging, LOGGING_LEVEL),
@@ -86,17 +28,18 @@ dictConfig(
 #                         logging.StreamHandler()
 #                     ]
 #                     )
-root_logger = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 sayulog = logging.getLogger(BOT_NAME)
 
 
 def logging_stream_info(msg):
-    if LOGGING_LEVEL != "INFO":
-        sayulog.setLevel("INFO")
-        sayulog.info(msg, extra={"hhr": human_hour_readable()})
-        sayulog.setLevel(LOGGING_LEVEL)
-    else:
-        sayulog.info(msg, extra={"hhr": human_hour_readable()})
+    # if LOGGING_LEVEL != "INFO":
+    #     sayulog.setLevel("INFO")
+    #     sayulog.info(msg, extra={"hhr": human_hour_readable()})
+    #     sayulog.setLevel(LOGGING_LEVEL)
+    # else:
+    # sayulog.info(msg, extra={"hhr": human_hour_readable()})
+    logger.info(msg)
 
 
 # Client
