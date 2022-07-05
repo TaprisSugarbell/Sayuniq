@@ -1,8 +1,10 @@
+from  Sayuniq.helper.utils import create_folder
 from Sayuniq.__vars__ import BOT_NAME, LOGGING_LEVEL
 
 __dr, __file = "./logs/", f"{BOT_NAME}.log"
 log_file = __dr + __file
-
+create_folder(temp_folder=__dr), create_folder(temp_folder="./sayureports/")
+# DEBUG
 _dbt = "-----------------------------------------------------------" \
        "------------------------------------------------------------"
 

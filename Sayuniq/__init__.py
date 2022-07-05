@@ -9,13 +9,7 @@ from __vars__ import *
 from helper.utils import create_folder
 from strings import get_string
 
-__dr, __file = "./logs/", f"{BOT_NAME}.log"
-log_file = __dr + __file
-create_folder(temp_folder=__dr), create_folder(temp_folder="./sayureports/")
 
-# DEBUG
-_dbt = "-----------------------------------------------------------" \
-       "------------------------------------------------------------"
 # logging.basicConfig(format=f'{_dbt}\n[%(levelname)s || %(hhr)s] '
 #                            f'REASON = "%(message)s"\n',
 #                     level=getattr(logging, LOGGING_LEVEL),
