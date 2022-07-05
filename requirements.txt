@@ -3,6 +3,7 @@ aiohttp[speedups]
 beautifulsoup4
 cloudscraper
 dnspython
+ffmpeg-python
 moviepy
 opencv-python-headless
 pymongo
