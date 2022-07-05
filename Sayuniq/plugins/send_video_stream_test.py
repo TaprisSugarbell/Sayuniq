@@ -29,21 +29,22 @@ async def __svst__(bot, update):
             rspns_json = await r.json()
             _orl = rspns_json["data"][-1]["file"]
         async with request.get(_orl) as r2:
+            print(_orl)
             print(r2.headers)
-            print(r2.content_length)
             print(r2.request_info)
+            print(r2.content_length)
             _start = time.time()
-            _data = ffmpeg.probe(_orl)
+            _data = ffmpeg.probe(r2.request_info.url)
             _data_of_video = [stream for stream in _data["streams"] if stream["codec_type"] == "video"][0]
             print(_data)
             print(_data_of_video)
             # DATA
             width = _data_of_video["width"]
             height = _data_of_video["height"]
-            duration = _data_of_video["duration"]
+            duration = int(_data_of_video["duration"])
             # total_frames = int(_data_of_video['nb_frames'])
             print("Waiting... {}".format(time.time() - _start))
-            _ss = int(float(duration) / random.randint(15, 30))
+            _ss = int(duration / random.randint(15, 30))
             frame, err = (
                 ffmpeg.input(_orl, ss=_ss)
                 .output('pipe:', vframes=1, format='image2', vcodec='png')    # vcodec=mjpeg || png
