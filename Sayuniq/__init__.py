@@ -1,14 +1,14 @@
 import asyncio
 import logging
 import os
-from logging import handlers
-from logging.config import dictConfig
+
 import pyrogram
+
+from Sayuniq.helper.logger_configs.logger_config import log_file
 from Sayuniq.helper.mongo_connect import Mongo, confirm
 from __vars__ import *
 from helper.utils import create_folder
 from strings import get_string
-
 
 # logging.basicConfig(format=f'{_dbt}\n[%(levelname)s || %(hhr)s] '
 #                            f'REASON = "%(message)s"\n',
