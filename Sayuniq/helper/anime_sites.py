@@ -5,6 +5,7 @@ from .mongo_connect import *
 from .servers import *
 from .servers.server_utils import get_jk_anime, get_mc_anime
 from ..__vars__ import BOT_NAME, USER_AGENT
+import string
 
 db = Mongo(database=BOT_NAME, collection="japanemi")
 
@@ -28,14 +29,13 @@ async def tioanime(app):
                     get_chapter = await _sa.get_chapter()
                     if get_chapter or _c.get("is_banned") or _c.get("is_paused"):
                         continue
-                    else:
-                        try:
-                            servers, _anime_uri = await get_tioanime_servers(chapter_url)
-                            anime_url = _url_base[:-1] + _anime_uri
-                            await database_assistant(
-                                _sa, servers, anime_url, chapter_url, True)
-                        except Exception as e:
-                            await sayu_error(e, app)
+                    try:
+                        servers, _anime_uri = await get_tioanime_servers(chapter_url)
+                        anime_url = _url_base[:-1] + _anime_uri
+                        await database_assistant(
+                            _sa, servers, anime_url, chapter_url, True)
+                    except Exception as e:
+                        await sayu_error(e, app)
                 else:
                     servers, _anime_uri = await get_tioanime_servers(chapter_url)
                     anime_url = _url_base[:-1] + _anime_uri
@@ -56,7 +56,8 @@ async def jkanime(app):
             for _a in list_of_a[::-1]:
                 title = _a.find("h5").string
                 chapter_url = _a.get("href")
-                chapter_no = chapter_url.split("/")[-2]
+                chno = chapter_url.split("/")[-2]
+                chapter_no = chno if chno[0] in string.digits else "1"
                 anime_url = await get_jk_anime(title)
                 _h6 = _a.find("h6").string.lower()
                 extra_caption = " Final" if "final" in _h6 else (" ONA" if "ona" in _h6 else "")
@@ -68,13 +69,12 @@ async def jkanime(app):
                     get_chapter = await _sa.get_chapter()
                     if get_chapter or _c.get("is_banned") or _c.get("is_paused"):
                         continue
-                    else:
-                        try:
-                            servers = await get_jk_servers(chapter_url)
-                            await database_assistant(
-                                _sa, servers, anime_url, chapter_url, True)
-                        except Exception as e:
-                            await sayu_error(e, app)
+                    try:
+                        servers = await get_jk_servers(chapter_url)
+                        await database_assistant(
+                            _sa, servers, anime_url, chapter_url, True)
+                    except Exception as e:
+                        await sayu_error(e, app)
                 else:
                     servers = await get_jk_servers(chapter_url)
                     try:
@@ -104,13 +104,12 @@ async def monoschinos(app):
                     get_chapter = await _sa.get_chapter()
                     if get_chapter or _c.get("is_banned") or _c.get("is_paused"):
                         continue
-                    else:
-                        try:
-                            servers = await get_mc_servers(chapter_url)
-                            await database_assistant(
-                                _sa, servers, anime_url, chapter_url, True)
-                        except Exception as e:
-                            await sayu_error(e, app)
+                    try:
+                        servers = await get_mc_servers(chapter_url)
+                        await database_assistant(
+                            _sa, servers, anime_url, chapter_url, True)
+                    except Exception as e:
+                        await sayu_error(e, app)
                 else:
                     servers = await get_mc_servers(chapter_url)
                     try:
@@ -140,13 +139,12 @@ async def animeflv(app):
                     get_chapter = await _sa.get_chapter()
                     if get_chapter or _c.get("is_banned") or _c.get("is_paused"):
                         continue
-                    else:
-                        try:
-                            servers = await get_flv_servers(chapter_url)
-                            await database_assistant(
-                                _sa, servers, anime_url, chapter_url, True)
-                        except Exception as e:
-                            await sayu_error(e, app)
+                    try:
+                        servers = await get_flv_servers(chapter_url)
+                        await database_assistant(
+                            _sa, servers, anime_url, chapter_url, True)
+                    except Exception as e:
+                        await sayu_error(e, app)
                 else:
                     servers = await get_flv_servers(chapter_url)
                     try:
