@@ -1,0 +1,15 @@
+aiofiles
+aiohttp[speedups]
+beautifulsoup4
+cloudscraper
+dnspython
+moviepy
+pymongo
+pyrogram
+pyromod
+python-decouple
+Pillow
+PyYAML
+TgCrypto
+yt-dlp
+wget
