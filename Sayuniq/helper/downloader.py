@@ -25,7 +25,7 @@ requests = cloudscraper.create_scraper(cloudscraper.Session)
 class SayuDownloader:
     def __init__(self, url, out="./", custom=None, ext=None, thumb=None, _app=None, filter_links=False):
         self.url = url
-        self.out = out if out[-1] == "/" else out + "/"
+        self.out = out if out[-1] == "/" else f"{out}/"
         self.custom = custom
         self.ext = ext
         self.thumb = thumb
@@ -54,23 +54,22 @@ class SayuDownloader:
         return _th
 
     async def get_thumbnail(self):
-        if self.thumb:
-            _scheme = parse.urlparse(self.thumb)
-            if _scheme.scheme:
-                _th = self.__rthumb.format(self.out, self.__rth)
-                if os.path.exists(_th):
-                    _th = self.__rthumb.format(self.out, rankey())
-                try:
-                    return await self.download_thumb(_th)
-                except Exception as e:
-                    print(e)
-                    return _th
-            elif os.path.exists(self.thumb):
-                return self.thumb
-            else:
-                return self.app.download_media(_scheme.path, self.out)
-        else:
+        if not self.thumb:
             return self.__rthumb.format(self.out, rankey())
+        _scheme = parse.urlparse(self.thumb)
+        if _scheme.scheme:
+            _th = self.__rthumb.format(self.out, self.__rth)
+            if os.path.exists(_th):
+                _th = self.__rthumb.format(self.out, rankey())
+            try:
+                return await self.download_thumb(_th)
+            except Exception as e:
+                print(e)
+                return _th
+        elif os.path.exists(self.thumb):
+            return self.thumb
+        else:
+            return self.app.download_media(_scheme.path, self.out)
 
     async def links_filter(self, url=None) -> str | Any:
         _url = url or self.url
@@ -115,7 +114,7 @@ class SayuDownloader:
         # Thumbnail?
         _thumb = await self.get_thumbnail()
         # Demás datos, title, ext
-        _title = re.sub("/", "", custom or video_info["title"]) + "@AnimeJapanTV"
+        _title = re.sub("/", "", custom or video_info["title"]) + f"@{CHANNEL_ID}"
         try:
             _ext = ext or video_info["ext"]
         except KeyError:
@@ -143,56 +142,51 @@ class SayuDownloader:
 
     async def iter_links(self, urls=None, **kwargs) -> Any:
         urls = urls or self.url
-        if isinstance(urls, list):
-            _total_urls = len(urls)
-            _out = None
-            for _nn, url in enumerate(urls):
-                _rl_ps = urlparse(url).netloc
-                _dats = dict(url=url, dif=_nn, total=_total_urls, netloc=_rl_ps,
-                             date=human_hour_readable(), **kwargs)
-                if self._message_id:
-                    await self.app.edit_message_text(
-                        LOG_CHANNEL,
-                        self._message_id,
-                        get_string("URL_UP_LOADING").format(**_dats),
-                        disable_web_page_preview=True)
-                else:
-                    msh_ = await self.app.send_message(
-                        LOG_CHANNEL, get_string("URL_UP_LOADING").format(**_dats))
-                    self._message_id = msh_.id
-                try:
-                    if isinstance(url, tuple):
-                        _out = await self.extractor(url[0])
-                    else:
-                        if _rl_ps == "www.yourupload.com" and _nn != _total_urls:
-                            urls.append((url,))
-                            continue
-                        _out = await asyncio.wait_for(self.extractor(url), 180)
-                except asyncio.TimeoutError:
-                    urls.append((url,))
-                    logging_stream_info(
-                        f"Fallo la descarga de - [{_nn}/{_total_urls}] - [link]({url}) por \"TimeoutError\"")
-                    _total_urls += 1
-                except Exception as e:
-                    logging_stream_info(f'Fallo la descarga de {url} [{_nn}/{_total_urls}]')
-                    if self.thumb:
-                        if os.path.exists(self.thumb):
-                            os.remove(self.thumb)
-                    await self.app.edit_message_text(
-                        LOG_CHANNEL,
-                        self._message_id,
-                        get_string("URL_DWN_ERR").format(**_dats),
-                        disable_web_page_preview=True)
-                if _out:
-                    await self.app.edit_message_text(
-                        LOG_CHANNEL,
-                        self._message_id,
-                        get_string("URL_UPLOADED").format(**_dats),
-                        disable_web_page_preview=True)
-                    break
-            return _out
-        else:
+        if not isinstance(urls, list):
             return None
+        _total_urls = len(urls)
+        _out = None
+        for _nn, url in enumerate(urls):
+            _rl_ps = urlparse(url).netloc
+            _dats = dict(url=url, dif=_nn, total=_total_urls, netloc=_rl_ps,
+                         date=human_hour_readable(), **kwargs)
+            if self._message_id:
+                await self.app.edit_message_text(
+                    LOG_CHANNEL,
+                    self._message_id,
+                    get_string("URL_UP_LOADING").format(**_dats),
+                    disable_web_page_preview=True)
+            else:
+                msh_ = await self.app.send_message(
+                    LOG_CHANNEL, get_string("URL_UP_LOADING").format(**_dats))
+                self._message_id = msh_.id
+            try:
+                if isinstance(url, tuple):
+                    _out = await self.extractor(url[0])
+                else:
+                    if _rl_ps == "www.yourupload.com" and _nn != _total_urls:
+                        urls.append((url,))
+                        continue
+                    _out = await asyncio.wait_for(self.extractor(url), 180)
+            except asyncio.TimeoutError:
+                urls.append((url,))
+                logging_stream_info(
+                    f"Fallo la descarga de - [{_nn}/{_total_urls}] - [link]({url}) por \"TimeoutError\"")
+                _total_urls += 1
+            except Exception as e:
+                logging_stream_info(f'Fallo la descarga de {url} [{_nn}/{_total_urls}]')
+                if self.thumb and os.path.exists(self.thumb):
+                    os.remove(self.thumb)
+                await self.app.edit_message_text(LOG_CHANNEL, self._message_id, get_string("URL_DWN_ERR").format(**_dats), disable_web_page_preview=True)
+
+            if _out:
+                await self.app.edit_message_text(
+                    LOG_CHANNEL,
+                    self._message_id,
+                    get_string("URL_UPLOADED").format(**_dats),
+                    disable_web_page_preview=True)
+                break
+        return _out
 
 
 async def download_assistant(_app, urls, folder, caption, thumb=None, **kwargs):

@@ -37,10 +37,7 @@ USER_AGENT = {"user-agent": config("USER_AGENT", default=f"{BOT_ALIAS}/{__versio
 
 
 def human_hour_readable(hformat=HOUR_FORMAT, _utc=UTC):
-    if ":" in UTC:
-        _hours, _minutes = UTC.split(":")
-    else:
-        _hours, _minutes = UTC, 0
+    _hours, _minutes = UTC.split(":") if ":" in UTC else (UTC, 0)
     return datetime.now(timezone(timedelta(hours=int(_hours), minutes=int(_minutes)))).strftime(
         f"{get_string('format_date').format(datetime.now().month)} "
         f"{get_string('format_hour')[hformat]}")

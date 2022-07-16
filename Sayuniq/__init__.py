@@ -44,10 +44,7 @@ app = pyrogram.Client(BOT_NAME, bot_token=BOT_TOKEN, api_id=API_ID, api_hash=API
 async def auth_users():
     _u = Mongo(database=BOT_NAME, collection="users")
     _c = await confirm(_u, {})
-    if _c:
-        return [i["user_id"] for i in _c]
-    else:
-        return []
+    return [i["user_id"] for i in _c] if _c else []
 
 
 async def logs_channel_update(
@@ -64,13 +61,11 @@ async def logs_channel_update(
             bot_name=BOT_NAME,
             date=human_hour_readable()
         )
+    _app = _app or app
     _snd_Txt = ["send_message", "edit_message_text"]
     t__ = {"text": message} if _mode in _snd_Txt else {_mode.split("_")[-1]: message}
     kwargs.update(t__)
-    if _app:
-        await getattr(_app, _mode)(LOG_CHANNEL, *args, **kwargs)
-    else:
-        await getattr(app, _mode)(LOG_CHANNEL, *args, **kwargs)
+    await getattr(_app, _mode)(LOG_CHANNEL, *args, **kwargs)
     if os.path.exists(message) and message != log_file:
         os.remove(message)
 
