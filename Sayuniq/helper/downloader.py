@@ -117,7 +117,7 @@ class SayuDownloader:
             if isinstance(_url, dict):
                 _url = _url["data"][-1]["file"]
         if solidfiles:
-            _url = await self.links_filter(_url)
+            _url = await self.links_filter(_url, solidfiles)
         video_info = youtube_dl.YoutubeDL().extract_info(_url, download=False)
         # Thumbnail?
         _thumb = await self.get_thumbnail()
