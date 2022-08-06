@@ -73,7 +73,7 @@ class SayuDownloader:
         else:
             return self.app.download_media(_scheme.path, self.out)
 
-    async def links_filter(self, url=None) -> str | Any:
+    async def links_filter(self, url=None, solidfiles=False) -> str | Any:
         _url = url or self.url
         _r = self.requests.get(_url, allow_redirects=True)
         host = parse.urlparse(_r.url).netloc
@@ -97,14 +97,14 @@ class SayuDownloader:
             case host if re.match(r"https://[\w.]*/v/[\w-]*", _r.url):
                 r = self.requests.post(f"https://{host}/api/source/" + _r.url.split("/")[-1])
                 return r.json()
-            case host if re.match(r"www\.solidfiles\.com", host):
+            case host if re.match(r"www\.solidfiles\.com", host) and solidfiles:
                 soup = BeautifulSoup(_r.content, "html.parser")
                 fnd_dct = re.findall(r"\{\"mimetype.*}", soup.find_all("script")[-1].string)[0]
                 return json.loads(fnd_dct)["downloadUrl"]
             case _:
                 return _url
 
-    async def extractor(self, url=None):
+    async def extractor(self, url=None, solidfiles=False):
         _url, out, custom, ext, thumb = (
             url or self.url,
             self.out,
@@ -116,6 +116,8 @@ class SayuDownloader:
             _url = await self.links_filter(_url)
             if isinstance(_url, dict):
                 _url = _url["data"][-1]["file"]
+        if solidfiles:
+            _url = await self.links_filter(_url)
         video_info = youtube_dl.YoutubeDL().extract_info(_url, download=False)
         # Thumbnail?
         _thumb = await self.get_thumbnail()
@@ -169,10 +171,14 @@ class SayuDownloader:
             try:
                 if isinstance(url, tuple):
                     _out = await self.extractor(url[0])
+                elif isinstance(url, list):
+                    _out = await self.extractor(url[0], True)
                 else:
                     if _rl_ps == "www.yourupload.com" and _nn != _total_urls:
                         urls.append((url,))
                         continue
+                    elif _rl_ps == "www.solidfiles.com" and _nn != _total_urls:
+                        urls.append([url])
                     _out = await asyncio.wait_for(self.extractor(url), 180)
             except asyncio.TimeoutError:
                 urls.append((url,))
