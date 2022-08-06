@@ -18,7 +18,7 @@ from moviepy.editor import VideoFileClip
 
 from .utils import rankey
 from .. import logging_stream_info
-from ..__vars__ import CHANNEL_ID, LOG_CHANNEL, human_hour_readable, _channel_type
+from ..__vars__ import CHANNEL_ID, LOG_CHANNEL, human_hour_readable
 from ..strings import get_string
 
 requests = cloudscraper.create_scraper(cloudscraper.Session)
@@ -216,7 +216,7 @@ async def download_assistant(_app, urls, folder, caption, thumb=None, **kwargs):
     match vide_file["type"]:
         case "video/mp4":
             msg_f = await _app.send_video(
-                _channel_type(CHANNEL_ID),
+                CHANNEL_ID,
                 file_video,
                 caption,
                 duration=duration,

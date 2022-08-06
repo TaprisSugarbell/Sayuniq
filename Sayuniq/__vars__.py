@@ -66,3 +66,9 @@ def _base_channel_url(
         return f"https://t.me/c/{channel_id_filtered}/{message_id}"
     else:
         return f"https://t.me/{channel_id_filtered}/{message_id}"
+
+
+LOG_CHANNEL = _channel_type(LOG_CHANNEL)
+TESTS_CHANNEL = _channel_type(TESTS_CHANNEL)
+CHANNEL_ID = _channel_type(CHANNEL_ID)
+
