@@ -1,3 +1,4 @@
+import re
 from datetime import datetime, timedelta, timezone
 
 from decouple import config
@@ -41,3 +42,28 @@ def human_hour_readable(hformat=HOUR_FORMAT, _utc=UTC):
     return datetime.now(timezone(timedelta(hours=int(_hours), minutes=int(_minutes)))).strftime(
         f"{get_string('format_date').format(datetime.now().month)} "
         f"{get_string('format_hour')[hformat]}")
+
+
+def _channel_type(channel_id: str | int, thousand: bool = True):
+    channel_id = str(channel_id) if isinstance(channel_id, int) else channel_id
+    if re.match(r"-?\d*", channel_id):
+        if thousand and not str(-100) in str(channel_id):
+            return int(f'-100{channel_id}')
+        elif thousand:
+            return int(channel_id)
+        else:
+            return int(str(channel_id).replace("-100", ""))
+    else:
+        return channel_id
+
+
+def _base_channel_url(
+        channel_id: str | int,
+        message_id: str | int = None
+):
+    channel_id_filtered = _channel_type(channel_id, False)
+    message_id = message_id or ""
+    if isinstance(channel_id_filtered, int):
+        return f"https://t.me/c/{channel_id_filtered}/{message_id}"
+    else:
+        return f"https://t.me/{channel_id_filtered}/{message_id}"

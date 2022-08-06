@@ -23,8 +23,7 @@ LOGGER_CONFIG = {
             "default": {
                 "level": "INFO",
                 "formatter": "default",
-                "class": "logging.StreamHandler",
-                # "stream": "ext://sys.stdout"
+                "class": "logging.StreamHandler"
             },
             "file": {
                   "class": "logging.handlers.RotatingFileHandler",
@@ -58,7 +57,5 @@ LOGGER_CONFIG = {
             # }
         }
     }
-
-
 
 

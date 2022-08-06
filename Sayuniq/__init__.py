@@ -6,7 +6,7 @@ import pyrogram
 
 from Sayuniq.helper.logger_configs.logger_config import log_file
 from Sayuniq.helper.mongo_connect import Mongo, confirm
-from __vars__ import *
+from __vars__ import LOG_CHANNEL, BOT_NAME, BOT_TOKEN, API_ID, API_HASH, human_hour_readable, _channel_type
 from helper.utils import create_folder
 from strings import get_string
 
@@ -24,6 +24,7 @@ from strings import get_string
 #                     )
 logger = logging.getLogger(__name__)
 sayulog = logging.getLogger(BOT_NAME)
+PACKAGE = __package__
 
 
 def logging_stream_info(msg):
@@ -65,7 +66,7 @@ async def logs_channel_update(
     _snd_Txt = ["send_message", "edit_message_text"]
     t__ = {"text": message} if _mode in _snd_Txt else {_mode.split("_")[-1]: message}
     kwargs.update(t__)
-    await getattr(_app, _mode)(LOG_CHANNEL, *args, **kwargs)
+    await getattr(_app, _mode)(_channel_type(LOG_CHANNEL), *args, **kwargs)
     if os.path.exists(message) and message != log_file:
         os.remove(message)
 

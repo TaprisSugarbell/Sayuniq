@@ -6,9 +6,8 @@ import aiohttp
 from PIL import Image
 from io import BytesIO
 from .. import sayulog
-from .. import TESTS_CHANNEL
 from pyrogram import Client, filters
-from ..__vars__ import human_hour_readable
+from ..__vars__ import human_hour_readable, TESTS_CHANNEL
 
 
 class NamedBytesIO(BytesIO):

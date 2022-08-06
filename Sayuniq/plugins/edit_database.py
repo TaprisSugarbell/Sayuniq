@@ -40,11 +40,16 @@ async def __edb__(bot, update):
                         [
                             InlineKeyboardButton("Pause Anime", f'pam_{key_id}'),
                             InlineKeyboardButton("Ban Anime", f'bam_{key_id}'),
+                        ],
+                        [
+                            InlineKeyboardButton("Finalizado", f'f_one_{key_id}'),
+                            InlineKeyboardButton("Finalizar todos.", f'f_all_{key_id}')
                         ]
                     ]
                 )
             )
         else:
+            _c.get("status")
             chikb = await chapters_ikb(_c)
             await bot.send_message(
                 chat_id,
@@ -54,6 +59,26 @@ async def __edb__(bot, update):
     else:
         await bot.send_message(chat_id, "No hay capítulos subidos...")
     await bot.delete_messages(chat_id, message_id)
+
+
+@Client.on_callback_query(filters.regex("pgd_.*"))
+async def __pgd__(bot, update):
+    print(update)
+    message_id = update.message.id
+    chat_id = update.message.from_user.id
+    AUTH_USERS = await auth_users()
+    c, key_id, page = update.data.split("_")
+    _c = await confirm_one(db, {"key_id": key_id})
+    if _c:
+        print(_c)
+        chikb = await chapters_ikb(_c, int(page))
+        await bot.edit_message_reply_markup(
+            chat_id,
+            message_id,
+            reply_markup=chikb
+        )
+    else:
+        await bot.edit_message_text(chat_id, "No hay capítulos... El anime fue baneado probablemente.")
 
 
 @Client.on_callback_query(filters.regex(r"chps_.*"))

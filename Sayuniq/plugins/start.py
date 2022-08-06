@@ -8,9 +8,7 @@ async def __start__(bot, update):
     chat_id = update.from_user.id
     await bot.send_message(
         chat_id,
-        f'**{BOT_NAME}**\n'
-        f'**__version:__** {__version__}\n'
-        f'Un bot en estado de prueba que hará muchas cosas.'
+        f'AnimeJapanTV {__version__}, Un bot en estado de prueba que hará muchas cosas.'
     )
 
 

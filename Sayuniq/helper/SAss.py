@@ -8,19 +8,8 @@ from .logs_utils import sayu_error
 from .mongo_connect import *
 from .utils import rankey, create_folder
 from .. import sayulog, human_hour_readable
-from ..__vars__ import BOT_ALIAS, CHANNEL_ID, UTC
+from ..__vars__ import BOT_ALIAS, CHANNEL_ID, UTC, _base_channel_url
 from ..strings import get_string
-
-
-def _base_channel_url(
-        channel_id: str | int,
-        message_id: str | int = None
-):
-    message_id = message_id or ""
-    if re.match(r"-\d*", channel_id):
-        return f"https://t.me/c/{str(channel_id).replace('-100', '')}/{message_id}"
-    else:
-        return f"https://t.me/{channel_id}/{message_id}"
 
 
 class SitesAssistant:
@@ -78,10 +67,7 @@ class SitesAssistant:
     @staticmethod
     async def Ibtn(_p: bool = False, msg_btn=None, **kwargs):
         msg_btn = "<<" if _p else msg_btn or ">>"
-        if _p:
-            return InlineKeyboardButton(msg_btn, **kwargs)
-        else:
-            return InlineKeyboardButton(msg_btn, **kwargs)
+        return InlineKeyboardButton(msg_btn, **kwargs)
 
     async def find_on_db(self):
         self.anime_dict = await confirm_one(
@@ -116,11 +102,74 @@ class SitesAssistant:
                        f"🗂 Capítulo {self.chapter_no}{extra_ch}\n🌐 #{self.site}"
         return self.caption
 
+    async def buttons_replace(self, app=None):
+        app = app or self.app
+        _btns, _btns1 = [], []
+
+        now_chapter = self.msg
+        now_chapter_id = now_chapter.id
+        prev_chapter = self.anime_dict["chapters"].get(self.prev_chapter_digit) if self.anime_dict else {}
+        _lstado = await self.Ibtn(msg_btn="Listado",
+                                  url=f"https://t.me/{BOT_ALIAS}?start=mty_{self.key_id}")
+        _site_button = await self.Ibtn(msg_btn="Site Link", url=self.chapter_url)
+
+        if prev_chapter and float(prev_chapter.get("chapter")) < float(self.chapter_no) \
+                and self.last_chapter == prev_chapter.get("chapter"):
+            prev_message_id = prev_chapter.get("message_id")
+            self.prev, self.next = prev_message_id, now_chapter_id
+            _prev_chapter_nav_ = prev_chapter["nav"].get("prev")
+            _btns.append(await self.Ibtn(True, url=_base_channel_url(CHANNEL_ID, prev_message_id)))
+            if _prev_chapter_nav_:
+                _btns1.append(await self.Ibtn(True, url=_base_channel_url(CHANNEL_ID, _prev_chapter_nav_)))
+            _btns1.append(await self.Ibtn(url=_base_channel_url(CHANNEL_ID, now_chapter_id)))
+            prev_site_button = await self.Ibtn(msg_btn="Site Link", url=prev_chapter["url"])
+            try:
+                await app.edit_message_reply_markup(
+                    CHANNEL_ID,
+                    prev_message_id,
+                    reply_markup=InlineKeyboardMarkup(
+                        [
+                            _btns1,
+                            [
+                                _lstado,
+                                prev_site_button
+                            ]
+                        ]
+                    )
+                )
+                await self.update_property(
+                    next=now_chapter_id
+                )
+            except Exception as e:
+                sayulog.error(f"CHANNEL_ID: {CHANNEL_ID}\n"
+                              f"PrevMessageId: {prev_message_id}\n"
+                              f"NowChapterId: {now_chapter_id}",
+                              extra={"hhr": human_hour_readable()})
+                await sayu_error(e, app)
+        try:
+            await app.edit_message_reply_markup(
+                CHANNEL_ID,
+                now_chapter_id,
+                reply_markup=InlineKeyboardMarkup(
+                    [
+                        _btns,
+                        [
+                            _lstado,
+                            _site_button
+                        ]
+                    ] if _btns else [
+                        [
+                            _lstado,
+                            _site_button
+                        ]
+                    ]
+                )
+            )
+        except Exception as e:
+            await sayu_error(e, app)
+
     async def update_or_add_db(self):
-        if ":" in UTC:
-            _hours, _minutes = UTC.split(":")
-        else:
-            _hours, _minutes = UTC, 0
+        _hours, _minutes = UTC.split(":") if ":" in UTC else (UTC, 0)
         _now = datetime.now(
             timezone(
                 timedelta(
@@ -155,6 +204,7 @@ class SitesAssistant:
             if self.next:
                 self.anime_dict["chapters"][self.prev_chapter_digit]["nav"].update(
                     {
+                        "prev": self.prev,
                         "next": self.next
                     }
                 )
@@ -166,75 +216,16 @@ class SitesAssistant:
                                  "key_id": self.key_id
                              },
                              {
+                                 "last_chapter": self.chapter_no
+                             }
+                             )
+            await update_one(self.database,
+                             {
+                                 "key_id": self.key_id
+                             },
+                             {
                                  "chapters": self.anime_dict["chapters"]
                              }
                              )
         else:
             await add_(self.database, _d)
-
-    async def buttons_replace(self, app=None):
-        app = app or self.app
-        _btns, _btns1 = [], []
-
-        now_chapter = self.msg
-        now_chapter_id = now_chapter.id
-        prev_chapter = self.anime_dict["chapters"].get(self.prev_chapter_digit) if self.anime_dict else {}
-        _lstado = await self.Ibtn(msg_btn="Listado",
-                                  url=f"https://t.me/{BOT_ALIAS}?start=mty_{self.key_id}")
-        _site_button = await self.Ibtn(msg_btn="Site Link", url=self.chapter_url)
-
-        if prev_chapter:
-            if float(prev_chapter.get("chapter")) < float(self.chapter_no) and \
-                    self.last_chapter == prev_chapter.get("chapter"):
-                prev_message_id = prev_chapter.get("message_id")
-                self.prev = prev_message_id
-                _prev_chapter_nav_ = prev_chapter["nav"].get("prev")
-                _btns.append(await self.Ibtn(True, url=_base_channel_url(CHANNEL_ID, prev_message_id)))
-                if _prev_chapter_nav_:
-                    _btns1.append(await self.Ibtn(True, url=_base_channel_url(CHANNEL_ID, _prev_chapter_nav_)))
-                _btns1.append(await self.Ibtn(url=_base_channel_url(CHANNEL_ID, now_chapter_id)))
-                prev_site_button = await self.Ibtn(msg_btn="Site Link", url=prev_chapter["url"])
-                try:
-                    await app.edit_message_reply_markup(
-                        CHANNEL_ID,
-                        prev_message_id,
-                        reply_markup=InlineKeyboardMarkup(
-                            [
-                                _btns1,
-                                [
-                                    _lstado,
-                                    prev_site_button
-                                ]
-                            ]
-                        )
-                    )
-                    await self.update_property(
-                        next=now_chapter_id
-                    )
-                except Exception as e:
-                    sayulog.error(f"CHANNEL_ID: {CHANNEL_ID}\n"
-                                  f"PrevMessageId: {prev_message_id}\n"
-                                  f"NowChapterId: {now_chapter_id}",
-                                  extra={"hhr": human_hour_readable()})
-                    await sayu_error(e, app)
-        try:
-            await app.edit_message_reply_markup(
-                CHANNEL_ID,
-                now_chapter_id,
-                reply_markup=InlineKeyboardMarkup(
-                    [
-                        _btns,
-                        [
-                            _lstado,
-                            _site_button
-                        ]
-                    ] if _btns else [
-                        [
-                            _lstado,
-                            _site_button
-                        ]
-                    ]
-                )
-            )
-        except Exception as e:
-            await sayu_error(e, app)

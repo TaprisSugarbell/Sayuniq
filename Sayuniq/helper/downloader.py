@@ -17,7 +17,7 @@ from ..strings import get_string
 from ..helper.logs_utils import sayu_error
 from .utils import rankey
 from .. import logging_stream_info
-from ..__vars__ import CHANNEL_ID, LOG_CHANNEL, human_hour_readable
+from ..__vars__ import CHANNEL_ID, LOG_CHANNEL, human_hour_readable, _channel_type
 
 requests = cloudscraper.create_scraper(cloudscraper.Session)
 
@@ -204,7 +204,7 @@ async def download_assistant(_app, urls, folder, caption, thumb=None, **kwargs):
     match vide_file["type"]:
         case "video/mp4":
             msg_f = await _app.send_video(
-                CHANNEL_ID,
+                _channel_type(CHANNEL_ID),
                 file_video,
                 caption,
                 duration=duration,
