@@ -155,7 +155,7 @@ class SayuDownloader:
         _total_urls = len(urls)
         _out = None
         for _nn, url in enumerate(urls):
-            _rl_ps = urlparse(url).netloc
+            _rl_ps = urlparse(url).netloc if isinstance(url, str) else urlparse(url[0]).netloc
             _dats = dict(url=url, dif=_nn, total=_total_urls, netloc=_rl_ps,
                          date=human_hour_readable(), **kwargs)
             if self._message_id:
