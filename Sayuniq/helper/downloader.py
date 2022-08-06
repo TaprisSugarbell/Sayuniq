@@ -1,23 +1,25 @@
+import asyncio
+import json
 import mimetypes
 import os
 import random
 import re
 from typing import Any
 from urllib import parse
-import asyncio
-import aiofiles
 from urllib.parse import urlparse
+
+import aiofiles
 import aiohttp
 import cloudscraper
 import yt_dlp as youtube_dl
 from PIL import Image
 from bs4 import BeautifulSoup
 from moviepy.editor import VideoFileClip
-from ..strings import get_string
-from ..helper.logs_utils import sayu_error
+
 from .utils import rankey
 from .. import logging_stream_info
 from ..__vars__ import CHANNEL_ID, LOG_CHANNEL, human_hour_readable, _channel_type
+from ..strings import get_string
 
 requests = cloudscraper.create_scraper(cloudscraper.Session)
 
@@ -95,6 +97,10 @@ class SayuDownloader:
             case host if re.match(r"https://[\w.]*/v/[\w-]*", _r.url):
                 r = self.requests.post(f"https://{host}/api/source/" + _r.url.split("/")[-1])
                 return r.json()
+            case host if re.match(r"www\.solidfiles\.com", host):
+                soup = BeautifulSoup(_r.content, "html.parser")
+                fnd_dct = re.findall(r"\{\"mimetype.*}", soup.find_all("script")[-1].string)[0]
+                return json.loads(fnd_dct)["downloadUrl"]
             case _:
                 return _url
 
