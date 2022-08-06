@@ -46,15 +46,14 @@ def human_hour_readable(hformat=HOUR_FORMAT, _utc=UTC):
 
 def _channel_type(channel_id: str | int, thousand: bool = True):
     channel_id = str(channel_id) if isinstance(channel_id, int) else channel_id
-    if re.match(r"-?\d*", channel_id):
-        if thousand and not str(-100) in str(channel_id):
-            return int(f'-100{channel_id}')
-        elif thousand:
-            return int(channel_id)
-        else:
-            return int(str(channel_id).replace("-100", ""))
-    else:
+    if not re.match(r"-?\d*", channel_id):
         return channel_id
+    if thousand and str(-100) not in str(channel_id):
+        return int(f'-100{channel_id}')
+    elif thousand:
+        return int(channel_id)
+    else:
+        return int(str(channel_id).replace("-100", ""))
 
 
 def _base_channel_url(
