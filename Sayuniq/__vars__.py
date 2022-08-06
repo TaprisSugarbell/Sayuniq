@@ -46,7 +46,7 @@ def human_hour_readable(hformat=HOUR_FORMAT, _utc=UTC):
 
 def _channel_type(channel_id: str | int, thousand: bool = True):
     channel_id = str(channel_id) if isinstance(channel_id, int) else channel_id
-    if not re.match(r"-?\d*", channel_id):
+    if not re.match(r"-?\d+", channel_id):
         return channel_id
     if thousand and str(-100) not in str(channel_id):
         return int(f'-100{channel_id}')
