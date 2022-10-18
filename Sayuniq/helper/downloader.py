@@ -4,6 +4,7 @@ import mimetypes
 import os
 import random
 import re
+import math
 from typing import Any
 from urllib import parse
 from urllib.parse import urlparse
@@ -15,7 +16,7 @@ import yt_dlp as youtube_dl
 from PIL import Image
 from bs4 import BeautifulSoup
 from moviepy.editor import VideoFileClip
-
+from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from .utils import rankey
 from .. import logging_stream_info
 from ..__vars__ import CHANNEL_ID, LOG_CHANNEL, human_hour_readable
@@ -25,7 +26,11 @@ requests = cloudscraper.create_scraper(cloudscraper.Session)
 
 
 class SayuDownloader:
-    def __init__(self, url, out="./", custom=None, ext=None, thumb=None, _app=None, filter_links=False):
+    def __init__(self,
+                 url,
+                 out="./",
+                 custom=None,
+                 ext=None, thumb=None, _app=None, limit=20000000, filter_links=False):
         self.url = url
         self.out = out if out[-1] == "/" else f"{out}/"
         self.custom = custom
@@ -86,14 +91,14 @@ class SayuDownloader:
                 u = None
                 soup = BeautifulSoup(_r.content, "html.parser")
                 for i in soup.find_all("script", attrs={"type": "text/javascript"}):
-                    sm = i.string
-                    if sm:
-                        m = re.findall('"/d/.*"', sm)
-                        if m:
-                            u = eval(m[0].replace("+ (", "+ str( "))
-                            break
-                protocol = _url.split(".")[0]
-                return protocol + ".zippyshare.com" + u if u else _url
+                    if sm := i.string:
+                        if m := re.findall('/d/.*', sm):
+                            namaes = re.findall(r"/[\w.]*", m[0])
+                            t = math.pow(int([_f for _f in re.findall(r"\d*", sm) if _f][0]), 3) + 3
+                            u = f"/d/{namaes[1][1:]}/{int(t)}{namaes[-1]}"
+                            protocol = _r.url.split(".")[0]
+                            if u:
+                                return f"{protocol}.zippyshare.com{u}"
             case host if re.match(r"https://[\w.]*/v/[\w-]*", _r.url):
                 r = self.requests.post(f"https://{host}/api/source/" + _r.url.split("/")[-1])
                 return r.json()
@@ -148,12 +153,18 @@ class SayuDownloader:
             "thumb": yes_thumb
         }
 
-    async def iter_links(self, urls=None, **kwargs) -> Any:
+    async def iter_links(self, urls=None, key_id=rankey(), **kwargs) -> Any:
         urls = urls or self.url
         if not isinstance(urls, list):
             return None
         _total_urls = len(urls)
         _out = None
+        _reply_links = [
+            [
+                InlineKeyboardButton("Pause", f'pam_{key_id}'),
+                InlineKeyboardButton("Pause", f'bam_{key_id}')
+            ]
+        ]
         for _nn, url in enumerate(urls):
             _rl_ps = urlparse(url).netloc if isinstance(url, str) else urlparse(url[0]).netloc
             _dats = dict(url=url, dif=_nn, total=_total_urls, netloc=_rl_ps,
