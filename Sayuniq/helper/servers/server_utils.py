@@ -4,13 +4,14 @@ import re
 import aiohttp
 from bs4 import BeautifulSoup
 
-PARSER = "html.parser"
+from .. import PARSER
+from ...__vars__ import USER_AGENT
 
 
 async def get_jk_anime(slug_title):
-    async with aiohttp.ClientSession() as requests:
+    async with aiohttp.ClientSession(headers=USER_AGENT) as request:
         _url_base = "https://jkanime.net/"
-        r = await requests.get(
+        r = await request.get(
             "https://jkanime.net/ajax/ajax_search/",
             params={
                 "q": slug_title
@@ -29,7 +30,7 @@ async def get_jk_anime(slug_title):
 
 
 async def get_mc_anime(_url):
-    async with aiohttp.ClientSession() as requests:
-        async with requests.get(_url) as r:
+    async with aiohttp.ClientSession(headers=USER_AGENT) as session:
+        async with session.get(_url) as r:
             soup = BeautifulSoup(await r.content.read(), PARSER)
             return soup.find("div", attrs={"class": "lista"}).find("a").get("href")

@@ -1,26 +1,22 @@
 import asyncio
+import shutil
+import time
 
 from Sayuniq.helper.anime_sites import *
-from Sayuniq.helper.mongo_connect import *
-from Sayuniq.helper.utils import create_folder
-
-folder = create_folder(temp_folder="DBooru")
-img_uploaded = Mongo(database="Sayuniq", collection="booru")
 
 
-def run_asyncio(obj, app):
-    asyncio.run(obj(app))
+def run_asyncio(obj, *args, **kwargs):
+    asyncio.run(obj(*args, **kwargs))
 
 
 async def read_and_execute(app):
     while True:
+        _start = time.time()
         for site in sites:
             try:
                 await site(app)
             except Exception as e:
-                await logs_channel_update(sayureports(reason=e), "send_document",
-                                          caption=get_string("document_err").format(BOT_NAME),
-                                          _app=app
-                                          )
-        logging_stream_info("Todo subido :3")
-        await asyncio.sleep(300)
+                shutil.rmtree("./Downloads/")
+                await sayu_error(e, app, f"Fallo el extractor de - \"{site.__name__}\"")
+        logging_stream_info(f"Todo subido en {round(time.time() - _start)}s :3")
+        await asyncio.sleep(120)

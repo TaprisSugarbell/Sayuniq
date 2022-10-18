@@ -1,9 +1,13 @@
+import asyncio
+import json
 import mimetypes
 import os
 import random
 import re
+import math
 from typing import Any
 from urllib import parse
+from urllib.parse import urlparse
 
 import aiofiles
 import aiohttp
@@ -12,18 +16,23 @@ import yt_dlp as youtube_dl
 from PIL import Image
 from bs4 import BeautifulSoup
 from moviepy.editor import VideoFileClip
-
+from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from .utils import rankey
 from .. import logging_stream_info
-from ..__vars__ import CHANNEL_ID
+from ..__vars__ import CHANNEL_ID, LOG_CHANNEL, human_hour_readable
+from ..strings import get_string
 
 requests = cloudscraper.create_scraper(cloudscraper.Session)
 
 
 class SayuDownloader:
-    def __init__(self, url, out="./", custom=None, ext=None, thumb=None, _app=None, filter_links=False):
+    def __init__(self,
+                 url,
+                 out="./",
+                 custom=None,
+                 ext=None, thumb=None, _app=None, limit=20000000, filter_links=False):
         self.url = url
-        self.out = out if out[-1] == "/" else out + "/"
+        self.out = out if out[-1] == "/" else f"{out}/"
         self.custom = custom
         self.ext = ext
         self.thumb = thumb
@@ -31,6 +40,7 @@ class SayuDownloader:
         self.filter_links = filter_links
         self.__rth = rankey()
         self.__rthumb = "{}thumb-{}.jpg"
+        self._message_id = None
         self.requests = cloudscraper.create_scraper(cloudscraper.Session)
 
     @staticmethod
@@ -51,25 +61,24 @@ class SayuDownloader:
         return _th
 
     async def get_thumbnail(self):
-        if self.thumb:
-            _scheme = parse.urlparse(self.thumb)
-            if _scheme.scheme:
-                _th = self.__rthumb.format(self.out, self.__rth)
-                if os.path.exists(_th):
-                    _th = self.__rthumb.format(self.out, rankey())
-                try:
-                    return await self.download_thumb(_th)
-                except Exception as e:
-                    print(e)
-                    return _th
-            elif os.path.exists(self.thumb):
-                return self.thumb
-            else:
-                return self.app.download_media(_scheme.path, self.out)
-        else:
+        if not self.thumb:
             return self.__rthumb.format(self.out, rankey())
+        _scheme = parse.urlparse(self.thumb)
+        if _scheme.scheme:
+            _th = self.__rthumb.format(self.out, self.__rth)
+            if os.path.exists(_th):
+                _th = self.__rthumb.format(self.out, rankey())
+            try:
+                return await self.download_thumb(_th)
+            except Exception as e:
+                print(e)
+                return _th
+        elif os.path.exists(self.thumb):
+            return self.thumb
+        else:
+            return self.app.download_media(_scheme.path, self.out)
 
-    async def links_filter(self, url=None) -> str | Any:
+    async def links_filter(self, url=None, solidfiles=False) -> str | Any:
         _url = url or self.url
         _r = self.requests.get(_url, allow_redirects=True)
         host = parse.urlparse(_r.url).netloc
@@ -82,21 +91,25 @@ class SayuDownloader:
                 u = None
                 soup = BeautifulSoup(_r.content, "html.parser")
                 for i in soup.find_all("script", attrs={"type": "text/javascript"}):
-                    sm = i.string
-                    if sm:
-                        m = re.findall('"/d/.*"', sm)
-                        if m:
-                            u = eval(m[0].replace("+ (", "+ str( "))
-                            break
-                protocol = _url.split(".")[0]
-                return protocol + ".zippyshare.com" + u if u else _url
+                    if sm := i.string:
+                        if m := re.findall('/d/.*', sm):
+                            namaes = re.findall(r"/[\w.]*", m[0])
+                            t = math.pow(int([_f for _f in re.findall(r"\d*", sm) if _f][0]), 3) + 3
+                            u = f"/d/{namaes[1][1:]}/{int(t)}{namaes[-1]}"
+                            protocol = _r.url.split(".")[0]
+                            if u:
+                                return f"{protocol}.zippyshare.com{u}"
             case host if re.match(r"https://[\w.]*/v/[\w-]*", _r.url):
                 r = self.requests.post(f"https://{host}/api/source/" + _r.url.split("/")[-1])
                 return r.json()
+            case host if re.match(r"www\.solidfiles\.com", host) and solidfiles:
+                soup = BeautifulSoup(_r.content, "html.parser")
+                fnd_dct = re.findall(r"\{\"mimetype.*}", soup.find_all("script")[-1].string)[0]
+                return json.loads(fnd_dct)["downloadUrl"]
             case _:
                 return _url
 
-    async def extractor(self, url=None):
+    async def extractor(self, url=None, solidfiles=False):
         _url, out, custom, ext, thumb = (
             url or self.url,
             self.out,
@@ -108,11 +121,13 @@ class SayuDownloader:
             _url = await self.links_filter(_url)
             if isinstance(_url, dict):
                 _url = _url["data"][-1]["file"]
+        if solidfiles:
+            _url = await self.links_filter(_url, solidfiles)
         video_info = youtube_dl.YoutubeDL().extract_info(_url, download=False)
         # Thumbnail?
         _thumb = await self.get_thumbnail()
         # Demás datos, title, ext
-        _title = re.sub("/", "", custom or video_info["title"])
+        _title = re.sub("/", "", custom or video_info["title"]) + f"@{CHANNEL_ID}"
         try:
             _ext = ext or video_info["ext"]
         except KeyError:
@@ -127,7 +142,7 @@ class SayuDownloader:
         file_type = mimetypes.guess_type(out_)[0]
         # Si es video trata de obtener capturas
         if "video" in file_type and not os.path.exists(_thumb):
-            yes_thumb =  await self.generate_screenshot(out_, _thumb)
+            yes_thumb = await self.generate_screenshot(out_, _thumb)
         elif os.path.exists(_thumb):
             yes_thumb = _thumb
         else:
@@ -138,31 +153,69 @@ class SayuDownloader:
             "thumb": yes_thumb
         }
 
-    async def iter_links(self, urls=None) -> Any:
+    async def iter_links(self, urls=None, key_id=rankey(), **kwargs) -> Any:
         urls = urls or self.url
-        if isinstance(urls, list):
-            _total_urls = len(urls)
-            _out = None
-            for _nn, url in enumerate(urls):
-                try:
-                    _out = await self.extractor(url)
-                except Exception as e:
-                    logging_stream_info(f'Fallo la descarga de {url} [{_nn}/{_total_urls}]')
-                    if self.thumb:
-                        if os.path.exists(self.thumb):
-                            os.remove(self.thumb)
-                    print(e)
-                if _out:
-                    break
-            return _out
-        else:
+        if not isinstance(urls, list):
             return None
+        _total_urls = len(urls)
+        _out = None
+        _reply_links = [
+            [
+                InlineKeyboardButton("Pause", f'pam_{key_id}'),
+                InlineKeyboardButton("Pause", f'bam_{key_id}')
+            ]
+        ]
+        for _nn, url in enumerate(urls):
+            _rl_ps = urlparse(url).netloc if isinstance(url, str) else urlparse(url[0]).netloc
+            _dats = dict(url=url, dif=_nn, total=_total_urls, netloc=_rl_ps,
+                         date=human_hour_readable(), **kwargs)
+            if self._message_id:
+                await self.app.edit_message_text(
+                    LOG_CHANNEL,
+                    self._message_id,
+                    get_string("URL_UP_LOADING").format(**_dats),
+                    disable_web_page_preview=True)
+            else:
+                msh_ = await self.app.send_message(
+                    LOG_CHANNEL, get_string("URL_UP_LOADING").format(**_dats))
+                self._message_id = msh_.id
+            try:
+                if isinstance(url, tuple):
+                    _out = await self.extractor(url[0])
+                elif isinstance(url, list):
+                    _out = await self.extractor(url[0], True)
+                else:
+                    if _rl_ps == "www.yourupload.com" and _nn != _total_urls:
+                        urls.append((url,))
+                        continue
+                    elif _rl_ps == "www.solidfiles.com" and _nn != _total_urls:
+                        urls.append([url])
+                    _out = await asyncio.wait_for(self.extractor(url), 180)
+            except asyncio.TimeoutError:
+                urls.append((url,))
+                logging_stream_info(
+                    f"Fallo la descarga de - [{_nn}/{_total_urls}] - [link]({url}) por \"TimeoutError\"")
+                _total_urls += 1
+            except Exception as e:
+                logging_stream_info(f'Fallo la descarga de {url} [{_nn}/{_total_urls}]')
+                if self.thumb and os.path.exists(self.thumb):
+                    os.remove(self.thumb)
+                await self.app.edit_message_text(LOG_CHANNEL, self._message_id, get_string("URL_DWN_ERR").format(**_dats), disable_web_page_preview=True)
+
+            if _out:
+                await self.app.edit_message_text(
+                    LOG_CHANNEL,
+                    self._message_id,
+                    get_string("URL_UPLOADED").format(**_dats),
+                    disable_web_page_preview=True)
+                break
+        return _out
 
 
-async def download_assistant(_app, urls, folder, caption, thumb=None):
+async def download_assistant(_app, urls, folder, caption, thumb=None, **kwargs):
     sd = SayuDownloader(urls, folder, thumb=thumb, _app=_app, filter_links=True)
     logging_stream_info(urls)
-    vide_file = await sd.iter_links()
+    vide_file = await sd.iter_links(**kwargs)
     file_video = vide_file["file"]
     thumb = vide_file["thumb"]
     logging_stream_info(f"Se ha descargado {vide_file}")

@@ -1,7 +1,8 @@
 import os
 from ..strings import get_string
 from pyrogram import Client, filters
-from .. import logs_channel_update, log_file, auth_users, BOT_NAME
+from ..__vars__ import LOG_CHANNEL, BOT_NAME, human_hour_readable
+from .. import log_file, auth_users
 
 
 @Client.on_message(filters.command(["log", "logs"]))
@@ -11,10 +12,14 @@ async def __ulgs__(bot, update):
     AUTH_USERS = await auth_users()
     if user_id == 784148805 or user_id in AUTH_USERS:
         if os.path.getsize(log_file) > 0:
-            await logs_channel_update(log_file, "send_document",
-                                      caption=get_string("document_log").format(BOT_NAME),
-                                      _app=bot
-                                      )
+            await bot.send_document(
+                LOG_CHANNEL,
+                log_file,
+                caption=get_string("document_log").format(
+                    bot_name=BOT_NAME,
+                    date=human_hour_readable()
+                )
+            )
             await bot.send_message(
                 user_id,
                 "Listo."
@@ -24,10 +29,14 @@ async def __ulgs__(bot, update):
                 user_id,
                 f"No hay log.\n\"{os.listdir('./logs/')}\""
             )
-            await logs_channel_update(log_file, "send_document",
-                                      caption=get_string("document_log").format(BOT_NAME),
-                                      _app=bot
-                                      )
+            await bot.send_document(
+                LOG_CHANNEL,
+                log_file,
+                caption=get_string("document_log").format(
+                    bot_name=BOT_NAME,
+                    date=human_hour_readable()
+                )
+            )
     else:
         print(user_id)
 
