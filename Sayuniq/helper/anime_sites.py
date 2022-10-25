@@ -3,6 +3,7 @@ from .database_utils import database_assistant
 from .logs_utils import sayu_error
 from .mongo_connect import *
 from .servers import *
+# from .database_Tests import *
 from .servers.server_utils import get_jk_anime, get_mc_anime
 from ..__vars__ import BOT_NAME, USER_AGENT
 import string
@@ -49,7 +50,7 @@ async def tioanime(app):
 async def jkanime(app):
     _site = "Jkanime"
     _url_base = "https://jkanime.net/"
-    async with aiohttp.ClientSession() as session:
+    async with aiohttp.ClientSession(headers=USER_AGENT) as session:
         async with session.get(_url_base) as result:
             soup = BeautifulSoup(await result.content.read(), "html.parser")
             list_of_a = soup.find("div", attrs={"class": "maximoaltura"}).find_all("a")
@@ -154,7 +155,39 @@ async def animeflv(app):
                         await sayu_error(e, app)
 
 
+# async def anime_tests(app):
+#     _site = "AnimeTesting"
+#     chapter_ = 0
+#     anime_url = "https://t.me/AnimeJapanTV"
+#     for _a in SERVERS:
+#         title = TITLE
+#         chapter_ += 1
+#         chapter_no = str(chapter_)
+#         _sa = SitesAssistant(_site, title, None,
+#                              chapter_no, _database=db, app=app)
+#         _c = await _sa.find_on_db()
+#         await _sa.get_caption()
+#         servers = [SERVERS[chapter_ - 1]]
+#         chapter_url = "https://t.me/AnimeJapanTV"
+#         if _c:
+#             get_chapter = await _sa.get_chapter()
+#             if get_chapter or _c.get("is_banned") or _c.get("is_paused"):
+#                 continue
+#             try:
+#                 await database_assistant(
+#                     _sa, servers, anime_url, chapter_url, True)
+#             except Exception as e:
+#                 await sayu_error(e, app)
+#         else:
+#             try:
+#                 await database_assistant(
+#                     _sa, servers, anime_url, chapter_url)
+#             except Exception as e:
+#                 await sayu_error(e, app)
+
+
 sites = [
+    # anime_tests
     animeflv,
     jkanime,
     monoschinos,
