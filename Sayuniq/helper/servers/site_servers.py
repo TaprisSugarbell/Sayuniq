@@ -119,7 +119,9 @@ async def get_flv_servers(chapter_url):
         async with session.get(chapter_url) as r:
             logging_stream_info(f"Get {chapter_url} is \"{r.ok}\"")
             soup = BeautifulSoup(await r.content.read(), "html.parser")
+
     return [
         ou.get("code") for ou in json.loads(
-            re.findall(r"\{\"SUB.*}", soup.find_all("script")[-7].string)[0])["SUB"]
+            [re.findall(r"\{\"SUB.*}", i.string) for i in soup.find_all("string") if getattr(i, "string") and "SUB" in getattr(i, "string")][0][0]["SUB"]
+        )
     ]
