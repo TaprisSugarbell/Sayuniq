@@ -122,6 +122,6 @@ async def get_flv_servers(chapter_url):
 
     return [
         ou.get("code") for ou in json.loads(
-            [re.findall(r"\{\"SUB.*}", i.string) for i in soup.find_all("string") if getattr(i, "string") and "SUB" in getattr(i, "string")][0][0]["SUB"]
-        )
+            [re.findall(r"\{\"SUB.*}", i.string) for i in soup.find_all("string") if getattr(i, "string") and "SUB" in getattr(i, "string")][0][0]
+        )["SUB"]
     ]
