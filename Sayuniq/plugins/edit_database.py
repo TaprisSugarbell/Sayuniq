@@ -17,7 +17,6 @@ async def __edb__(bot, update):
     c, key_id = update.text.split()[1].split("_")
     _c = await confirm_one(db, {"key_id": key_id})
     if _c:
-        site = _c["site"]
         thumb = _c["thumb"]
         anime = _c["anime"]
         chapters = _c["chapters"]
