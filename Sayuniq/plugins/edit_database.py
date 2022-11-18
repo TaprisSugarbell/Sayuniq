@@ -181,5 +181,5 @@ async def __ban_anime__(bot, update):
         "pausado" if tre else "reanudado",
         {"is_paused": tre})
     _arm_txt_inf = f'**{_c["anime"]}** ha sido {_txt_inf}!'
-    await update_many(db, {"anime": _c["anime"]}, _chng_inf_is)
+    await update_one(db, ky_id, _chng_inf_is)
     await bot.send_message(chat_id, _arm_txt_inf)
