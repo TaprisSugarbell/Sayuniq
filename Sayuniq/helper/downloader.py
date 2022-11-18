@@ -162,7 +162,7 @@ class SayuDownloader:
         _reply_links = [
             [
                 InlineKeyboardButton("Pause", f'pam_{key_id}'),
-                InlineKeyboardButton("Pause", f'bam_{key_id}')
+                InlineKeyboardButton("Ban", f'bam_{key_id}')
             ]
         ]
         for _nn, url in enumerate(urls):
