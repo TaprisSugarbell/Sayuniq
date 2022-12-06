@@ -2,7 +2,7 @@ import sys
 import traceback
 from typing import Any
 
-import pyrogram
+from pyrogram import Client
 from source.helpers.utils import rankey
 from source import logs_channel_update, human_hour_readable
 from source import sayu_logger
@@ -39,7 +39,7 @@ def report_error(bot_name: str, extra_info: str = "", reason: Exception | str = 
 
 
 async def bot_error(
-    error: Exception = None, app: pyrogram.Client = None, reason: str = None, **kwargs
+    error: Exception = None, app: Client = None, reason: str = None, **kwargs
 ):
     if reason is None:
         reason = error

@@ -18,7 +18,7 @@ You should have received a copy of the GNU General Public License
 along with pyromod.  If not, see <https://www.gnu.org/licenses/>.
 """
 import math
-from .helpers import array_chunk
+from source.helpers.hps.helpers import array_chunk
 
 
 class Pagination:

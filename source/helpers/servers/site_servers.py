@@ -124,11 +124,14 @@ async def get_mc_servers(chapter_url):
 async def get_flv_servers(chapter_url):
     async with aiohttp.ClientSession(headers=USER_AGENT) as session:
         async with session.get(chapter_url) as r:
-            logging.info(f'Get {chapter_url} is "{r.ok}"')
             soup = BeautifulSoup(await r.content.read(), "html.parser")
     return [
         ou.get("code")
         for ou in json.loads(
-            re.findall(r"\{\"SUB.*}", soup.find_all("script")[-7].string)[0]
+            [
+                re.findall(r"\{\"SUB.*}", i.string)[0]
+                for i in soup.find_all("script")
+                if getattr(i, "string") and "SUB" in getattr(i, "string")
+            ][0]
         )["SUB"]
     ]

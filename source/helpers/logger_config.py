@@ -1,8 +1,7 @@
-import datetime
 from source.helpers.utils import create_folder
 from source.config import BOT_NAME, LOGGING_LEVEL
 
-__dr, __file = "./logs/", f"{datetime.datetime.strftime('%d/%m/%Y-%H:%M')}_{BOT_NAME}.log"
+__dr, __file = "./logs/", f"{BOT_NAME}.log"
 log_file = __dr + __file
 create_folder(temp_folder=__dr), create_folder(temp_folder="./reports/")
 # DEBUG

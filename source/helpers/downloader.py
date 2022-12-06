@@ -1,27 +1,29 @@
 import asyncio
 import json
+import logging
+import math
 import mimetypes
 import os
 import random
 import re
-import math
-import logging
 from typing import Any
 from urllib import parse
 from urllib.parse import urlparse
 
 import aiofiles
 import aiohttp
-import pyrogram
 import cloudscraper
+
 import yt_dlp as youtube_dl
-from PIL import Image
 from bs4 import BeautifulSoup
 from moviepy.editor import VideoFileClip
-from pyrogram.types import InlineKeyboardButton
-from .utils import rankey
-from ..config import CHANNEL_ID, LOG_CHANNEL, human_hour_readable
-from ..locales import get_string
+
+from PIL import Image
+from pyrogram import Client, types
+
+from source.config import CHANNEL_ID, LOG_CHANNEL, human_hour_readable
+from source.helpers.utils import rankey
+from source.locales import get_string
 
 requests = cloudscraper.create_scraper(cloudscraper.Session)
 
@@ -29,13 +31,12 @@ requests = cloudscraper.create_scraper(cloudscraper.Session)
 class SayuDownloader:
     def __init__(
         self,
-        url,
-        out="./",
-        custom=None,
-        ext=None,
-        thumb=None,
-        _app=None,
-        limit=20000000,
+        url: str,
+        out: str = "./",
+        custom: str = None,
+        ext: str = None,
+        thumb: str = None,
+        app: Client = None,
         filter_links=False,
     ):
         self.url = url
@@ -43,7 +44,7 @@ class SayuDownloader:
         self.custom = custom
         self.ext = ext
         self.thumb = thumb
-        self.app = _app
+        self.app = app
         self.filter_links = filter_links
         self.__rth = rankey()
         self.__rthumb = "{}thumb-{}.jpg"
@@ -176,8 +177,8 @@ class SayuDownloader:
         _out = None
         _reply_links = [
             [
-                InlineKeyboardButton("Pause", f"pam_{key_id}"),
-                InlineKeyboardButton("Pause", f"bam_{key_id}"),
+                types.InlineKeyboardButton("Pause", f"pam_{key_id}"),
+                types.InlineKeyboardButton("Pause", f"bam_{key_id}"),
             ]
         ]
         for _nn, url in enumerate(urls):
@@ -246,11 +247,9 @@ class SayuDownloader:
         return _out
 
 
-async def download_assistant(
-    _app: pyrogram.Client, urls, folder, caption, thumb=None, **kwargs
-):
-    sd = SayuDownloader(urls, folder, thumb=thumb, _app=_app, filter_links=True)
-    vide_file = await sd.iter_links(**kwargs)
+async def download_assistant(app: Client, urls, folder, caption, thumb=None, **kwargs):
+    download = SayuDownloader(urls, folder, thumb=thumb, app=app, filter_links=True)
+    vide_file = await download.iter_links(**kwargs)
     file_video = vide_file["file"]
     thumb = vide_file["thumb"]
     logging.info(f"Se ha descargado {vide_file}")
@@ -261,10 +260,10 @@ async def download_assistant(
     duration = int(clip.duration)
     match vide_file["type"]:
         case "video/mp4":
-            video = await _app.send_video(
-                CHANNEL_ID,
-                file_video,
-                caption,
+            video = await app.send_video(
+                chat_id=CHANNEL_ID,
+                video=file_video,
+                caption=caption,
                 duration=duration,
                 width=width,
                 height=height,
