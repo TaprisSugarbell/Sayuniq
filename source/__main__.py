@@ -1,7 +1,3 @@
-import sys
-
-sys.dont_write_bytecode = True
-
 import asyncio
 import logging
 from source import app, logs_channel_update
