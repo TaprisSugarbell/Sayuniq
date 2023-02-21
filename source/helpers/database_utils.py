@@ -1,23 +1,38 @@
 import shutil
 
-from .downloader import download_assistant
+from source.helpers.downloader import download_assistant
+from source.helpers.site_assistant import SitesAssistant
 
 
-async def database_assistant(_sa, servers, anime_url, chapter_url, _update=None):
-    app = _sa.app
-    folder = _sa.folder
-    caption = _sa.caption
-    thumb_url = _sa.thumb
-    msg_ = await download_assistant(
-        app, servers, folder, caption, thumb_url, anime=_sa.title, site=_sa.site
+async def database_assistant(
+    anime_info: SitesAssistant, servers, anime_url, chapter_url, update: bool = None
+):
+    app, folder, caption, thumb_url = (
+        anime_info.app,
+        anime_info.folder,
+        anime_info.caption,
+        anime_info.thumb,
     )
+
+    message = await download_assistant(
+        app,
+        servers,
+        folder,
+        caption,
+        thumb_url,
+        anime=anime_info.title,
+        site=anime_info.site,
+    )
+
     shutil.rmtree(folder)
-    await _sa.update_property(
+
+    await anime_info.update_property(
         anime_url=anime_url,
         chapter_url=chapter_url,
-        msg=msg_,
-        message_id=msg_.id,
-        update=_update,
+        msg=message,
+        message_id=message.id,
+        update=update,
     )
-    await _sa.buttons_replace()
-    await _sa.update_or_add_db()
+
+    await anime_info.buttons_replace()
+    await anime_info.update_or_add_db()

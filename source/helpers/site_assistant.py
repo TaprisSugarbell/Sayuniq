@@ -2,50 +2,49 @@ import re
 from datetime import datetime, timedelta, timezone
 from typing import Any
 
-import pyrogram
-from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from pyrogram import Client, types
 
-from .logs_utils import bot_error
-from .mongo_connect import confirm_one, update_one, add_one
-from .utils import rankey, create_folder
-from .. import sayu_logger, human_hour_readable
-from ..config import CHANNEL_ID, UTC, base_channel_url
-from ..locales import get_string
+from source import human_hour_readable, sayu_logger
+from source.config import CHANNEL_ID, UTC, base_channel_url
+from source.helpers.logs_utils import bot_error
+from source.helpers.mongo_connect import add_one, confirm_one, update_one, Mongo
+from source.helpers.utils import create_folder, rankey
+from source.locales import get_string
 
 
 class SitesAssistant:
     def __init__(
         self,
-        _site: str = None,
+        site: str = None,
         title: str = None,
         thumb: str = None,
         chapter_no: str | int | float = None,
         chapter_url: str = None,
         anime_url: str = None,
-        msg_: Any = None,
+        message: Any = None,
         message_id: int = None,
         anime_dict: dict = None,
         _prev: str | int = None,
         _next: str | int = None,
-        _update: bool = None,
+        update: bool = None,
         menu_id: str | int = None,
-        _database=None,
-        app=None,
+        database: Mongo = None,
+        app: Client = None,
     ):
-        self.site = _site
+        self.site = site
         self.title = title
         self.thumb = thumb
         self.chapter_no = chapter_no
         self.chapter_url = chapter_url
         self.anime_url = anime_url
-        self.msg = msg_
+        self.msg = message
         self.message_id = message_id
         self.anime_dict = anime_dict
         self.prev = _prev
         self.next = _next
-        self.update = _update
+        self.update = update
         self.menu_id = menu_id
-        self.database = _database
+        self.database = database
         self.app = app
 
         self.key_id = None or rankey(10)
@@ -71,7 +70,7 @@ class SitesAssistant:
     @staticmethod
     async def Ibtn(_p: bool = False, msg_btn=None, **kwargs):
         msg_btn = "<<" if _p else msg_btn or ">>"
-        return InlineKeyboardButton(msg_btn, **kwargs)
+        return types.InlineKeyboardButton(msg_btn, **kwargs)
 
     async def find_on_db(self):
         self.anime_dict = await confirm_one(
@@ -104,7 +103,7 @@ class SitesAssistant:
         )
         return self.caption
 
-    async def buttons_replace(self, app: pyrogram.Client = None):
+    async def buttons_replace(self, app: Client = None):
         app = app or self.app
         _btns, _btns1 = [], []
 
@@ -117,7 +116,7 @@ class SitesAssistant:
         )
         _lstado = await self.Ibtn(
             msg_btn="Listado",
-            url=f"https://t.me/{app.me.first_name}?start=mty_{self.key_id}",
+            url=f"https://t.me/{app.me.username}?start=mty_{self.key_id}",
         )
         _site_button = await self.Ibtn(msg_btn="Site Link", url=self.chapter_url)
 
@@ -148,7 +147,7 @@ class SitesAssistant:
                 await app.edit_message_reply_markup(
                     CHANNEL_ID,
                     prev_message_id,
-                    reply_markup=InlineKeyboardMarkup(
+                    reply_markup=types.InlineKeyboardMarkup(
                         [_btns1, [_lstado, prev_site_button]]
                     ),
                 )
@@ -160,19 +159,19 @@ class SitesAssistant:
                     f"NowChapterId: {now_chapter_id}",
                     extra={"hhr": human_hour_readable()},
                 )
-                await bot_error(e, app)
+                await bot_error(error=e, app=app)
         try:
             await app.edit_message_reply_markup(
                 CHANNEL_ID,
                 now_chapter_id,
-                reply_markup=InlineKeyboardMarkup(
+                reply_markup=types.InlineKeyboardMarkup(
                     [_btns, [_lstado, _site_button]]
                     if _btns
                     else [[_lstado, _site_button]]
                 ),
             )
         except Exception as e:
-            await bot_error(e, app)
+            await bot_error(error=e, app=app)
 
     async def update_or_add_db(self):
         _hours, _minutes = UTC.split(":") if ":" in UTC else (UTC, 0)

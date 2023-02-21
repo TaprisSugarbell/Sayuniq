@@ -22,7 +22,7 @@ def report_error(bot_name: str, extra_info: str = "", reason: Exception | str = 
         f" error si tiene algún dato confidencial aquí, "
         f"nadie verá sus datos si decide no hacerlo.\n"
     )
-    text = f"--------START {bot_name} CRASH LOG--------\n"
+    text += f"--------START {bot_name} CRASH LOG--------\n"
     text += extra_info
     text += "Traceback info:\nTraceback (most recent call last):\n"
     for tb in tbs:
