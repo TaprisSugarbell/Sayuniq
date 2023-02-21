@@ -140,7 +140,7 @@ async def monoschinos(app):
     _url_base = "https://monoschinos2.com/"
     async with aiohttp.ClientSession(headers=USER_AGENT) as session:
         async with session.get(_url_base) as r:
-            logger.info(r.status)
+            logger.error(r.status)
             soup = BeautifulSoup(await r.content.read(), "html.parser")
             list_of_animes = soup.find(
                 "div", attrs={"class": "row row-cols-5"}
