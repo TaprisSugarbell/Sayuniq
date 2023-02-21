@@ -3,7 +3,7 @@ from pyrogram import Client, filters, types
 from .. import auth_users, BOT_NAME
 from ..helpers.mongo_connect import Mongo, URI, add_one, confirm, remove_one
 
-_u = Mongo(URI, BOT_NAME, "users")
+db = Mongo(URI, BOT_NAME, "users")
 
 
 @Client.on_message(filters.command(["add", "watch", "delete", "del"]))
@@ -25,13 +25,13 @@ async def __add_and_delete_admins__(bot: Client, update: types.Message):
                 try:
                     user_id = int(data)
                     _ui = {"user_id": user_id}
-                    _c = await confirm(_u, _ui)
+                    _c = await confirm(db, _ui)
                     if _c:
                         await bot.send_message(
                             chat_id, f'"{user_id}" ya se encuentra en la base de datos.'
                         )
                     else:
-                        await add_one(_u, _ui)
+                        await add_one(db, _ui)
                         await bot.send_message(
                             chat_id, f'Se agrego "{user_id}" a la base de datos.'
                         )
@@ -43,9 +43,9 @@ async def __add_and_delete_admins__(bot: Client, update: types.Message):
                 try:
                     user_id = int(data)
                     _ui = {"user_id": user_id}
-                    _c = await confirm(_u, _ui)
+                    _c = await confirm(db, _ui)
                     if _c:
-                        await remove_one(_u, _ui)
+                        await remove_one(db, _ui)
                         await bot.send_message(
                             chat_id, f'Se elimino "{data}" de la base de datos'
                         )

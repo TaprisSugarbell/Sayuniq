@@ -1,7 +1,7 @@
 import asyncio
 import logging
 from source import app, logs_channel_update
-from source.config import __version__
+from source.config import __version__, BOT_NAME
 from source.helpers import configure_workdir
 from source.helpers.logs_utils import bot_error
 from source.helpers.loop_in_thread import read_and_execute, run_asyncio
@@ -15,7 +15,7 @@ async def main():
 
 
 if __name__ == "__main__":
-    logging.info(f"Starting Sayuniq, version - {__version__}")
+    logging.info(f"Starting {BOT_NAME}, version - {__version__}")
     try:
         app.run(main())
     except Exception as e:

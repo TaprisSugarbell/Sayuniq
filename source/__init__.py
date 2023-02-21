@@ -24,7 +24,7 @@ PACKAGE = __package__
 
 
 # Client
-plugins = dict(root=f"{BOT_NAME}/plugins")
+plugins = dict(root=f"source/plugins")
 
 app = pyrogram.Client(
     name=BOT_NAME,
@@ -59,7 +59,7 @@ async def logs_channel_update(
     text = {"text": message} if mode in send_mode else {mode.split("_")[-1]: message}
 
     kwargs |= text
-    await getattr(client, mode)(LOG_CHANNEL, *args, **kwargs)
+    await getattr(client, mode)(chat_id=LOG_CHANNEL, *args, **kwargs)
     if os.path.exists(message) and message != log_file:
         os.remove(message)
 

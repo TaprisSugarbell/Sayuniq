@@ -1,8 +1,7 @@
 from pyromod.helpers import ikb
-from ...config import CHANNEL_ID
-from pyrogram import Client, filters
-from ..site_assistant import base_channel_url
-from ..hps.pagination import Pagination
+from source.config import CHANNEL_ID
+from source.helpers.site_assistant import base_channel_url
+from source.helpers.hps.pagination import Pagination
 
 
 def page_data(page):

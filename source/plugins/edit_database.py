@@ -1,16 +1,16 @@
-from pyrogram import Client, types, filters
-from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from pyrogram import Client, filters, types
 from pyrogram.enums import ParseMode
-from .. import auth_users, BOT_NAME
-from ..helpers.chapters.chapters_page import chapters_ikb
-from ..helpers.mongo_connect import Mongo, update_one, confirm_one, update_many
+from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+
+from source import BOT_NAME, auth_users
+from source.helpers.chapters.chapters_page import chapters_ikb
+from source.helpers.mongo_connect import Mongo, confirm_one, update_many, update_one
 
 db = Mongo(database=BOT_NAME, collection="japanemi")
 
 
 @Client.on_message(filters.regex("mty_.*") & filters.private)
-async def __edb__(bot: Client, update):
-
+async def __edb__(bot, update):
     message_id = update.id
     chat_id = update.from_user.id
     AUTH_USERS = await auth_users()
@@ -22,11 +22,11 @@ async def __edb__(bot: Client, update):
         anime = _c["anime"]
         chapters = _c["chapters"]
         anime_url = _c["anime_url"]
-
+        print(_c)
         if chat_id in AUTH_USERS:
             await bot.send_message(
                 chat_id,
-                f"`{key_id}`\n**{anime}**\nCapítulos subidos: **{len(chapters)}**",
+                f"`{key_id}`\n**{anime}**\nCapitulos subidos: **{len(chapters)}**",
                 reply_markup=InlineKeyboardMarkup(
                     [
                         [
@@ -38,8 +38,20 @@ async def __edb__(bot: Client, update):
                             InlineKeyboardButton("Chapters", f"chps_{key_id}"),
                         ],
                         [
-                            InlineKeyboardButton("Pause Anime", f"pam_{key_id}"),
-                            InlineKeyboardButton("Ban Anime", f"bam_{key_id}"),
+                            InlineKeyboardButton(
+                                "Pause Anime (one)", f"pam_{key_id}_one"
+                            ),
+                            InlineKeyboardButton(
+                                "Ban Anime (one)", f"bam_{key_id}_one"
+                            ),
+                        ],
+                        [
+                            InlineKeyboardButton(
+                                "Pause Anime (all)", f"pam_{key_id}_all"
+                            ),
+                            InlineKeyboardButton(
+                                "Ban Anime (all)", f"bam_{key_id}_all"
+                            ),
                         ],
                         [
                             InlineKeyboardButton("Finalizado", f"f_one_{key_id}"),
@@ -53,21 +65,20 @@ async def __edb__(bot: Client, update):
             chikb = await chapters_ikb(_c)
             await bot.send_message(
                 chat_id,
-                f"**{anime}**\nCapítulos subidos: **{len(chapters)}**",
+                f"**{anime}**\nCapitulos subidos: **{len(chapters)}**",
                 reply_markup=chikb,
             )
     else:
-        await bot.send_message(chat_id, "No hay capítulos subidos...")
+        await bot.send_message(chat_id, "No hay capitulos subidos...")
     await bot.delete_messages(chat_id, message_id)
 
 
 @Client.on_callback_query(filters.regex("pgd_.*"))
-async def __pgd__(bot: Client, update: types.CallbackQuery):
-
-    message_id = update.message.id
-    chat_id = update.message.from_user.id
+async def __pgd__(bot: Client, callback: types.CallbackQuery):
+    message_id = callback.message.id
+    chat_id = callback.message.from_user.id
     AUTH_USERS = await auth_users()
-    c, key_id, page = update.data.split("_")
+    c, key_id, page = callback.data.split("_")
     _c = await confirm_one(db, {"key_id": key_id})
     if _c:
 
@@ -80,10 +91,10 @@ async def __pgd__(bot: Client, update: types.CallbackQuery):
 
 
 @Client.on_callback_query(filters.regex(r"chps_.*"))
-async def __chps__(bot: Client, update: types.CallbackQuery):
+async def __chps__(bot: Client, callback: types.CallbackQuery):
 
-    chat_id = update.from_user.id
-    c, key_id = update.data.split("_")
+    chat_id = callback.from_user.id
+    _, key_id = callback.data.split("_")
     _c = await confirm_one(db, {"key_id": key_id})
     if _c:
 
@@ -110,10 +121,10 @@ async def __chps__(bot: Client, update: types.CallbackQuery):
 
 
 @Client.on_callback_query(filters.regex(r"ttl_.*"))
-async def __edit_title__(bot: Client, update: types.CallbackQuery):
+async def __edit_title__(bot: Client, callback: types.CallbackQuery):
 
-    chat_id = update.from_user.id
-    data, key_id = update.data.split("_")
+    chat_id = callback.from_user.id
+    data, key_id = callback.data.split("_")
     ky_id = {"key_id": key_id}
     msg = await bot.ask(chat_id, "Envía el nuevo titulo")
 
@@ -123,10 +134,10 @@ async def __edit_title__(bot: Client, update: types.CallbackQuery):
 
 
 @Client.on_callback_query(filters.regex(r"thb_.*"))
-async def __edit_thumb__(bot: Client, update: types.CallbackQuery):
+async def __edit_thumb__(bot: Client, callback: types.CallbackQuery):
 
-    chat_id = update.from_user.id
-    data, key_id = update.data.split("_")
+    chat_id = callback.from_user.id
+    data, key_id = callback.data.split("_")
     ky_id = {"key_id": key_id}
     _c = await confirm_one(db, ky_id)
     msg = await bot.ask(chat_id, "Envía link o imagen")
@@ -139,22 +150,22 @@ async def __edit_thumb__(bot: Client, update: types.CallbackQuery):
 
 
 @Client.on_callback_query(filters.regex(r"[pb]am_.*"))
-async def __ban_anime__(bot: Client, update: types.CallbackQuery):
-
+async def __ban_anime__(bot, update):
     chat_id = update.from_user.id
-    data, key_id = update.data.split("_")
+    data, key_id, __type__ = update.data.split("_")
     ky_id = {"key_id": key_id}
     _c = await confirm_one(db, ky_id)
-    _tt = _c.get("is_banned")
-    tre = True if _tt is False else (True if _tt is None else False)
+    _tt = _c.get("is_banned") or _c.get("is_paused")
+    tre = _tt is None if _tt else True
     _txt_inf, _chng_inf_is = (
         ("baneado" if tre else "desbaneado", {"is_banned": tre, "chapters": {}})
         if data == "bam"
         else ("pausado" if tre else "reanudado", {"is_paused": tre})
     )
     _arm_txt_inf = f'**{_c["anime"]}** ha sido {_txt_inf}!'
-    await update_many(db, {"anime": _c["anime"]}, _chng_inf_is)
-    if _tt:
-        await bot.send_message(chat_id, _arm_txt_inf)
-    else:
-        await bot.send_message(chat_id, _arm_txt_inf)
+    match __type__:
+        case "one":
+            await update_one(db, ky_id, _chng_inf_is)
+        case "all":
+            await update_many(db, {"anime": _c["anime"]}, _chng_inf_is)
+    await bot.send_message(chat_id, _arm_txt_inf)

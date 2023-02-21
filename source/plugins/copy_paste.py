@@ -1,9 +1,14 @@
 from pyrogram import Client, types, filters, enums
 import asyncio
-from .. import BOT_NAME
-from ..helpers.mongo_connect import Mongo, remove_one, confirm_one, update_one, add_one
+from source import BOT_NAME
+from source.helpers.mongo_connect import (
+    Mongo,
+    remove_one,
+    confirm_one,
+    update_one,
+    add_one,
+)
 
-MET = enums.MessageEntityType
 db = Mongo(database=BOT_NAME, collection="copy_paste")
 
 
@@ -29,32 +34,33 @@ async def __copy_paste__(bot: Client, message: types.Message):
                         chat_id, message.reply_to_message_id
                     )
                 copy_text = [
-                    _iuo.caption for _iuo in media_group if getattr(_iuo, "caption")
+                    msg.caption for msg in media_group if getattr(msg, "caption")
                 ][0]
             else:
                 copy_text = reply_to_message.text
-            _c = await confirm_one(
+            user = await confirm_one(
                 db,
                 {
                     "user_id": user_id,
                 },
             )
-            if _c:
-                if copy_text == _c["copy_text"]:
+            if user:
+                if copy_text == user["copy_text"]:
                     await bot.send_message(chat_id, "Ya copiaste este texto :3")
                 else:
                     await bot.send_message(
                         chat_id,
                         f"Ya haz copiado un texto, se reemplazara el anterior :3\n"
-                        f"**Anterior:** `{_c['copy_text']}`",
+                        f"**Anterior:** `{user['copy_text']}`",
                     )
                     await update_one(db, {"user_id": user_id}, {"copy_text": copy_text})
             else:
                 await add_one(db, {"user_id": user_id, "copy_text": copy_text})
                 await bot.send_message(chat_id, "Se ha copiado el texto :3")
         else:
-            _c = await confirm_one(db, {"user_id": user_id})
-            copy_text = _c["copy_text"]
+            user = await confirm_one(db, {"user_id": user_id})
+            copy_text = user["copy_text"]
+
             if sender_chat:
                 await bot.edit_message_caption(
                     sender_chat.id, reply_to_message.forward_from_message_id, copy_text
