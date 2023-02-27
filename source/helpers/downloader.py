@@ -213,8 +213,10 @@ class SayuDownloader:
                 else:
                     if _rl_ps == "www.yourupload.com":
                         urls.remove(url)
+                        continue
                     elif _rl_ps == "www.solidfiles.com" and _nn != _total_urls:
                         urls.append([url])
+                        continue
                     _out = await asyncio.wait_for(self.extractor(url), 180)
             except asyncio.TimeoutError:
                 urls.append((url,))
