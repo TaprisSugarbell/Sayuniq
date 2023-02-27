@@ -13,6 +13,7 @@ from urllib.parse import urlparse
 import aiofiles
 import aiohttp
 import cloudscraper
+from PyBypass import bypass
 
 import yt_dlp as youtube_dl
 from bs4 import BeautifulSoup
@@ -101,15 +102,10 @@ class SayuDownloader:
                 for i in soup.find_all("script", attrs={"type": "text/javascript"}):
                     if sm := i.string:
                         if m := re.findall("/d/.*", sm):
-                            namaes = re.findall(r"/[\w.]*", m[0])
-                            t = (
-                                math.pow(
-                                    int([_f for _f in re.findall(r"\d*", sm) if _f][0]),
-                                    3,
-                                )
-                                + 3
-                            )
-                            u = f"/d/{namaes[1][1:]}/{int(t)}{namaes[-1]}"
+                            namaes = re.findall(r"/[\w.]*", sm)
+                            vlt = [_f for _f in re.findall(r"\d*", sm) if _f]
+                            var_B = (int(vlt[1]) % int(vlt[2])) * (int(vlt[1]) % 3)
+                            u = f"/d/{namaes[1][1:]}/{int(var_B) + 18}{namaes[-1]}"
                             protocol = _r.url.split(".")[0]
                             if u:
                                 return f"{protocol}.zippyshare.com{u}"
@@ -124,6 +120,8 @@ class SayuDownloader:
                     r"\{\"mimetype.*}", soup.find_all("script")[-1].string
                 )[0]
                 return json.loads(fnd_dct)["downloadUrl"]
+            case host if re.match(r"streamtape.com", host):
+                return bypass(_url)
             case _:
                 return _url
 
@@ -214,7 +212,7 @@ class SayuDownloader:
                     _out = await self.extractor(url[0], True)
                 else:
                     if _rl_ps == "www.yourupload.com" and _nn != _total_urls:
-                        urls.append((url,))
+                        # urls.append((url,))
                         continue
                     elif _rl_ps == "www.solidfiles.com" and _nn != _total_urls:
                         urls.append([url])
