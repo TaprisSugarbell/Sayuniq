@@ -253,7 +253,7 @@ async def download_assistant(app: Client, urls, folder, caption, thumb=None, **k
     thumb = vide_file["thumb"]
     logging.info(f"Se ha descargado {vide_file}")
     # file, type, thumb
-    clip = VideoFileClip(vide_file["file"])
+    clip = VideoFileClip(file_video)
     # Extraer información del video
     width, height = clip.size
     duration = int(clip.duration)

@@ -1,14 +1,13 @@
 import os
 import random
 import string
-from typing import Any
 
 
 def rankey(length: int = 5, _string: string = string.hexdigits):
     return "".join(random.choice(_string) for _ in range(length))
 
 
-def create_folder(folder_name: Any = None, temp_folder: str = rankey()):
+def create_folder(folder_name: str | int = None, temp_folder: str = rankey()):
     _user_id = (
         ""
         if folder_name is None
