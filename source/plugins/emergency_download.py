@@ -11,6 +11,7 @@ from source.helpers.utils import create_folder
 async def emergency_download(bot, update):
     url = update.text
     temporal_folder = create_folder()
+    logging.info(f"ha iniciado la descarga de: {url}")
     vide_file = await SayuDownloader(url, temporal_folder, filter_links=True, app=bot).extractor()
     file_video = vide_file["file"]
     thumb = vide_file["thumb"]
