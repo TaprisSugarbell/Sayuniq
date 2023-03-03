@@ -1,4 +1,5 @@
 import logging
+import shutil
 
 from moviepy.editor import VideoFileClip
 from pyrogram import Client, filters
@@ -23,7 +24,7 @@ async def emergency_download(bot, update):
     duration = int(clip.duration)
     match vide_file["type"]:
         case "video/mp4":
-            video = await bot.send_video(
+            await bot.send_video(
                 chat_id=update.from_user.id,
                 video=file_video,
                 duration=duration,
@@ -31,7 +32,6 @@ async def emergency_download(bot, update):
                 height=height,
                 thumb=thumb,
             )
-            return video
         case _:
             logging.info(vide_file["type"])
-            return None
+    shutil.rmtree(temporal_folder, ignore_errors=True)
