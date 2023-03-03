@@ -101,7 +101,7 @@ class SayuDownloader:
                 soup = BeautifulSoup(_r.content, "html.parser")
                 for i in soup.find_all("script", attrs={"type": "text/javascript"}):
                     if sm := i.string:
-                        if m := re.findall("/d/.*", sm):
+                        if m := re.findall("parseInt.*", sm):
                             namaes = re.findall(r"/[\w.]*", sm)
                             vlt = [_f for _f in re.findall(r"\d*", sm) if _f]
                             var_B = (int(vlt[1]) % int(vlt[2])) * (int(vlt[1]) % 3)
@@ -216,7 +216,7 @@ class SayuDownloader:
                     elif _rl_ps == "www.solidfiles.com" and _nn != _total_urls:
                         urls.append([url])
                         continue
-                    _out = await asyncio.wait_for(self.extractor(url), 180)
+                    _out = await asyncio.wait_for(self.extractor(url), 300)
             except asyncio.TimeoutError:
                 urls.append((url,))
                 logging.info(
@@ -224,7 +224,7 @@ class SayuDownloader:
                 )
                 _total_urls += 1
             except Exception as e:
-                logging.info(f"Fallo la descarga de {url} [{_nn}/{_total_urls}]")
+                logging.info(f"Fallo la descarga de {url} [{_nn}/{_total_urls}]", exc_info=e)
                 if self.thumb and os.path.exists(self.thumb):
                     os.remove(self.thumb)
                 await self.app.edit_message_text(
@@ -246,9 +246,9 @@ class SayuDownloader:
 
 
 async def download_assistant(app: Client, urls, folder, caption, thumb=None, **kwargs):
-    logging.info(urls)
     download = SayuDownloader(urls, folder, thumb=thumb, app=app, filter_links=True)
     vide_file = await download.iter_links(**kwargs)
+    logging.info(urls)
     file_video = vide_file["file"]
     thumb = vide_file["thumb"]
     logging.info(f"Se ha descargado {vide_file}")
