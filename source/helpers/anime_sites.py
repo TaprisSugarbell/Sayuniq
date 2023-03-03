@@ -192,7 +192,6 @@ async def animeflv(app):
     _url_base = "https://www3.animeflv.net/"
     async with aiohttp.ClientSession(headers=USER_AGENT) as session:
         async with session.get(_url_base) as r:
-            r.status
             soup = BeautifulSoup(await r.content.read(), "html.parser")
             list_of_animes = soup.find(
                 "ul", {"class": "ListEpisodios AX Rows A06 C04 D03"}

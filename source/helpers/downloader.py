@@ -212,7 +212,6 @@ class SayuDownloader:
                     _out = await self.extractor(url[0], True)
                 else:
                     if _rl_ps == "www.yourupload.com":
-                        urls.remove(url)
                         continue
                     elif _rl_ps == "www.solidfiles.com" and _nn != _total_urls:
                         urls.append([url])
