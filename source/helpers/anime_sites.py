@@ -237,8 +237,7 @@ async def animeflv(app):
                             anime_info=anime_info,
                             servers=servers,
                             anime_url=anime_url,
-                            chapter_url=chapter_url,
-                            update=True,
+                            chapter_url=chapter_url
                         )
                     except Exception as e:
                         await bot_error(error=e, app=app)
