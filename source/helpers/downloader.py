@@ -102,10 +102,10 @@ class SayuDownloader:
                 for i in soup.find_all("script", attrs={"type": "text/javascript"}):
                     if sm := i.string:
                         if m := re.findall("parseInt.*", sm):
-                            namaes = re.findall(r"/[\w.]*", sm)
+                            namaes = re.findall(r"/[\w.%-]*", sm)
                             vlt = [_f for _f in re.findall(r"\d*", sm) if _f]
                             var_B = (int(vlt[1]) % int(vlt[2])) * (int(vlt[1]) % 3)
-                            u = f"/d/{namaes[1][1:]}/{int(var_B) + 18}{namaes[-1]}"
+                            u = f"/d{namaes[1]}/{int(var_B) + 18}{namaes[-1]}"
                             protocol = _r.url.split(".")[0]
                             if u:
                                 return f"{protocol}.zippyshare.com{u}"
@@ -212,6 +212,7 @@ class SayuDownloader:
                     _out = await self.extractor(url[0], True)
                 else:
                     if _rl_ps == "www.yourupload.com":
+                        _total_urls -= 1
                         continue
                     elif _rl_ps == "www.solidfiles.com" and _nn != _total_urls:
                         urls.append([url])
@@ -259,7 +260,7 @@ async def download_assistant(app: Client, urls, folder, caption, thumb=None, **k
     duration = int(clip.duration)
     match vide_file["type"]:
         case "video/mp4":
-            video = await app.send_video(
+            return await app.send_video(
                 chat_id=CHANNEL_ID,
                 video=file_video,
                 caption=caption,
@@ -268,7 +269,6 @@ async def download_assistant(app: Client, urls, folder, caption, thumb=None, **k
                 height=height,
                 thumb=thumb,
             )
-            return video
         case _:
             logging.info(vide_file["type"])
             return None
