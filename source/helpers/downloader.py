@@ -217,7 +217,7 @@ class SayuDownloader:
                     elif _rl_ps == "www.solidfiles.com" and _nn != _total_urls:
                         urls.append([url])
                         continue
-                    _out = await asyncio.wait_for(self.extractor(url), 300)
+                    _out = await asyncio.wait_for(self.extractor(url), 480)
             except asyncio.TimeoutError:
                 urls.append((url,))
                 logging.info(
