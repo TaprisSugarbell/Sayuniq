@@ -19,7 +19,7 @@ async def read_and_execute(app: Client):
             try:
                 await site(app)
             except Exception as e:
-                shutil.rmtree("./downloads/")
+                shutil.rmtree("./downloads/", ignore_errors=True)
                 await bot_error(
                     error=e,
                     app=app,
