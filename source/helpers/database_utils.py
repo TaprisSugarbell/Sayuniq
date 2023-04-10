@@ -1,4 +1,3 @@
-import contextlib
 import shutil
 
 from source.helpers.downloader import download_assistant
@@ -15,7 +14,7 @@ async def database_assistant(
         anime_info.thumb,
     )
 
-    with contextlib.suppress(TypeError):
+    try:
         message = await download_assistant(
             app,
             servers,
@@ -25,15 +24,17 @@ async def database_assistant(
             anime=anime_info.title,
             site=anime_info.site,
         )
+    except TypeError:
+        message = None
     shutil.rmtree(folder, ignore_errors=True)
+    if message:
+        await anime_info.update_property(
+            anime_url=anime_url,
+            chapter_url=chapter_url,
+            msg=message,
+            message_id=message.id,
+            update=update,
+        )
 
-    await anime_info.update_property(
-        anime_url=anime_url,
-        chapter_url=chapter_url,
-        msg=message,
-        message_id=message.id,
-        update=update,
-    )
-
-    await anime_info.buttons_replace()
-    await anime_info.update_or_add_db()
+        await anime_info.buttons_replace()
+        await anime_info.update_or_add_db()
