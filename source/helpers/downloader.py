@@ -34,7 +34,7 @@ async def count_err(title, site):
     anime_info = await confirm_one(db, find_with)
     err = anime_info.get("err") or 0
     if err == 5:
-        await update_one(db, {"is_paused": True})
+        await update_one(db, find_with,{"is_paused": True})
     else:
         await update_one(db, find_with, {"err": err + 1})
 

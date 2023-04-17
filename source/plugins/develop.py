@@ -15,7 +15,7 @@ async def aexec(code: str, bot: Client, message: types.Message):
 @Client.on_message(filters.command(["eval"]))
 async def __eval__(bot: Client, message: types.Message):
     AUTH_USERS = await auth_users()
-    if not message.from_user in AUTH_USERS:
+    if message.from_user not in AUTH_USERS:
         return
 
     try:
@@ -48,9 +48,8 @@ async def __eval__(bot: Client, message: types.Message):
         evaluation = stdout
     else:
         evaluation = "Hecho"
-    final_output = "**Entrada:** `{}`\n\n**Resultado:**\n\n```{}```".format(
-        cmd,
-        evaluation.strip(),
+    final_output = (
+        f"**Entrada:** `{cmd}`\n\n**Resultado:**\n\n```{evaluation.strip()}```"
     )
 
     if len(final_output) > 4096:
@@ -71,9 +70,5 @@ async def __eval__(bot: Client, message: types.Message):
 
 @Client.on_message(filters.command(commands=["json"]))
 async def __eval_json__(bot: Client, message: types.Message):
-    if message.reply_to_message:
-        json = message.reply_to_message
-    else:
-        json = message
-
+    json = message.reply_to_message or message
     await message.reply(text=f"```{json}```")
