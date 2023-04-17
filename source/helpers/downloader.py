@@ -32,13 +32,13 @@ db = Mongo(database=BOT_NAME, collection="japanemi")
 async def count_err(title, site):
     find_with = {"site": site, "anime": title}
     anime_info = await confirm_one(db, find_with)
-    err = anime_info.get("err")
+    err = anime_info.get("err") or 0
     if err == 5:
         await update_one(db, {"is_paused": True})
     elif err < 5:
         await update_one(db, find_with, {"err": err + 1})
     else:
-        await update_one(db, {"err": 1})
+        await update_one(db, {"err": err})
 
 
 class SayuDownloader:
