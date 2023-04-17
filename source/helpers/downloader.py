@@ -35,10 +35,8 @@ async def count_err(title, site):
     err = anime_info.get("err") or 0
     if err == 5:
         await update_one(db, {"is_paused": True})
-    elif err < 5:
-        await update_one(db, find_with, {"err": err + 1})
     else:
-        await update_one(db, {"err": err})
+        await update_one(db, find_with, {"err": err + 1})
 
 
 class SayuDownloader:
