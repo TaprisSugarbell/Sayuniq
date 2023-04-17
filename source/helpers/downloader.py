@@ -1,7 +1,6 @@
 import asyncio
 import json
 import logging
-import math
 import mimetypes
 import os
 import random
@@ -18,15 +17,28 @@ from PyBypass import bypass
 import yt_dlp as youtube_dl
 from bs4 import BeautifulSoup
 from moviepy.editor import VideoFileClip
-
+from source.helpers.mongo_connect import Mongo, confirm_one, update_one
 from PIL import Image
 from pyrogram import Client, types
 
-from source.config import CHANNEL_ID, LOG_CHANNEL, human_hour_readable
+from source.config import CHANNEL_ID, LOG_CHANNEL, human_hour_readable, BOT_NAME
 from source.helpers.utils import rankey
 from source.locales import get_string
 
 requests = cloudscraper.create_scraper(cloudscraper.Session)
+db = Mongo(database=BOT_NAME, collection="japanemi")
+
+
+async def count_err(title, site):
+    find_with = {"site": site, "anime": title}
+    anime_info = await confirm_one(db, find_with)
+    err = anime_info.get("err")
+    if err == 5:
+        await update_one(db, {"is_paused": True})
+    elif err < 5:
+        await update_one(db, find_with, {"err": err + 1})
+    else:
+        await update_one(db, {"err": 1})
 
 
 class SayuDownloader:
@@ -234,6 +246,7 @@ class SayuDownloader:
                     get_string("URL_DWN_ERR").format(**_dats),
                     disable_web_page_preview=True,
                 )
+                await count_err(**kwargs)
 
             if _out:
                 await self.app.edit_message_text(
