@@ -260,6 +260,7 @@ class SayuDownloader:
 
 async def download_assistant(app: Client, urls, folder, caption, thumb=None, **kwargs):
     download = SayuDownloader(urls, folder, thumb=thumb, app=app, filter_links=True)
+    vide_file = await download.iter_links(**kwargs)
     logging.info(urls)
     file_video = vide_file["file"]
     thumb = vide_file["thumb"]
