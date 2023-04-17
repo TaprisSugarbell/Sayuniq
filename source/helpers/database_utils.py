@@ -1,6 +1,6 @@
 import shutil
 
-from source.helpers.downloader import download_assistant
+from source.helpers.downloader import download_assistant, count_err
 from source.helpers.site_assistant import SitesAssistant
 
 
@@ -25,6 +25,7 @@ async def database_assistant(
             site=anime_info.site,
         )
     except TypeError:
+        await count_err(anime_info.title, anime_info.site)
         message = None
     shutil.rmtree(folder, ignore_errors=True)
     if message:

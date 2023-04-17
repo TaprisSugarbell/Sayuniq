@@ -246,7 +246,6 @@ class SayuDownloader:
                     get_string("URL_DWN_ERR").format(**_dats),
                     disable_web_page_preview=True,
                 )
-                await count_err(**kwargs)
 
             if _out:
                 await self.app.edit_message_text(
@@ -261,7 +260,6 @@ class SayuDownloader:
 
 async def download_assistant(app: Client, urls, folder, caption, thumb=None, **kwargs):
     download = SayuDownloader(urls, folder, thumb=thumb, app=app, filter_links=True)
-    vide_file = await download.iter_links(**kwargs)
     logging.info(urls)
     file_video = vide_file["file"]
     thumb = vide_file["thumb"]
