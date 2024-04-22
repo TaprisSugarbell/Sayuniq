@@ -1,11 +1,27 @@
-from pyromod.helpers import ikb
 from source.config import CHANNEL_ID
 from source.helpers.site_assistant import base_channel_url
 from source.helpers.hps.pagination import Pagination
+from hydrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 
-def page_data(page):
-    return f"pgd_{key_id}_{page}"
+def btn(text, value, type="callback_data"):
+    return InlineKeyboardButton(text, **{type: value})
+
+
+def ikb(rows=None):
+    if rows is None:
+        rows = []
+
+    lines = []
+    for row in rows:
+        line = []
+        for button in row:
+            button = (
+                btn(button, button) if isinstance(button, str) else btn(*button)
+            )  # InlineKeyboardButton
+            line.append(button)
+        lines.append(line)
+    return InlineKeyboardMarkup(inline_keyboard=lines)
 
 
 def chapter_data(item, page):
@@ -16,18 +32,16 @@ def chapter_title(item, page):
     return f'Capítulo {item["chapter"]}'
 
 
-async def chapters_ikb(obj, index=0):
-    global key_id
+async def chapters_ikb(obj, index=0, lines=5, columns=3):
     key_id = obj["key_id"]
-    chapters = obj["chapters"]
-    chapters = [chapters[oy] for oy in sorted(chapters, key=lambda x: float(x))]
+    page_data = staticmethod(lambda page: f"pgd_{key_id}_{page}")
+    original_chapters = obj["chapters"]
+    sorted_chapters = [original_chapters[oy] for oy in sorted(original_chapters, key=lambda x: float(x))]
     page = Pagination(
-        chapters,
+        sorted_chapters,
         page_data=page_data,
         item_data=chapter_data,
         item_title=chapter_title,
-        _type="url",
+        callback_type="url",
     )
-    lines = 5
-    columns = 3
     return ikb(page.create(index, lines, columns))

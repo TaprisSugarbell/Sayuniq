@@ -1,12 +1,12 @@
-from decouple import config
 from pymongo import MongoClient
 
-# Variables
-URI = config("MONGO_URL", default=None)
+from source.config import MONGO_URL
 
 
 class Mongo:
-    def __init__(self, uri=URI, database="", collection="", data={} or []):
+    def __init__(self, uri=MONGO_URL, database="", collection="", data=None):
+        if data is None:
+            data = {} or []
         self.data = data
         self.client = MongoClient(uri)
         self.db = self.client.get_database(database)

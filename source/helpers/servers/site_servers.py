@@ -1,12 +1,12 @@
 import base64
 import json
+import logging
 import re
 
 import aiohttp
-import logging
 from bs4 import BeautifulSoup
 
-from ...config import USER_AGENT
+from source.config import USER_AGENT
 
 PARSER = "html.parser"
 
@@ -134,4 +134,6 @@ async def get_flv_servers(chapter_url):
                 if getattr(i, "string") and "SUB" in getattr(i, "string")
             ][0]
         )["SUB"]
-    ]
+    ], "-".join(chapter_url.split("-")[:-1]).replace(
+                    "/ver/", "/anime/"
+                )

@@ -2,7 +2,7 @@ import logging
 import shutil
 
 from moviepy.editor import VideoFileClip
-from pyrogram import Client, filters
+from hydrogram import Client, filters
 
 from source.helpers.downloader import SayuDownloader
 from source.helpers.utils import create_folder

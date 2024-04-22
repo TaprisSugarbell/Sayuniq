@@ -2,7 +2,7 @@ import asyncio
 import logging
 import os
 
-import pyrogram
+import hydrogram
 
 from source.helpers.logger_config import log_file
 from source.helpers.mongo_connect import Mongo, confirm
@@ -26,13 +26,13 @@ PACKAGE = __package__
 # Client
 plugins = dict(root=f"source/plugins")
 
-app = pyrogram.Client(
+app = hydrogram.Client(
     name=BOT_NAME,
     bot_token=BOT_TOKEN,
     api_id=API_ID,
     api_hash=API_HASH,
     plugins=plugins,
-    in_memory=True,
+    # in_memory=True,
 )
 
 
@@ -45,7 +45,7 @@ async def auth_users():
 async def logs_channel_update(
     message: str = None,
     mode: str = "send_message",
-    client: pyrogram.Client = None,
+    client: hydrogram.Client = None,
     *args,
     **kwargs,
 ):

@@ -12,14 +12,13 @@ from urllib.parse import urlparse
 import aiofiles
 import aiohttp
 import cloudscraper
-from PyBypass import bypass
 
 import yt_dlp as youtube_dl
 from bs4 import BeautifulSoup
 from moviepy.editor import VideoFileClip
 from source.helpers.mongo_connect import Mongo, confirm_one, update_one
 from PIL import Image
-from pyrogram import Client, types
+from hydrogram import Client, types
 
 from source.config import CHANNEL_ID, LOG_CHANNEL, human_hour_readable, BOT_NAME
 from source.helpers.utils import rankey
@@ -130,8 +129,8 @@ class SayuDownloader:
                     r"\{\"mimetype.*}", soup.find_all("script")[-1].string
                 )[0]
                 return json.loads(fnd_dct)["downloadUrl"]
-            case host if re.match(r"streamtape.com", host):
-                return bypass(_url)
+            case host if re.match(r"streamwish\.to|mega\.nz", host):
+                return None
             case _:
                 return _url
 
@@ -147,6 +146,8 @@ class SayuDownloader:
             _url = await self.links_filter(_url)
             if isinstance(_url, dict):
                 _url = _url["data"][-1]["file"]
+            elif not _url:
+                return None
         if solidfiles:
             _url = await self.links_filter(_url, solidfiles)
         video_info = youtube_dl.YoutubeDL().extract_info(_url, download=False)
@@ -259,6 +260,11 @@ class SayuDownloader:
 async def download_assistant(app: Client, urls, folder, caption, thumb=None, **kwargs):
     download = SayuDownloader(urls, folder, thumb=thumb, app=app, filter_links=True)
     vide_file = await download.iter_links(**kwargs)
+    # vide_file = {
+    #     "file": "./downloads/button.mp4",
+    #     "thumb": "./downloads/shogun_auto.jpg",
+    #     "type": "video/mp4",
+    # }
     logging.info(urls)
     file_video = vide_file["file"]
     thumb = vide_file["thumb"]

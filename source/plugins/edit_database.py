@@ -1,15 +1,16 @@
-from pyrogram import Client, filters, types
-from pyrogram.enums import ParseMode
-from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+from hydrogram import Client, filters, types
+from hydrogram.enums import ParseMode
+from hydrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 from source import BOT_NAME, auth_users
 from source.helpers.chapters.chapters_page import chapters_ikb
 from source.helpers.mongo_connect import Mongo, confirm_one, update_many, update_one
-
+import sys
+import traceback
 db = Mongo(database=BOT_NAME, collection="japanemi")
 
 
-@Client.on_message(filters.regex("mty_.*") & filters.private)
+@Client.on_message(filters.regex(r"mty_.*") & filters.private)
 async def __edb__(bot, update):
     message_id = update.id
     chat_id = update.from_user.id
@@ -62,7 +63,10 @@ async def __edb__(bot, update):
             )
         else:
             _c.get("status")
-            chikb = await chapters_ikb(_c)
+            try:
+                chikb = await chapters_ikb(_c)
+            except Exception as e:
+                print(traceback.format_tb(sys.exc_info()[2]))
             await bot.send_message(
                 chat_id,
                 f"**{anime}**\nCapitulos subidos: **{len(chapters)}**",
@@ -86,7 +90,7 @@ async def __pgd__(bot: Client, callback: types.CallbackQuery):
         await bot.edit_message_reply_markup(chat_id, message_id, reply_markup=chikb)
     else:
         await bot.edit_message_text(
-            chat_id, "No hay capítulos... El anime fue baneado probablemente."
+            chat_id, message_id, "No hay capítulos... El anime fue baneado probablemente."
         )
 
 

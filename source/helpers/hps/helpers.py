@@ -1,4 +1,4 @@
-from pyrogram.types import (
+from hydrogram.types import (
     InlineKeyboardButton,
     InlineKeyboardMarkup,
     KeyboardButton,
@@ -79,4 +79,4 @@ def force_reply(selective=True):
 
 
 def array_chunk(input, size):
-    return [input[i : i + size] for i in range(0, len(input), size)]
+    return [input[i: i + size] for i in range(0, len(input), size)]

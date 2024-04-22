@@ -1,8 +1,7 @@
 import sys
 import traceback
-from typing import Any
 
-from pyrogram import Client
+from hydrogram import Client
 from source.helpers.utils import rankey
 from source import logs_channel_update, human_hour_readable
 from source import sayu_logger
@@ -10,11 +9,11 @@ from source.config import BOT_NAME
 from source.locales import get_string
 
 
-def report_error(bot_name: str, extra_info: str = "", reason: Exception | str = None):
+def sayu_report(bot_name: str, extra_info: str = "", reason: Exception | str = None):
 
     exc_info = sys.exc_info()
     tbs = traceback.format_tb(exc_info[2])
-    report_file = f"./reports/report_v{rankey()}.txt"
+    report_file = f"./sayureports/report_{rankey()}.txt"
     text = (
         f"Disclaimer:\nEste archivo se ha subido SOLO aquí, "
         f"se registra solo el hecho del error y la fecha, "
@@ -38,13 +37,13 @@ def report_error(bot_name: str, extra_info: str = "", reason: Exception | str = 
     return report_file
 
 
-async def bot_error(
+async def sayu_error(
     error: Exception = None, app: Client = None, reason: str = None, **kwargs
 ):
     if reason is None:
         reason = error
     return await logs_channel_update(
-        report_error(bot_name=app.me.first_name.upper(), reason=error),
+        sayu_report(bot_name=BOT_NAME, reason=error),
         "send_document",
         caption=get_string("document_err").format(
             bot_name=BOT_NAME, reason=reason, date=human_hour_readable()

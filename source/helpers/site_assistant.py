@@ -2,34 +2,35 @@ import re
 from datetime import datetime, timedelta, timezone
 from typing import Any
 
-from pyrogram import Client, types
+from hydrogram import Client, types
 
 from source import human_hour_readable, sayu_logger
 from source.config import CHANNEL_ID, UTC, base_channel_url
-from source.helpers.logs_utils import bot_error
+from source.helpers.logs_utils import sayu_error
 from source.helpers.mongo_connect import add_one, confirm_one, update_one, Mongo
 from source.helpers.utils import create_folder, rankey
 from source.locales import get_string
+from hydrogram.errors import MessageIdInvalid
 
 
 class SitesAssistant:
     def __init__(
-        self,
-        site: str = None,
-        title: str = None,
-        thumb: str = None,
-        chapter_no: str | int | float = None,
-        chapter_url: str = None,
-        anime_url: str = None,
-        message: Any = None,
-        message_id: int = None,
-        anime_dict: dict = None,
-        _prev: str | int = None,
-        _next: str | int = None,
-        update: bool = None,
-        menu_id: str | int = None,
-        database: Mongo = None,
-        app: Client = None,
+            self,
+            site: str = None,
+            title: str = None,
+            thumb: str = None,
+            chapter_no: str | int | float = None,
+            chapter_url: str = None,
+            anime_url: str = None,
+            message: Any = None,
+            message_id: int = None,
+            anime_dict: dict = None,
+            _prev: str | int = None,
+            _next: str | int = None,
+            update: bool = None,
+            menu_id: str | int = None,
+            database: Mongo = None,
+            app: Client = None,
     ):
         self.site = site
         self.title = title
@@ -121,9 +122,9 @@ class SitesAssistant:
         _site_button = await self.Ibtn(msg_btn="Site Link", url=self.chapter_url)
 
         if (
-            prev_chapter
-            and float(prev_chapter.get("chapter")) < float(self.chapter_no)
-            and self.last_chapter == prev_chapter.get("chapter")
+                prev_chapter
+                and float(prev_chapter.get("chapter")) < float(self.chapter_no)
+                and self.last_chapter == prev_chapter.get("chapter")
         ):
             prev_message_id = prev_chapter.get("message_id")
             self.prev, self.next = prev_message_id, now_chapter_id
@@ -152,6 +153,8 @@ class SitesAssistant:
                     ),
                 )
                 await self.update_property(next=now_chapter_id)
+            except MessageIdInvalid:
+                sayu_logger.warning("Previous chapter removed.")
             except Exception as e:
                 sayu_logger.error(
                     f"CHANNEL_ID: {CHANNEL_ID}\n"
@@ -159,7 +162,7 @@ class SitesAssistant:
                     f"NowChapterId: {now_chapter_id}",
                     extra={"hhr": human_hour_readable()},
                 )
-                await bot_error(error=e, app=app)
+                await sayu_error(error=e, app=app)
         try:
             await app.edit_message_reply_markup(
                 CHANNEL_ID,
@@ -171,7 +174,7 @@ class SitesAssistant:
                 ),
             )
         except Exception as e:
-            await bot_error(error=e, app=app)
+            await sayu_error(error=e, app=app)
 
     async def update_or_add_db(self):
         _hours, _minutes = UTC.split(":") if ":" in UTC else (UTC, 0)

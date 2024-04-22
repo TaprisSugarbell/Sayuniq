@@ -1,7 +1,7 @@
 import os
 import logging
 from source.locales import get_string
-from pyrogram import Client, filters, types
+from hydrogram import Client, filters, types
 from source.config import LOG_CHANNEL, human_hour_readable
 from source import log_file, auth_users
 

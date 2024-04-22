@@ -22,21 +22,23 @@ from source.helpers.hps.helpers import array_chunk
 
 
 class Pagination:
+
+    DEFAULT_PAGE_CALLBACK = staticmethod(lambda x: str(x))
+    DEFAULT_ITEM_CALLBACK = staticmethod(lambda i, pg: f"[{pg}] {i}")
+
     def __init__(
-        self,
-        objects,
-        page_data=None,
-        item_data=None,
-        item_title=None,
-        _type="callback_data",
+            self,
+            objects,
+            page_data=None,
+            item_data=None,
+            item_title=None,
+            callback_type="callback_data"
     ):
-        default_page_callback = lambda x: str(x)
-        default_item_callback = lambda i, pg: f"[{pg}] {i}"
         self.objects = objects
-        self.page_data = page_data or default_page_callback
-        self.item_data = item_data or default_item_callback
-        self.item_title = item_title or default_item_callback
-        self.type = _type
+        self.page_data = page_data or Pagination.DEFAULT_PAGE_CALLBACK
+        self.item_data = item_data or Pagination.DEFAULT_ITEM_CALLBACK
+        self.item_title = item_title or Pagination.DEFAULT_ITEM_CALLBACK
+        self.callback_type = callback_type
 
     def create(self, page, lines=5, columns=1):
         quant_per_page = lines * columns
@@ -92,7 +94,7 @@ class Pagination:
         buttons = []
         for item in cutted:
             buttons.append(
-                (self.item_title(item, page), self.item_data(item, page), self.type)
+                (self.item_title(item, page), self.item_data(item, page), self.callback_type)
             )
         kb_lines = array_chunk(buttons, columns)
         if last_page > 1:

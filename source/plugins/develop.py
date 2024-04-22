@@ -1,5 +1,5 @@
 import os, sys, traceback, io
-from pyrogram import Client, filters, types, enums
+from hydrogram import Client, filters, types, enums
 
 from source import auth_users
 

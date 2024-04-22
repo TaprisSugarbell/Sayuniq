@@ -1,9 +1,9 @@
-from pyrogram import Client, filters, types
+from hydrogram import Client, filters, types
 
 from .. import auth_users, BOT_NAME
-from ..helpers.mongo_connect import Mongo, URI, add_one, confirm, remove_one
+from ..helpers.mongo_connect import Mongo, MONGO_URL, add_one, confirm, remove_one
 
-db = Mongo(URI, BOT_NAME, "users")
+db = Mongo(MONGO_URL, BOT_NAME, "users")
 
 
 @Client.on_message(filters.command(["add", "watch", "delete", "del"]))

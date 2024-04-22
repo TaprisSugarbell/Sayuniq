@@ -13,7 +13,7 @@ __version_short__ = ".".join(__version__tuple__[:-1])
 
 #   # CONSTANTS
 # Database 8 Restrictions
-MONGO_URL = config("MONGO_URL", default=None)
+MONGO_URL = config("MONGO_URL", default="mongodb://localhost:27017")
 AUTH_USERS = config("AUTH_USERS", default=None)
 # Data
 BOT_NAME = config("BOT_NAME", default="Sayuniq")
@@ -69,5 +69,4 @@ def base_channel_url(channel_id: str | int, message_id: str | int = None):
 
 
 LOG_CHANNEL = _channel_type(LOG_CHANNEL)
-TESTS_CHANNEL = _channel_type(TESTS_CHANNEL)
-CHANNEL_ID = _channel_type(CHANNEL_ID)
+CHANNEL_ID = _channel_type(CHANNEL_ID or TESTS_CHANNEL)
