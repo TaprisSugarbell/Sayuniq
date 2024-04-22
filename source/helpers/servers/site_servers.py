@@ -124,6 +124,7 @@ async def get_mc_servers(chapter_url):
 async def get_flv_servers(chapter_url):
     async with aiohttp.ClientSession(headers=USER_AGENT) as session:
         async with session.get(chapter_url) as r:
+            logging.info(f'Get {chapter_url} is "{r.ok}"')
             soup = BeautifulSoup(await r.content.read(), "html.parser")
     return [
         ou.get("code")
