@@ -31,7 +31,7 @@ async def get_tioanime_servers(chapter_url):
             )
             return (
                 re.findall(r"https?://[\w/.?#=!-]*", _script.replace("\\", "")),
-                _anime_uri,
+                _anime_uri
             )
 
 

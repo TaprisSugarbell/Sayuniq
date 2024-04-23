@@ -13,10 +13,78 @@ from source.locales import get_string
 from hydrogram.errors import MessageIdInvalid
 
 
+class Chapter:
+    def __init__(self, number: str | int | float = None, url: str = None, message_id: int = None,
+                 anime_dictionary: dict = None, _prev: str | int = None, _next: str | int = None,
+                 database: Mongo = None):
+        self.number = number
+        self.url = url
+        self.message_id = message_id,
+        self.anime_dictionary = anime_dictionary
+        self.prev = _prev
+        self.next = _next
+        self.database = database
+        self.last = None
+        self.prev_digit = (
+            str(round(number))
+            if isinstance(number, float)
+            else str(int(number) - 1)
+        )
+
+    async def get(self):
+        return self.anime_dictionary["chapters"].get(self.number)
+
+    async def get_prev(self):
+        return self.anime_dictionary["chapters"].get(self.prev_digit)
+
+    # async def update_db(self):
+    #
+    # # logic to update chapter in db using self.database
+
+    def dict_repr(self):
+        return {'url': self.url, 'chapter': self.number, 'message_id': self.message_id,
+                'datetime': '', 'nav': {'prev': self.prev, 'next': None}}
+
+
+class Anime:
+    def __init__(self, title: str = None, thumb: str = None, url: str = None,
+                 message: Any = None, database: Mongo = None):
+        self.title = title
+        self.thumb = thumb
+        self.url = url
+        self.msg = message
+        self.anime_dictionary = None
+        self.caption = ""
+        self.database = database
+        self.key_id = None or rankey(10)
+
+    async def filter_title(self, title=None):
+        title = title or self.title
+        _clean_title = re.sub(r"_+", "_", re.sub(r"\W", "_", title))
+        return _clean_title[:-1] if _clean_title[-1] == "_" else _clean_title
+
+    async def get_caption(self, number, site, extra_ch: str = ""):
+        _filter_title = await self.filter_title()
+        self.caption = (
+            f"#{_filter_title}\n💮 {self.title}\n"
+            f"🗂 Capítulo {number}{extra_ch}\n🌐 #{site}"
+        )
+        return self.caption
+
+    async def find_on_db(self, site):
+        self.anime_dictionary = await confirm_one(self.database,
+                                                  {"site": site, "anime": self.title})
+        if self.anime_dictionary:
+            self.key_id = self.anime_dictionary["key_id"]
+            self.url = self.anime_dictionary["anime_url"]
+            self.thumb = self.anime_dictionary["thumb"] or self.thumb
+        return self.anime_dictionary
+
+
 class SitesAssistant:
     def __init__(
             self,
-            site: str = None,
+            site: tuple = None,
             title: str = None,
             thumb: str = None,
             chapter_no: str | int | float = None,
@@ -32,7 +100,7 @@ class SitesAssistant:
             database: Mongo = None,
             app: Client = None,
     ):
-        self.site = site
+        self.site, self.url_base = site
         self.title = title
         self.thumb = thumb
         self.chapter_no = chapter_no

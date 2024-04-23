@@ -35,7 +35,7 @@ def build_anime_list(title: str, chapters: int = 12):
 
 async def test(app):
     _site = "TioAnime"
-    chapter_url = "https://tioanime.com/"
+    url_base = "https://tioanime.com/"
     list_of_animes = build_anime_list(
         "Renmei Kuugun Koukuu Mahou Ongakutai Luminous Witches"
     )
@@ -43,7 +43,7 @@ async def test(app):
         title = anime["name"]
         chapter_no = str(anime["chapter"])
         anime_info = SitesAssistant(
-            site=_site,
+            site=(_site, url_base),
             title=title,
             thumb=None,
             chapter_no=chapter_no,
@@ -54,40 +54,9 @@ async def test(app):
         await anime_info.get_caption()
         servers = []
         anime_url = "nada"
-        if in_db:
-            get_chapter = await anime_info.get_chapter()
-            if get_chapter or in_db.get("is_banned") or in_db.get("is_paused"):
-                continue
-            try:
-
-                await database_assistant(
-                    anime_info=anime_info,
-                    servers=servers,
-                    anime_url=anime_url,
-                    chapter_url=chapter_url,
-                    update=True,
-                )
-            except Exception as e:
-                await sayu_error(error=e, app=app)
-        else:
-            try:
-                await database_assistant(
-                    anime_info=anime_info,
-                    servers=servers,
-                    anime_url=anime_url,
-                    chapter_url=chapter_url,
-                )
-            except Exception as e:
-                await sayu_error(error=e, app=app)
 
 
-async def fetch_anime_server_and_uri(chapter_url, url_base, get_servers):
-    servers, _anime_uri = await get_servers(chapter_url)
-    anime_url = url_base[:-1] + _anime_uri
-    return servers, anime_url
-
-
-async def process_anime_info(in_db, anime_info, servers, anime_url, chapter_url):
+async def process_anime_info(in_db, anime_info: SitesAssistant, chapter_url, get_servers):
     if in_db:
         get_chapter = await anime_info.get_chapter()
         if get_chapter or in_db.get("is_banned") or in_db.get("is_paused"):
@@ -95,9 +64,8 @@ async def process_anime_info(in_db, anime_info, servers, anime_url, chapter_url)
     try:
         await database_assistant(
             anime_info=anime_info,
-            servers=servers,
-            anime_url=anime_url,
             chapter_url=chapter_url,
+            get_servers=get_servers,
             update=bool(in_db)
         )
     except Exception as e:
@@ -120,7 +88,7 @@ async def tioanime(app):
                 title = anime.find("h3").text.replace(chapter_no, "").strip()
                 chapter_url = _url_base[:-1] + anime.get("href")
                 anime_info = SitesAssistant(
-                    site=_site,
+                    site=(_site, _url_base),
                     title=title,
                     thumb=None,
                     chapter_no=chapter_no,
@@ -129,13 +97,7 @@ async def tioanime(app):
                 )
                 in_db = await anime_info.find_on_db()
                 await anime_info.get_caption()
-
-                servers, anime_url = await fetch_anime_server_and_uri(
-                    chapter_url, _url_base, get_tioanime_servers
-                )
-
-                await process_anime_info(
-                    in_db, anime_info, servers, anime_url, chapter_url)
+                await process_anime_info(in_db, anime_info, chapter_url, get_tioanime_servers)
 
 
 async def jkanime(app):
@@ -160,7 +122,7 @@ async def jkanime(app):
                     " Final" if "final" in _h6 else (" ONA" if "ona" in _h6 else "")
                 )
                 anime_info = SitesAssistant(
-                    site=_site,
+                    site=(_site, _url_base),
                     title=title,
                     thumb=None,
                     chapter_no=chapter_no,
@@ -169,32 +131,6 @@ async def jkanime(app):
                 )
                 in_db = await anime_info.find_on_db()
                 await anime_info.get_caption(extra_caption)
-                if in_db:
-                    get_chapter = await anime_info.get_chapter()
-                    if get_chapter or in_db.get("is_banned") or in_db.get("is_paused"):
-                        continue
-                    try:
-                        servers = await get_jk_servers(chapter_url)
-                        await database_assistant(
-                            anime_info=anime_info,
-                            servers=servers,
-                            anime_url=anime_url,
-                            chapter_url=chapter_url,
-                            update=True,
-                        )
-                    except Exception as e:
-                        await sayu_error(error=e, app=app)
-                else:
-                    servers = await get_jk_servers(chapter_url)
-                    try:
-                        await database_assistant(
-                            anime_info=anime_info,
-                            servers=servers,
-                            anime_url=anime_url,
-                            chapter_url=chapter_url,
-                        )
-                    except Exception as e:
-                        await sayu_error(error=e, app=app)
 
 
 async def monoschinos(app):
@@ -212,7 +148,7 @@ async def monoschinos(app):
                 chapter_url = _a.get("href")
                 anime_url = await get_mc_anime(chapter_url)
                 anime_info = SitesAssistant(
-                    site=_site,
+                    site=(_site, _url_base),
                     title=title,
                     thumb=None,
                     chapter_no=chapter_no,
@@ -221,32 +157,7 @@ async def monoschinos(app):
                 )
                 in_db = await anime_info.find_on_db()
                 await anime_info.get_caption()
-                if in_db:
-                    get_chapter = await anime_info.get_chapter()
-                    if get_chapter or in_db.get("is_banned") or in_db.get("is_paused"):
-                        continue
-                    try:
-                        servers = await get_mc_servers(chapter_url)
-                        await database_assistant(
-                            anime_info=anime_info,
-                            servers=servers,
-                            anime_url=anime_url,
-                            chapter_url=chapter_url,
-                            update=True,
-                        )
-                    except Exception as e:
-                        await sayu_error(error=e, app=app)
-                else:
-                    servers = await get_mc_servers(chapter_url)
-                    try:
-                        await database_assistant(
-                            anime_info=anime_info,
-                            servers=servers,
-                            anime_url=anime_url,
-                            chapter_url=chapter_url,
-                        )
-                    except Exception as e:
-                        await sayu_error(error=e, app=app)
+
 
 
 async def animeflv(app):
@@ -265,7 +176,7 @@ async def animeflv(app):
                 ]
                 chapter_url = _url_base[:-1] + anime.get("href")
                 anime_info = SitesAssistant(
-                    site=_site,
+                    site=(_site, _url_base),
                     title=title,
                     thumb=None,
                     chapter_no=chapter_no,
@@ -274,10 +185,7 @@ async def animeflv(app):
                 )
                 in_db = await anime_info.find_on_db()
                 await anime_info.get_caption()
-                servers, anime_url = await fetch_anime_server_and_uri(
-                    chapter_url, _url_base, get_flv_servers)
-                await process_anime_info(
-                    in_db, anime_info, servers, anime_url, chapter_url)
+                await process_anime_info(in_db, anime_info, chapter_url, get_flv_servers)
 
 
 sites = [

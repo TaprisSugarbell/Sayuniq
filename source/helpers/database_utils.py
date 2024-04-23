@@ -5,7 +5,7 @@ from source.helpers.site_assistant import SitesAssistant
 
 
 async def database_assistant(
-    anime_info: SitesAssistant, servers, anime_url, chapter_url, update: bool = None
+    anime_info: SitesAssistant, chapter_url, get_servers, update: bool = None
 ):
     app, folder, caption, thumb_url = (
         anime_info.app,
@@ -13,7 +13,8 @@ async def database_assistant(
         anime_info.caption,
         anime_info.thumb,
     )
-
+    servers, anime_uri = await get_servers(chapter_url)
+    anime_url = anime_info.url_base[:-1] + anime_uri
     try:
         message = await download_assistant(
             app,
