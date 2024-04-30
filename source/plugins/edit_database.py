@@ -1,12 +1,15 @@
+import sys
+import traceback
+
 from hydrogram import Client, filters, types
 from hydrogram.enums import ParseMode
 from hydrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 from source import BOT_NAME, auth_users
 from source.helpers.chapters.chapters_page import chapters_ikb
-from source.helpers.mongo_connect import Mongo, confirm_one, update_many, update_one
-import sys
-import traceback
+from source.helpers.mongo_connect import (Mongo, confirm_one, update_many,
+                                          update_one)
+
 db = Mongo(database=BOT_NAME, collection="japanemi")
 
 
@@ -18,12 +21,12 @@ async def __edb__(bot, update):
     c, key_id = update.text.split()[1].split("_")
     _c = await confirm_one(db, {"key_id": key_id})
     if _c:
-        site = _c["site"]
-        thumb = _c["thumb"]
+        # site = _c["site"]
+        # thumb = _c["thumb"]
         anime = _c["anime"]
         chapters = _c["chapters"]
-        anime_url = _c["anime_url"]
-        print(_c)
+        # anime_url = _c["anime_url"]
+        # print(_c)
         if chat_id in AUTH_USERS:
             await bot.send_message(
                 chat_id,
@@ -65,8 +68,9 @@ async def __edb__(bot, update):
             _c.get("status")
             try:
                 chikb = await chapters_ikb(_c)
-            except Exception as e:
-                print(traceback.format_tb(sys.exc_info()[2]))
+            except Exception:
+                # print(traceback.format_tb(sys.exc_info()[2]))
+                raise
             await bot.send_message(
                 chat_id,
                 f"**{anime}**\nCapitulos subidos: **{len(chapters)}**",
@@ -81,7 +85,7 @@ async def __edb__(bot, update):
 async def __pgd__(bot: Client, callback: types.CallbackQuery):
     message_id = callback.message.id
     chat_id = callback.message.from_user.id
-    AUTH_USERS = await auth_users()
+    # AUTH_USERS = await auth_users()
     c, key_id, page = callback.data.split("_")
     _c = await confirm_one(db, {"key_id": key_id})
     if _c:
@@ -90,7 +94,9 @@ async def __pgd__(bot: Client, callback: types.CallbackQuery):
         await bot.edit_message_reply_markup(chat_id, message_id, reply_markup=chikb)
     else:
         await bot.edit_message_text(
-            chat_id, message_id, "No hay capítulos... El anime fue baneado probablemente."
+            chat_id,
+            message_id,
+            "No hay capítulos... El anime fue baneado probablemente.",
         )
 
 
@@ -105,9 +111,9 @@ async def __chps__(bot: Client, callback: types.CallbackQuery):
         chapters = _c.get("chapters")
         anime = _c["anime"]
         if chapters:
-            site = _c["site"]
-            thumb = _c["thumb"]
-            anime_url = _c["anime_url"]
+            # site = _c["site"]
+            # thumb = _c["thumb"]
+            # anime_url = _c["anime_url"]
             chikb = await chapters_ikb(_c)
             await bot.send_message(
                 chat_id,

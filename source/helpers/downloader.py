@@ -12,15 +12,15 @@ from urllib.parse import urlparse
 import aiofiles
 import aiohttp
 import cloudscraper
-
 import yt_dlp as youtube_dl
 from bs4 import BeautifulSoup
-from moviepy.editor import VideoFileClip
-from source.helpers.mongo_connect import Mongo, confirm_one, update_one
-from PIL import Image
 from hydrogram import Client, types
+from moviepy.editor import VideoFileClip
+from PIL import Image
 
-from source.config import CHANNEL_ID, LOG_CHANNEL, human_hour_readable, BOT_NAME
+from source.config import (BOT_NAME, CHANNEL_ID, LOG_CHANNEL,
+                           human_hour_readable)
+from source.helpers.mongo_connect import Mongo, confirm_one, update_one
 from source.helpers.utils import rankey
 from source.locales import get_string
 
@@ -33,7 +33,7 @@ async def count_err(title, site):
     anime_info = await confirm_one(db, find_with)
     err = anime_info.get("err") or 0
     if err == 5:
-        await update_one(db, find_with,{"is_paused": True})
+        await update_one(db, find_with, {"is_paused": True})
     else:
         await update_one(db, find_with, {"err": err + 1})
 
@@ -236,7 +236,9 @@ class SayuDownloader:
                 )
                 _total_urls += 1
             except Exception as e:
-                logging.info(f"Fallo la descarga de {url} [{_nn}/{_total_urls}]", exc_info=e)
+                logging.info(
+                    f"Fallo la descarga de {url} [{_nn}/{_total_urls}]", exc_info=e
+                )
                 if self.thumb and os.path.exists(self.thumb):
                     os.remove(self.thumb)
                 await self.app.edit_message_text(

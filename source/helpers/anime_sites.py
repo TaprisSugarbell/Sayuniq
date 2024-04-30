@@ -1,62 +1,54 @@
+import logging
 import re
 import string
 
 import aiohttp
 from bs4 import BeautifulSoup
 
-import logging
 from source.config import BOT_NAME, USER_AGENT
-from source.helpers.servers.server_utils import get_jk_anime, get_mc_anime
+# from source.helpers.servers.server_utils import get_jk_anime, get_mc_anime
+from source.helpers.site_assistant import SitesAssistant
 
 from .database_utils import database_assistant
 from .logs_utils import sayu_error
 from .mongo_connect import Mongo
-from .servers import (
-    get_flv_servers,
-    get_jk_servers,
-    get_mc_servers,
-    get_tioanime_servers,
-)
-from source.helpers.site_assistant import SitesAssistant
+from .servers import (get_flv_servers, get_jk_servers, get_mc_servers,
+                      get_tioanime_servers)
 
 logger = logging.getLogger(__name__)
 db = Mongo(database=BOT_NAME, collection="japanemi")
 
 
 def build_anime_list(title: str, chapters: int = 12):
-    return [
-        {
-            "name": title,
-            "chapter": chapter_no
-        }
-        for chapter_no in range(1, chapters)
-    ]
+    return [{"name": title, "chapter": chapter_no} for chapter_no in range(1, chapters)]
 
 
-async def test(app):
-    _site = "TioAnime"
-    url_base = "https://tioanime.com/"
-    list_of_animes = build_anime_list(
-        "Renmei Kuugun Koukuu Mahou Ongakutai Luminous Witches"
-    )
-    for anime in list_of_animes:
-        title = anime["name"]
-        chapter_no = str(anime["chapter"])
-        anime_info = SitesAssistant(
-            site=(_site, url_base),
-            title=title,
-            thumb=None,
-            chapter_no=chapter_no,
-            database=db,
-            app=app,
-        )
-        in_db = await anime_info.find_on_db()
-        await anime_info.get_caption()
-        servers = []
-        anime_url = "nada"
+# async def test(app):
+#     _site = "TioAnime"
+#     url_base = "https://tioanime.com/"
+#     list_of_animes = build_anime_list(
+#         "Renmei Kuugun Koukuu Mahou Ongakutai Luminous Witches"
+#     )
+#     for anime in list_of_animes:
+#         title = anime["name"]
+#         chapter_no = str(anime["chapter"])
+#         anime_info = SitesAssistant(
+#             site=(_site, url_base),
+#             title=title,
+#             thumb=None,
+#             chapter_no=chapter_no,
+#             database=db,
+#             app=app,
+#         )
+#         in_db = await anime_info.find_on_db()
+#         await anime_info.get_caption()
+#         servers = []
+#         anime_url = "nada"
 
 
-async def process_anime_info(in_db, anime_info: SitesAssistant, chapter_url, get_servers):
+async def process_anime_info(
+    in_db, anime_info: SitesAssistant, chapter_url, get_servers
+):
     if in_db:
         get_chapter = await anime_info.get_chapter()
         if get_chapter or in_db.get("is_banned") or in_db.get("is_paused"):
@@ -66,7 +58,7 @@ async def process_anime_info(in_db, anime_info: SitesAssistant, chapter_url, get
             anime_info=anime_info,
             chapter_url=chapter_url,
             get_servers=get_servers,
-            update=bool(in_db)
+            update=bool(in_db),
         )
     except Exception as e:
         await sayu_error(error=e, app=anime_info.app)
@@ -78,8 +70,7 @@ async def tioanime(app):
     async with aiohttp.ClientSession() as session:
         async with session.get(_url_base) as result:
             soup = BeautifulSoup(await result.content.read(), "html.parser")
-            list_of_animes = soup.find(
-                "ul", attrs={"class": "episodes"}).find_all("a")
+            list_of_animes = soup.find("ul", attrs={"class": "episodes"}).find_all("a")
 
             for anime in list_of_animes[::-1]:
                 chapter_no = [
@@ -97,7 +88,9 @@ async def tioanime(app):
                 )
                 in_db = await anime_info.find_on_db()
                 await anime_info.get_caption()
-                await process_anime_info(in_db, anime_info, chapter_url, get_tioanime_servers)
+                await process_anime_info(
+                    in_db, anime_info, chapter_url, get_tioanime_servers
+                )
 
 
 async def jkanime(app):
@@ -116,7 +109,7 @@ async def jkanime(app):
                 chapter_url = anime.get("href")
                 chno = chapter_url.split("/")[-2]
                 chapter_no = chno if chno[0] in string.digits else "1"
-                anime_url = await get_jk_anime(title)
+                # anime_url = await get_jk_anime(title)
                 _h6 = anime.find("h6").string.lower()
                 extra_caption = (
                     " Final" if "final" in _h6 else (" ONA" if "ona" in _h6 else "")
@@ -131,6 +124,7 @@ async def jkanime(app):
                 )
                 in_db = await anime_info.find_on_db()
                 await anime_info.get_caption(extra_caption)
+                await process_anime_info(in_db, anime_info, chapter_url, get_jk_servers)
 
 
 async def monoschinos(app):
@@ -146,7 +140,7 @@ async def monoschinos(app):
                 title = _a.find("h2", attrs={"class": "animetitles"}).string
                 chapter_no = _a.find("p").string
                 chapter_url = _a.get("href")
-                anime_url = await get_mc_anime(chapter_url)
+                # anime_url = await get_mc_anime(chapter_url)
                 anime_info = SitesAssistant(
                     site=(_site, _url_base),
                     title=title,
@@ -157,7 +151,7 @@ async def monoschinos(app):
                 )
                 in_db = await anime_info.find_on_db()
                 await anime_info.get_caption()
-
+                await process_anime_info(in_db, anime_info, chapter_url, get_mc_servers)
 
 
 async def animeflv(app):
@@ -185,7 +179,9 @@ async def animeflv(app):
                 )
                 in_db = await anime_info.find_on_db()
                 await anime_info.get_caption()
-                await process_anime_info(in_db, anime_info, chapter_url, get_flv_servers)
+                await process_anime_info(
+                    in_db, anime_info, chapter_url, get_flv_servers
+                )
 
 
 sites = [

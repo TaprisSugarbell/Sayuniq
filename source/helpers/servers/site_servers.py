@@ -31,7 +31,7 @@ async def get_tioanime_servers(chapter_url):
             )
             return (
                 re.findall(r"https?://[\w/.?#=!-]*", _script.replace("\\", "")),
-                _anime_uri
+                _anime_uri,
             )
 
 
@@ -135,6 +135,4 @@ async def get_flv_servers(chapter_url):
                 if getattr(i, "string") and "SUB" in getattr(i, "string")
             ][0]
         )["SUB"]
-    ], "-".join(chapter_url.split("-")[:-1]).replace(
-                    "/ver/", "/anime/"
-                )
+    ], "-".join(chapter_url.split("-")[:-1]).replace("/ver/", "/anime/")

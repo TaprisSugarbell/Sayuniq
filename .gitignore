@@ -150,5 +150,5 @@ Pipfile.lock
 
 *.session
 *session-journal
-sayureports
+reports
 

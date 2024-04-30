@@ -17,7 +17,9 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with pyromod.  If not, see <https://www.gnu.org/licenses/>.
 """
+
 import math
+
 from source.helpers.hps.helpers import array_chunk
 
 
@@ -27,12 +29,12 @@ class Pagination:
     DEFAULT_ITEM_CALLBACK = staticmethod(lambda i, pg: f"[{pg}] {i}")
 
     def __init__(
-            self,
-            objects,
-            page_data=None,
-            item_data=None,
-            item_title=None,
-            callback_type="callback_data"
+        self,
+        objects,
+        page_data=None,
+        item_data=None,
+        item_title=None,
+        callback_type="callback_data",
     ):
         self.objects = objects
         self.page_data = page_data or Pagination.DEFAULT_PAGE_CALLBACK
@@ -72,7 +74,7 @@ class Pagination:
         elif page >= last_page - 2:
             nav.extend(
                 [
-                    (f"« 1" if last_page - 4 > 1 else 1, self.page_data(1)),
+                    ("« 1" if last_page - 4 > 1 else 1, self.page_data(1)),
                     (
                         f"‹ {last_page - 3}" if last_page - 4 > 1 else last_page - 3,
                         self.page_data(last_page - 3),
@@ -84,7 +86,7 @@ class Pagination:
                 nav.append((text, self.page_data(n)))
         else:
             nav = [
-                (f"« 1", self.page_data(1)),
+                ("« 1", self.page_data(1)),
                 (f"‹ {page - 1}", self.page_data(page - 1)),
                 (f"· {page} ·", "noop"),
                 (f"{page + 1} ›", self.page_data(page + 1)),
@@ -94,7 +96,11 @@ class Pagination:
         buttons = []
         for item in cutted:
             buttons.append(
-                (self.item_title(item, page), self.item_data(item, page), self.callback_type)
+                (
+                    self.item_title(item, page),
+                    self.item_data(item, page),
+                    self.callback_type,
+                )
             )
         kb_lines = array_chunk(buttons, columns)
         if last_page > 1:

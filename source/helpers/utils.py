@@ -11,9 +11,7 @@ def create_folder(folder_name: str | int = None, temp_folder: str = rankey()):
     _user_id = (
         ""
         if folder_name is None
-        else f"downloads/{folder_name}/"
-        if temp_folder
-        else f"downloads/{folder_name}"
+        else f"downloads/{folder_name}/" if temp_folder else f"downloads/{folder_name}"
     )
 
     tmp_directory = f"./{_user_id}{temp_folder}/"

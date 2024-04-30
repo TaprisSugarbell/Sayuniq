@@ -1,10 +1,6 @@
-from hydrogram.types import (
-    InlineKeyboardButton,
-    InlineKeyboardMarkup,
-    KeyboardButton,
-    ReplyKeyboardMarkup,
-    ForceReply,
-)
+from hydrogram.types import (ForceReply, InlineKeyboardButton,
+                             InlineKeyboardMarkup, KeyboardButton,
+                             ReplyKeyboardMarkup)
 
 
 def ikb(rows=[]):
@@ -79,4 +75,4 @@ def force_reply(selective=True):
 
 
 def array_chunk(input, size):
-    return [input[i: i + size] for i in range(0, len(input), size)]
+    return [input[i : i + size] for i in range(0, len(input), size)]

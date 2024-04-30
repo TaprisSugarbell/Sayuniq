@@ -6,7 +6,7 @@ from decouple import config
 from source.locales import get_string
 
 # Version
-__version__tuple__ = ("0", "0", "1")
+__version__tuple__ = ("0", "1", "0")
 
 __version__ = ".".join(__version__tuple__)
 __version_short__ = ".".join(__version__tuple__[:-1])
@@ -61,11 +61,12 @@ def _channel_type(channel_id: str | int, thousand: bool = True):
 
 def base_channel_url(channel_id: str | int, message_id: str | int = None):
     channel_id_filtered = _channel_type(channel_id, False)
-    message_id = message_id or ""
     if isinstance(channel_id_filtered, int):
         return f"https://t.me/c/{channel_id_filtered}/{message_id}"
-    else:
+    elif isinstance(channel_id_filtered, str):
         return f"https://t.me/{channel_id_filtered}/{message_id}"
+    else:
+        return f"https://t.me/{channel_id_filtered}/"
 
 
 LOG_CHANNEL = _channel_type(LOG_CHANNEL)

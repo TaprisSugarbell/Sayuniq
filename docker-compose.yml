@@ -1,0 +1,6 @@
+services:
+  bot:
+    container_name: SayuniqBot
+    build:
+      context: .
+    restart: always

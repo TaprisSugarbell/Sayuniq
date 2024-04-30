@@ -4,8 +4,8 @@ import re
 import aiohttp
 from bs4 import BeautifulSoup
 
-from source.helpers import PARSER
 from source.config import USER_AGENT
+from source.helpers import PARSER
 
 
 async def get_jk_anime(slug_title):

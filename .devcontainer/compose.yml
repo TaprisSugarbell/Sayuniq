@@ -1,0 +1,15 @@
+services:
+  sayucode:
+    container_name: sayucode
+    env_file: .env
+    build:
+      context: .
+      args:
+        - USER_UID=$USER_UID
+        - USER_GID=$USER_GID
+        - HOSTDOCKERGID=$HOSTDOCKERGID
+    volumes:
+      - ..:/Sayuniq:cached
+      - ~/.config/gh/:$HOME/.config/gh/
+      - /var/run/docker.sock:/var/run/docker.sock
+    user: sayucode

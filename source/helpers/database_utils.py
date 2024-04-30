@@ -1,6 +1,6 @@
 import shutil
 
-from source.helpers.downloader import download_assistant, count_err
+from source.helpers.downloader import count_err, download_assistant
 from source.helpers.site_assistant import SitesAssistant
 
 

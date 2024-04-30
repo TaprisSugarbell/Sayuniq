@@ -3,32 +3,38 @@ from datetime import datetime, timedelta, timezone
 from typing import Any
 
 from hydrogram import Client, types
+from hydrogram.errors import MessageIdInvalid
 
 from source import human_hour_readable, sayu_logger
 from source.config import CHANNEL_ID, UTC, base_channel_url
 from source.helpers.logs_utils import sayu_error
-from source.helpers.mongo_connect import add_one, confirm_one, update_one, Mongo
+from source.helpers.mongo_connect import (Mongo, add_one, confirm_one,
+                                          update_one)
 from source.helpers.utils import create_folder, rankey
 from source.locales import get_string
-from hydrogram.errors import MessageIdInvalid
 
 
 class Chapter:
-    def __init__(self, number: str | int | float = None, url: str = None, message_id: int = None,
-                 anime_dictionary: dict = None, _prev: str | int = None, _next: str | int = None,
-                 database: Mongo = None):
+    def __init__(
+        self,
+        number: str | int | float = None,
+        url: str = None,
+        message_id: int = None,
+        anime_dictionary: dict = None,
+        _prev: str | int = None,
+        _next: str | int = None,
+        database: Mongo = None,
+    ):
         self.number = number
         self.url = url
-        self.message_id = message_id,
+        self.message_id = (message_id,)
         self.anime_dictionary = anime_dictionary
         self.prev = _prev
         self.next = _next
         self.database = database
         self.last = None
         self.prev_digit = (
-            str(round(number))
-            if isinstance(number, float)
-            else str(int(number) - 1)
+            str(round(number)) if isinstance(number, float) else str(int(number) - 1)
         )
 
     async def get(self):
@@ -42,13 +48,24 @@ class Chapter:
     # # logic to update chapter in db using self.database
 
     def dict_repr(self):
-        return {'url': self.url, 'chapter': self.number, 'message_id': self.message_id,
-                'datetime': '', 'nav': {'prev': self.prev, 'next': None}}
+        return {
+            "url": self.url,
+            "chapter": self.number,
+            "message_id": self.message_id,
+            "datetime": "",
+            "nav": {"prev": self.prev, "next": None},
+        }
 
 
 class Anime:
-    def __init__(self, title: str = None, thumb: str = None, url: str = None,
-                 message: Any = None, database: Mongo = None):
+    def __init__(
+        self,
+        title: str = None,
+        thumb: str = None,
+        url: str = None,
+        message: Any = None,
+        database: Mongo = None,
+    ):
         self.title = title
         self.thumb = thumb
         self.url = url
@@ -72,8 +89,9 @@ class Anime:
         return self.caption
 
     async def find_on_db(self, site):
-        self.anime_dictionary = await confirm_one(self.database,
-                                                  {"site": site, "anime": self.title})
+        self.anime_dictionary = await confirm_one(
+            self.database, {"site": site, "anime": self.title}
+        )
         if self.anime_dictionary:
             self.key_id = self.anime_dictionary["key_id"]
             self.url = self.anime_dictionary["anime_url"]
@@ -83,22 +101,22 @@ class Anime:
 
 class SitesAssistant:
     def __init__(
-            self,
-            site: tuple = None,
-            title: str = None,
-            thumb: str = None,
-            chapter_no: str | int | float = None,
-            chapter_url: str = None,
-            anime_url: str = None,
-            message: Any = None,
-            message_id: int = None,
-            anime_dict: dict = None,
-            _prev: str | int = None,
-            _next: str | int = None,
-            update: bool = None,
-            menu_id: str | int = None,
-            database: Mongo = None,
-            app: Client = None,
+        self,
+        site: tuple = None,
+        title: str = None,
+        thumb: str = None,
+        chapter_no: str | int | float = None,
+        chapter_url: str = None,
+        anime_url: str = None,
+        message: Any = None,
+        message_id: int = None,
+        anime_dict: dict = None,
+        _prev: str | int = None,
+        _next: str | int = None,
+        update: bool = None,
+        menu_id: str | int = None,
+        database: Mongo = None,
+        app: Client = None,
     ):
         self.site, self.url_base = site
         self.title = title
@@ -190,9 +208,9 @@ class SitesAssistant:
         _site_button = await self.Ibtn(msg_btn="Site Link", url=self.chapter_url)
 
         if (
-                prev_chapter
-                and float(prev_chapter.get("chapter")) < float(self.chapter_no)
-                and self.last_chapter == prev_chapter.get("chapter")
+            prev_chapter
+            and float(prev_chapter.get("chapter")) < float(self.chapter_no)
+            and self.last_chapter == prev_chapter.get("chapter")
         ):
             prev_message_id = prev_chapter.get("message_id")
             self.prev, self.next = prev_message_id, now_chapter_id

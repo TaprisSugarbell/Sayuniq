@@ -1,0 +1,5 @@
+*.session*
+reports/
+downloads/
+.devcontainer/
+.git/

@@ -1,7 +1,8 @@
+from hydrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+
 from source.config import CHANNEL_ID
-from source.helpers.site_assistant import base_channel_url
 from source.helpers.hps.pagination import Pagination
-from hydrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from source.helpers.site_assistant import base_channel_url
 
 
 def btn(text, value, type="callback_data"):
@@ -36,7 +37,10 @@ async def chapters_ikb(obj, index=0, lines=5, columns=3):
     key_id = obj["key_id"]
     page_data = staticmethod(lambda page: f"pgd_{key_id}_{page}")
     original_chapters = obj["chapters"]
-    sorted_chapters = [original_chapters[oy] for oy in sorted(original_chapters, key=lambda x: float(x))]
+    sorted_chapters = [
+        original_chapters[oy]
+        for oy in sorted(original_chapters, key=lambda x: float(x))
+    ]
     page = Pagination(
         sorted_chapters,
         page_data=page_data,

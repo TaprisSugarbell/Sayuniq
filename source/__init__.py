@@ -4,19 +4,11 @@ import os
 
 import hydrogram
 
+from source.config import (API_HASH, API_ID, BOT_NAME, BOT_TOKEN, LOG_CHANNEL,
+                           human_hour_readable)
 from source.helpers.logger_config import log_file
 from source.helpers.mongo_connect import Mongo, confirm
-from source.config import (
-    LOG_CHANNEL,
-    BOT_NAME,
-    BOT_TOKEN,
-    API_ID,
-    API_HASH,
-    human_hour_readable,
-)
-from source.helpers.utils import create_folder
 from source.locales import get_string
-
 
 logger = logging.getLogger(__name__)
 sayu_logger = logging.getLogger(BOT_NAME)
@@ -24,7 +16,7 @@ PACKAGE = __package__
 
 
 # Client
-plugins = dict(root=f"source/plugins")
+plugins = dict(root="source/plugins")
 
 app = hydrogram.Client(
     name=BOT_NAME,
@@ -32,7 +24,7 @@ app = hydrogram.Client(
     api_id=API_ID,
     api_hash=API_HASH,
     plugins=plugins,
-    # in_memory=True,
+    in_memory=True,
 )
 
 
