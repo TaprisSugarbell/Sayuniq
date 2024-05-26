@@ -7,9 +7,7 @@ from hydrogram.errors import MessageIdInvalid
 
 from source import human_hour_readable, sayu_logger
 from source.config import CHANNEL_ID, UTC, base_channel_url
-from source.helpers.logs_utils import sayu_error
-from source.helpers.mongo_connect import (Mongo, add_one, confirm_one,
-                                          update_one)
+from source.helpers.mongo_connect import Mongo, add_one, confirm_one, update_one
 from source.helpers.utils import create_folder, rankey
 from source.locales import get_string
 
@@ -99,6 +97,43 @@ class Anime:
         return self.anime_dictionary
 
 
+class SitesAssistant_2:
+    def __init__(
+        self,
+        site_info: tuple = None,
+        anime_dictionary: Anime = None,
+        chapter: Chapter = None,
+        message: Any = None,
+        message_id: int = None,
+        anime_dict: dict = None,
+        update: bool = None,
+        menu_id: str | int = None,
+        database: Mongo = None,
+        app: Client = None,
+    ):
+        self.site_info = site_info
+        self.anime_dictionary = anime_dictionary
+        self.chapter = chapter
+        self.message = message
+        self.message_id = message_id
+        self.anime_dict = anime_dict
+        self.update = update
+        self.menu_id = menu_id
+        self.database = database
+        self.app = app
+
+        self.key_id = None or rankey(10)
+        self.last_chapter = None
+
+        self.prev_chapter_digit = (
+            str(round(self.chapter.number))
+            if isinstance(self.chapter.number, float)
+            else str(int(self.chapter.number) - 1)
+        )
+
+        self.folder = create_folder(self.site_info[0], "")
+
+
 class SitesAssistant:
     def __init__(
         self,
@@ -116,7 +151,6 @@ class SitesAssistant:
         update: bool = None,
         menu_id: str | int = None,
         database: Mongo = None,
-        app: Client = None,
     ):
         self.site, self.url_base = site
         self.title = title
@@ -132,7 +166,6 @@ class SitesAssistant:
         self.update = update
         self.menu_id = menu_id
         self.database = database
-        self.app = app
 
         self.key_id = None or rankey(10)
         self.caption = ""
@@ -169,7 +202,7 @@ class SitesAssistant:
             self.anime_url = self.anime_dict["anime_url"]
             self.last_chapter = self.anime_dict.get("last_chapter")
             self.thumb = self.anime_dict["thumb"] or self.thumb
-        return self.anime_dict
+        return self.anime_dict or {}
 
     async def get_chapter(self):
         return self.anime_dict["chapters"].get(self.chapter_no)
@@ -191,7 +224,6 @@ class SitesAssistant:
         return self.caption
 
     async def buttons_replace(self, app: Client = None):
-        app = app or self.app
         _btns, _btns1 = [], []
 
         now_chapter = self.msg
@@ -248,7 +280,6 @@ class SitesAssistant:
                     f"NowChapterId: {now_chapter_id}",
                     extra={"hhr": human_hour_readable()},
                 )
-                await sayu_error(error=e, app=app)
         try:
             await app.edit_message_reply_markup(
                 CHANNEL_ID,
@@ -260,7 +291,7 @@ class SitesAssistant:
                 ),
             )
         except Exception as e:
-            await sayu_error(error=e, app=app)
+            await sayu_logger.error(e, exc_info=e)
 
     async def update_or_add_db(self):
         _hours, _minutes = UTC.split(":") if ":" in UTC else (UTC, 0)

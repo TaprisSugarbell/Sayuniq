@@ -6,14 +6,20 @@ import aiohttp
 from bs4 import BeautifulSoup
 
 from source.config import BOT_NAME, USER_AGENT
-# from source.helpers.servers.server_utils import get_jk_anime, get_mc_anime
 from source.helpers.site_assistant import SitesAssistant
-
+# from source.helpers.servers.server_utils import get_jk_anime, get_mc_anime
+from source.helpers.site_assistant import (
+    SitesAssistant_2,
+    Chapter,
+)
 from .database_utils import database_assistant
-from .logs_utils import sayu_error
 from .mongo_connect import Mongo
-from .servers import (get_flv_servers, get_jk_servers, get_mc_servers,
-                      get_tioanime_servers)
+from .servers import (
+    get_flv_servers,
+    get_jk_servers,
+    get_mc_servers,
+    get_tioanime_servers,
+)
 
 logger = logging.getLogger(__name__)
 db = Mongo(database=BOT_NAME, collection="japanemi")
@@ -23,36 +29,45 @@ def build_anime_list(title: str, chapters: int = 12):
     return [{"name": title, "chapter": chapter_no} for chapter_no in range(1, chapters)]
 
 
-# async def test(app):
-#     _site = "TioAnime"
-#     url_base = "https://tioanime.com/"
-#     list_of_animes = build_anime_list(
-#         "Renmei Kuugun Koukuu Mahou Ongakutai Luminous Witches"
-#     )
-#     for anime in list_of_animes:
-#         title = anime["name"]
-#         chapter_no = str(anime["chapter"])
-#         anime_info = SitesAssistant(
-#             site=(_site, url_base),
-#             title=title,
-#             thumb=None,
-#             chapter_no=chapter_no,
-#             database=db,
-#             app=app,
-#         )
-#         in_db = await anime_info.find_on_db()
-#         await anime_info.get_caption()
-#         servers = []
-#         anime_url = "nada"
+async def test(app):
+    _site = "TioAnime"
+    url_base = "https://tioanime.com/"
+    list_of_animes = build_anime_list(
+        "Renmei Kuugun Koukuu Mahou Ongakutai Luminous Witches"
+    )
+    for anime in list_of_animes:
+        title = anime["name"]
+        chapter_no = str(anime["chapter"])
+        anime_info = SitesAssistant(
+            site=(_site, url_base),
+            title=title,
+            thumb=None,
+            chapter_no=chapter_no,
+            database=db,
+            app=app,
+        )
+        in_db = await anime_info.find_on_db()
+        await anime_info.get_caption()
+        servers = []
+        anime_url = "nada"
+
+
+async def process_anime_info_test(
+    anime_info: dict, chapter: Chapter, site: SitesAssistant_2
+):
+    if anime_info.get("is_banned") or anime_info.get("is_paused"):
+        return
+    try:
+        pass
+    except Exception as e:
+        logger.error(e, exc_info=e)
 
 
 async def process_anime_info(
     in_db, anime_info: SitesAssistant, chapter_url, get_servers
 ):
-    if in_db:
-        get_chapter = await anime_info.get_chapter()
-        if get_chapter or in_db.get("is_banned") or in_db.get("is_paused"):
-            return
+    if in_db.get("is_banned") or in_db.get("is_paused"):
+        return
     try:
         await database_assistant(
             anime_info=anime_info,
@@ -61,10 +76,10 @@ async def process_anime_info(
             update=bool(in_db),
         )
     except Exception as e:
-        await sayu_error(error=e, app=anime_info.app)
+        logger.error(e, exc_info=e)
 
 
-async def tioanime(app):
+async def tioanime():
     _site = "TioAnime"
     _url_base = "https://tioanime.com/"
     async with aiohttp.ClientSession() as session:
@@ -78,13 +93,13 @@ async def tioanime(app):
                 ][-1]
                 title = anime.find("h3").text.replace(chapter_no, "").strip()
                 chapter_url = _url_base[:-1] + anime.get("href")
+                # anime_info = Anime(title, None, chapter_url, db)
                 anime_info = SitesAssistant(
                     site=(_site, _url_base),
                     title=title,
                     thumb=None,
                     chapter_no=chapter_no,
                     database=db,
-                    app=app,
                 )
                 in_db = await anime_info.find_on_db()
                 await anime_info.get_caption()
@@ -185,7 +200,7 @@ async def animeflv(app):
 
 
 sites = [
-    animeflv,
+    # animeflv,
     # jkanime,
     # monoschinos,
     tioanime,

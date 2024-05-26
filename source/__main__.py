@@ -3,10 +3,9 @@ import logging
 
 from hydrogram.errors import FloodWait
 
-from source import app, logs_channel_update
+from source import app
 from source.config import BOT_NAME, __version__
-from source.helpers.logs_utils import sayu_error
-from source.helpers.loop_in_thread import read_and_execute, run_asyncio
+from source.helpers.loop_in_thread import read_and_execute
 
 
 def handle_floodwait_exception(flood_wait_exception: FloodWait) -> None:
@@ -31,8 +30,14 @@ async def main(flood=None):
         await asyncio.sleep(flood)
         logging.info("Wake up!")
     await app.start()
-    await logs_channel_update()
-    await asyncio.to_thread(run_asyncio, obj=read_and_execute, app=app)
+    uploader_task = asyncio.create_task(read_and_execute())
+    try:
+        await asyncio.gather(
+            uploader_task,
+            return_exceptions=True
+        )
+    except Exception as e:
+        logging.error("Error - ", exc_info=e)
 
 
 if __name__ == "__main__":
@@ -44,4 +49,4 @@ if __name__ == "__main__":
     except FloodWait as e:
         handle_floodwait_exception(e)
     except Exception as e:
-        app.run(sayu_error(e, app))
+        logging.error("Error - ", exc_info=e)

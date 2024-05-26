@@ -13,13 +13,12 @@ import aiofiles
 import aiohttp
 import cloudscraper
 import yt_dlp as youtube_dl
-from bs4 import BeautifulSoup
-from hydrogram import Client, types
-from moviepy.editor import VideoFileClip
 from PIL import Image
+from bs4 import BeautifulSoup
+from hydrogram import Client
+from moviepy.editor import VideoFileClip
 
-from source.config import (BOT_NAME, CHANNEL_ID, LOG_CHANNEL,
-                           human_hour_readable)
+from source.config import CHANNEL_ID, LOG_CHANNEL, human_hour_readable, BOT_NAME
 from source.helpers.mongo_connect import Mongo, confirm_one, update_one
 from source.helpers.utils import rankey
 from source.locales import get_string
@@ -54,7 +53,7 @@ class SayuDownloader:
         self.custom = custom
         self.ext = ext
         self.thumb = thumb
-        self.app = app
+        self.app = app or Client
         self.filter_links = filter_links
         self.__rth = rankey()
         self.__rthumb = "{}thumb-{}.jpg"
@@ -105,36 +104,21 @@ class SayuDownloader:
                 soup = BeautifulSoup(_r.content, "html.parser")
                 dwnld = soup.find(id="downloadButton")
                 return dwnld.get("href")
-            case host if re.match(r"www\d*.zippyshare.com", host):
-                u = None
-                soup = BeautifulSoup(_r.content, "html.parser")
-                for i in soup.find_all("script", attrs={"type": "text/javascript"}):
-                    if sm := i.string:
-                        if m := re.findall("parseInt.*", sm):
-                            namaes = re.findall(r"/[\w.%-]*", sm)
-                            vlt = [_f for _f in re.findall(r"\d*", sm) if _f]
-                            var_B = (int(vlt[1]) % int(vlt[2])) * (int(vlt[1]) % 3)
-                            u = f"/d{namaes[1]}/{int(var_B) + 18}{namaes[-1]}"
-                            protocol = _r.url.split(".")[0]
-                            if u:
-                                return f"{protocol}.zippyshare.com{u}"
-            case host if re.match(r"https://[\w.]*/v/[\w-]*", _r.url):
-                r = self.requests.post(
-                    f"https://{host}/api/source/" + _r.url.split("/")[-1]
-                )
-                return r.json()
             case host if re.match(r"www\.solidfiles\.com", host) and solidfiles:
                 soup = BeautifulSoup(_r.content, "html.parser")
                 fnd_dct = re.findall(
                     r"\{\"mimetype.*}", soup.find_all("script")[-1].string
                 )[0]
                 return json.loads(fnd_dct)["downloadUrl"]
-            case host if re.match(r"streamwish\.to|mega\.nz", host):
+            case host if re.match(
+                r"streamwish\.to|mega\.nz|https://[\w.]*/v/[\w-]*|www\d*.zippyshare.com",
+                host,
+            ):
                 return None
             case _:
                 return _url
 
-    async def extractor(self, url=None, solidfiles=False):
+    async def extractor(self, url=None, solidfiles=False, dats_pck=None):
         _url, out, custom, ext, thumb = (
             url or self.url,
             self.out,
@@ -144,13 +128,17 @@ class SayuDownloader:
         )
         if self.filter_links:
             _url = await self.links_filter(_url)
-            if isinstance(_url, dict):
-                _url = _url["data"][-1]["file"]
-            elif not _url:
+            if not _url:
                 return None
-        if solidfiles:
+        elif solidfiles:
             _url = await self.links_filter(_url, solidfiles)
         video_info = youtube_dl.YoutubeDL().extract_info(_url, download=False)
+        await self.app.edit_message_text(
+            LOG_CHANNEL,
+            self._message_id,
+            get_string("URL_UP_LOADING").format(**dats_pck),
+            disable_web_page_preview=True,
+        )
         # Thumbnail?
         _thumb = await self.get_thumbnail()
         # Demás datos, title, ext
@@ -178,18 +166,12 @@ class SayuDownloader:
             yes_thumb = False
         return {"file": out_, "type": file_type, "thumb": yes_thumb}
 
-    async def iter_links(self, urls=None, key_id=rankey(), **kwargs) -> Any:
+    async def iter_links(self, urls=None, **kwargs) -> Any:
         urls = urls or self.url
         if not isinstance(urls, list):
             return None
         _total_urls = len(urls)
         _out = None
-        _reply_links = [
-            [
-                types.InlineKeyboardButton("Pause", f"pam_{key_id}"),
-                types.InlineKeyboardButton("Pause", f"bam_{key_id}"),
-            ]
-        ]
         for _nn, url in enumerate(urls):
             _rl_ps = (
                 urlparse(url).netloc
@@ -204,14 +186,7 @@ class SayuDownloader:
                 date=human_hour_readable(),
                 **kwargs,
             )
-            if self._message_id:
-                await self.app.edit_message_text(
-                    LOG_CHANNEL,
-                    self._message_id,
-                    get_string("URL_UP_LOADING").format(**_dats),
-                    disable_web_page_preview=True,
-                )
-            else:
+            if not self._message_id:
                 msh_ = await self.app.send_message(
                     LOG_CHANNEL, get_string("URL_UP_LOADING").format(**_dats)
                 )
@@ -228,7 +203,9 @@ class SayuDownloader:
                     elif _rl_ps == "www.solidfiles.com" and _nn != _total_urls:
                         urls.append([url])
                         continue
-                    _out = await asyncio.wait_for(self.extractor(url), 480)
+                    _out = await asyncio.wait_for(
+                        self.extractor(url, False, _dats), 480
+                    )
             except asyncio.TimeoutError:
                 urls.append((url,))
                 logging.info(
@@ -241,12 +218,13 @@ class SayuDownloader:
                 )
                 if self.thumb and os.path.exists(self.thumb):
                     os.remove(self.thumb)
-                await self.app.edit_message_text(
-                    LOG_CHANNEL,
-                    self._message_id,
-                    get_string("URL_DWN_ERR").format(**_dats),
-                    disable_web_page_preview=True,
-                )
+                if _nn == _total_urls:
+                    await self.app.edit_message_text(
+                        LOG_CHANNEL,
+                        self._message_id,
+                        get_string("URL_DWN_ERR").format(**_dats),
+                        disable_web_page_preview=True,
+                    )
 
             if _out:
                 await self.app.edit_message_text(
@@ -262,11 +240,6 @@ class SayuDownloader:
 async def download_assistant(app: Client, urls, folder, caption, thumb=None, **kwargs):
     download = SayuDownloader(urls, folder, thumb=thumb, app=app, filter_links=True)
     vide_file = await download.iter_links(**kwargs)
-    # vide_file = {
-    #     "file": "./downloads/button.mp4",
-    #     "thumb": "./downloads/shogun_auto.jpg",
-    #     "type": "video/mp4",
-    # }
     logging.info(urls)
     file_video = vide_file["file"]
     thumb = vide_file["thumb"]

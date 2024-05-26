@@ -3,8 +3,13 @@ import asyncio
 from hydrogram import Client, filters, types
 
 from source import BOT_NAME
-from source.helpers.mongo_connect import (Mongo, add_one, confirm_one,
-                                          remove_one, update_one)
+from source.helpers.mongo_connect import (
+    Mongo,
+    add_one,
+    confirm_one,
+    remove_one,
+    update_one,
+)
 
 db = Mongo(database=BOT_NAME, collection="copy_paste")
 

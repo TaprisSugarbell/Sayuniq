@@ -1,9 +1,15 @@
-from hydrogram.types import (ForceReply, InlineKeyboardButton,
-                             InlineKeyboardMarkup, KeyboardButton,
-                             ReplyKeyboardMarkup)
+from hydrogram.types import (
+    ForceReply,
+    InlineKeyboardButton,
+    InlineKeyboardMarkup,
+    KeyboardButton,
+    ReplyKeyboardMarkup,
+)
 
 
-def ikb(rows=[]):
+def ikb(rows=None):
+    if rows is None:
+        rows = []
     lines = []
     for row in rows:
         line = []
@@ -51,7 +57,9 @@ def ntb(button):
     # return {'text': text, type: value}
 
 
-def kb(rows=[], **kwargs):
+def kb(rows=None, **kwargs):
+    if rows is None:
+        rows = []
     lines = []
     for row in rows:
         line = []

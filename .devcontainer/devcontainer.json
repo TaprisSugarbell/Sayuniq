@@ -1,29 +1,29 @@
 {
-	"name": "MeguRobot Devcontainer",
-	"dockerComposeFile": [
-		"compose.yml"
-	],
-	"service": "sayucode",
-	"workspaceFolder": "/${localWorkspaceFolderBasename}",
-	"initializeCommand": "bash .devcontainer/setenv.sh",
-	"postCreateCommand": "poetry install --no-cache --with dev --no-interaction",
-	"postAttachCommand": "zsh",
-	"customizations": {
-		"vscode": {
-			"extensions": [
-				"ms-azuretools.vscode-docker",
-				"ms-python.black-formatter",
-				"ms-python.isort",
-				"ms-python.mypy-type-checker",
-				"ms-python.vscode-pylance",
-				"redhat.vscode-yaml",
-				"tamasfe.even-better-toml",
-				"charliermarsh.ruff",
-				"ms-python.python",
-				"ms-python.debugpy"
-			]
-		}
-	},
-	"shutdownAction": "stopCompose",
-	"containerUser": "sayucode"
+  "name": "MeguRobot Devcontainer",
+  "dockerComposeFile": [
+    "compose.yml"
+  ],
+  "service": "sayucode",
+  "workspaceFolder": "/${localWorkspaceFolderBasename}",
+  "initializeCommand": "bash .devcontainer/setenv.sh",
+  "postCreateCommand": "poetry install --no-cache --with dev --no-interaction",
+  "postAttachCommand": "zsh",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-azuretools.vscode-docker",
+        "ms-python.black-formatter",
+        "ms-python.isort",
+        "ms-python.mypy-type-checker",
+        "ms-python.vscode-pylance",
+        "redhat.vscode-yaml",
+        "tamasfe.even-better-toml",
+        "charliermarsh.ruff",
+        "ms-python.python",
+        "ms-python.debugpy"
+      ]
+    }
+  },
+  "shutdownAction": "stopCompose",
+  "containerUser": "sayucode"
 }

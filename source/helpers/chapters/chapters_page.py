@@ -5,8 +5,8 @@ from source.helpers.hps.pagination import Pagination
 from source.helpers.site_assistant import base_channel_url
 
 
-def btn(text, value, type="callback_data"):
-    return InlineKeyboardButton(text, **{type: value})
+def btn(text, value, _type="callback_data"):
+    return InlineKeyboardButton(text, **{_type: value})
 
 
 def ikb(rows=None):
@@ -41,11 +41,11 @@ async def chapters_ikb(obj, index=0, lines=5, columns=3):
         original_chapters[oy]
         for oy in sorted(original_chapters, key=lambda x: float(x))
     ]
-    page = Pagination(
+    paginated = Pagination(
         sorted_chapters,
         page_data=page_data,
         item_data=chapter_data,
         item_title=chapter_title,
         callback_type="url",
     )
-    return ikb(page.create(index, lines, columns))
+    return ikb(paginated.create(index, lines, columns))

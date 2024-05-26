@@ -1,9 +1,4 @@
 from source.config import BOT_NAME, LOGGING_LEVEL
-from source.helpers.utils import create_folder
-
-__dr, __file = "./logs/", f"{BOT_NAME}.log"
-log_file = __dr + __file
-create_folder(temp_folder=__dr), create_folder(temp_folder="./reports/")
 
 LOGGER_CONFIG = {
     "version": 1,
@@ -20,7 +15,7 @@ LOGGER_CONFIG = {
         },
         "file": {
             "class": "logging.handlers.RotatingFileHandler",
-            "filename": log_file,
+            "filename": f"{BOT_NAME}.log",
             "maxBytes": 3145728,
             "backupCount": 1,
             "formatter": "default",
@@ -28,7 +23,7 @@ LOGGER_CONFIG = {
     },
     "loggers": {
         "": {"handlers": ["default", "file"], "level": "INFO", "propagate": False},
-        "SayuWaifu.helper": {
+        "source.helper": {
             "handlers": ["default", "file"],
             "level": LOGGING_LEVEL,
             "propagate": False,

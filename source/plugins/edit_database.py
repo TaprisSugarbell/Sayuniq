@@ -7,8 +7,7 @@ from hydrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 from source import BOT_NAME, auth_users
 from source.helpers.chapters.chapters_page import chapters_ikb
-from source.helpers.mongo_connect import (Mongo, confirm_one, update_many,
-                                          update_one)
+from source.helpers.mongo_connect import Mongo, confirm_one, update_many, update_one
 
 db = Mongo(database=BOT_NAME, collection="japanemi")
 
@@ -21,12 +20,12 @@ async def __edb__(bot, update):
     c, key_id = update.text.split()[1].split("_")
     _c = await confirm_one(db, {"key_id": key_id})
     if _c:
-        # site = _c["site"]
-        # thumb = _c["thumb"]
+        site = _c["site"]
+        thumb = _c["thumb"]
         anime = _c["anime"]
         chapters = _c["chapters"]
-        # anime_url = _c["anime_url"]
-        # print(_c)
+        anime_url = _c["anime_url"]
+        print(_c)
         if chat_id in AUTH_USERS:
             await bot.send_message(
                 chat_id,
@@ -68,14 +67,13 @@ async def __edb__(bot, update):
             _c.get("status")
             try:
                 chikb = await chapters_ikb(_c)
-            except Exception:
-                # print(traceback.format_tb(sys.exc_info()[2]))
-                raise
-            await bot.send_message(
-                chat_id,
-                f"**{anime}**\nCapitulos subidos: **{len(chapters)}**",
-                reply_markup=chikb,
-            )
+                await bot.send_message(
+                    chat_id,
+                    f"**{anime}**\nCapitulos subidos: **{len(chapters)}**",
+                    reply_markup=chikb,
+                )
+            except Exception as e:
+                print(traceback.format_tb(sys.exc_info()[2]))
     else:
         await bot.send_message(chat_id, "No hay capitulos subidos...")
     await bot.delete_messages(chat_id, message_id)
@@ -85,7 +83,7 @@ async def __edb__(bot, update):
 async def __pgd__(bot: Client, callback: types.CallbackQuery):
     message_id = callback.message.id
     chat_id = callback.message.from_user.id
-    # AUTH_USERS = await auth_users()
+    AUTH_USERS = await auth_users()
     c, key_id, page = callback.data.split("_")
     _c = await confirm_one(db, {"key_id": key_id})
     if _c:
@@ -111,9 +109,9 @@ async def __chps__(bot: Client, callback: types.CallbackQuery):
         chapters = _c.get("chapters")
         anime = _c["anime"]
         if chapters:
-            # site = _c["site"]
-            # thumb = _c["thumb"]
-            # anime_url = _c["anime_url"]
+            site = _c["site"]
+            thumb = _c["thumb"]
+            anime_url = _c["anime_url"]
             chikb = await chapters_ikb(_c)
             await bot.send_message(
                 chat_id,

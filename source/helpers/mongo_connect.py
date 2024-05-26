@@ -79,7 +79,7 @@ async def confirm(user_db, data=None):
 async def confirm_one(user_db, data=None):
     if data is None:
         data = {}
-    return user_db.find_one(data)
+    return user_db.find_one(data) or {}
 
 
 async def add_one(user_db, data=None):

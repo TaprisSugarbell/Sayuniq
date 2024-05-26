@@ -1,5 +1,6 @@
 import shutil
 
+from source import app
 from source.helpers.downloader import count_err, download_assistant
 from source.helpers.site_assistant import SitesAssistant
 
@@ -7,8 +8,7 @@ from source.helpers.site_assistant import SitesAssistant
 async def database_assistant(
     anime_info: SitesAssistant, chapter_url, get_servers, update: bool = None
 ):
-    app, folder, caption, thumb_url = (
-        anime_info.app,
+    folder, caption, thumb_url = (
         anime_info.folder,
         anime_info.caption,
         anime_info.thumb,
@@ -38,5 +38,5 @@ async def database_assistant(
             update=update,
         )
 
-        await anime_info.buttons_replace()
+        await anime_info.buttons_replace(app)
         await anime_info.update_or_add_db()
