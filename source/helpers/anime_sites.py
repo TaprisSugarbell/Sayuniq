@@ -44,7 +44,6 @@ async def test(app):
             thumb=None,
             chapter_no=chapter_no,
             database=db,
-            app=app,
         )
         in_db = await anime_info.find_on_db()
         await anime_info.get_caption()
@@ -135,7 +134,6 @@ async def jkanime(app):
                     thumb=None,
                     chapter_no=chapter_no,
                     database=db,
-                    app=app,
                 )
                 in_db = await anime_info.find_on_db()
                 await anime_info.get_caption(extra_caption)
@@ -162,7 +160,6 @@ async def monoschinos(app):
                     thumb=None,
                     chapter_no=chapter_no,
                     database=db,
-                    app=app,
                 )
                 in_db = await anime_info.find_on_db()
                 await anime_info.get_caption()
@@ -190,7 +187,6 @@ async def animeflv(app):
                     thumb=None,
                     chapter_no=chapter_no,
                     database=db,
-                    app=app,
                 )
                 in_db = await anime_info.find_on_db()
                 await anime_info.get_caption()

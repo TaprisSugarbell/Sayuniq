@@ -37,6 +37,42 @@ async def count_err(title, site):
         await update_one(db, find_with, {"err": err + 1})
 
 
+async def streamtape(self, downLink: str):
+    async with aiohttp.ClientSession(skip_auto_headers={}) as session:
+        async with session.get(downLink) as response:
+            cookies = response.cookies
+            html_content = await response.text()
+            soup = BeautifulSoup(html_content, "html.parser")
+            video_link = "https:/" + soup.find("div", id="ideoooolink").text + "&stream=1"
+
+            real_token = re.search(r"token=[\w_-]+", soup.find_all("script")[-8].text).group(0)
+            find_fake_token = urlparse(video_link).query.split("&")[-2]
+            video_link = video_link.replace(find_fake_token, real_token)
+        async with session.get(
+                video_link,
+                headers={
+                    "Accept": "*/*",
+                    "Accept-Encoding": "identity;q=1, *;q=0",
+                    "Accept-Language": "es-419,es;q=0.9",
+                    "Connection": "keep-alive",
+                    "Cookie": f"_csrf={cookies['_csrf']}; _b{cookies['_b']}",
+                    "Host": "streamtape.com",
+                    "Range": "bytes=0-",
+                    "Referer": downLink,
+                    "sec-ch-ua": 'Google Chrome";v="129", "Not=A?Brand";v="8", "Chromium";v="129',
+                    "sec-ch-ua-mobile": "?0",
+                    "sec-ch-ua-platform": "Windows",
+                    "Sec-Fetch-Dest": "video",
+                    "Sec-Fetch-Mode": "cors",
+                    "Sec-Fetch-Site": "same-origin",
+                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+                                  "(KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36",
+                },
+                # cookies=cookies
+        ) as response:
+            return response.request_info.url.__str__()
+
+
 class SayuDownloader:
     def __init__(
         self,
@@ -104,6 +140,8 @@ class SayuDownloader:
                 soup = BeautifulSoup(_r.content, "html.parser")
                 dwnld = soup.find(id="downloadButton")
                 return dwnld.get("href")
+            case host if re.match(r"streamtape\.com", host):
+                return await streamtape(_url)
             case host if re.match(r"www\.solidfiles\.com", host) and solidfiles:
                 soup = BeautifulSoup(_r.content, "html.parser")
                 fnd_dct = re.findall(
@@ -214,7 +252,7 @@ class SayuDownloader:
                 _total_urls += 1
             except Exception as e:
                 logging.info(
-                    f"Fallo la descarga de {url} [{_nn}/{_total_urls}]", exc_info=e
+                    f"Fallo la descarga de {url} [{_nn}/{_total_urls}]"
                 )
                 if self.thumb and os.path.exists(self.thumb):
                     os.remove(self.thumb)
