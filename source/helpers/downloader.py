@@ -22,9 +22,14 @@ from source.config import CHANNEL_ID, LOG_CHANNEL, human_hour_readable, BOT_NAME
 from source.helpers.mongo_connect import Mongo, confirm_one, update_one
 from source.helpers.utils import rankey
 from source.locales import get_string
+from source.config import BOT_MODE, TESTS_CHANNEL
 
 requests = cloudscraper.create_scraper(cloudscraper.Session)
 db = Mongo(database=BOT_NAME, collection="japanemi")
+
+
+async def get_file_test():
+    return {"file": r"./downloads/button.mp4", "thumb": "./downloads/shogun.png", "type": "video/mp4"}
 
 
 async def count_err(title, site):
@@ -277,7 +282,12 @@ class SayuDownloader:
 
 async def download_assistant(app: Client, urls, folder, caption, thumb=None, **kwargs):
     download = SayuDownloader(urls, folder, thumb=thumb, app=app, filter_links=True)
-    vide_file = await download.iter_links(**kwargs)
+    if BOT_MODE == "TEST":
+        vide_file = await get_file_test()
+        CHAN_ID = TESTS_CHANNEL
+    else:
+        vide_file = await download.iter_links(**kwargs)
+        CHAN_ID = CHANNEL_ID
     logging.info(urls)
     file_video = vide_file["file"]
     thumb = vide_file["thumb"]
@@ -290,7 +300,7 @@ async def download_assistant(app: Client, urls, folder, caption, thumb=None, **k
     match vide_file["type"]:
         case "video/mp4":
             return await app.send_video(
-                chat_id=CHANNEL_ID,
+                chat_id=CHAN_ID,
                 video=file_video,
                 caption=caption,
                 duration=duration,

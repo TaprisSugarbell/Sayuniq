@@ -26,6 +26,7 @@ UTC = config("UTC", default="-6")
 CHANNEL_ID = config("CHANNEL_ID", default=None)
 LOG_CHANNEL = config("LOG_CHANNEL", default=None, cast=int)
 TESTS_CHANNEL = config("TESTS_CHANNEL", default=None, cast=int)
+BOT_MODE = config("BOT_MODE", default="ENV")
 
 # DATETIME
 HOUR_FORMAT = 1 if config("HOUR_FORMAT", default=0, cast=int) == 24 else 0

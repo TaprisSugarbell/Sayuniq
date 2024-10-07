@@ -65,7 +65,7 @@ async def process_anime_info_test(
 async def process_anime_info(
     in_db, anime_info: SitesAssistant, chapter_url, get_servers
 ):
-    if in_db.get("is_banned") or in_db.get("is_paused"):
+    if await anime_info.get_chapter() or in_db.get("is_banned") or in_db.get("is_paused"):
         return
     try:
         await database_assistant(
@@ -166,7 +166,7 @@ async def monoschinos(app):
                 await process_anime_info(in_db, anime_info, chapter_url, get_mc_servers)
 
 
-async def animeflv(app):
+async def animeflv():
     _site = "AnimeFLV"
     _url_base = "https://www3.animeflv.net/"
     async with aiohttp.ClientSession(headers=USER_AGENT) as session:
@@ -196,7 +196,7 @@ async def animeflv(app):
 
 
 sites = [
-    # animeflv,
+    animeflv,
     # jkanime,
     # monoschinos,
     tioanime,
