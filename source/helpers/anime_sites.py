@@ -65,7 +65,11 @@ async def process_anime_info_test(
 async def process_anime_info(
     in_db, anime_info: SitesAssistant, chapter_url, get_servers
 ):
-    if await anime_info.get_chapter() or in_db.get("is_banned") or in_db.get("is_paused"):
+    if in_db:
+        get_chapter = await anime_info.get_chapter()
+    else:
+        get_chapter = None
+    if get_chapter or in_db.get("is_banned") or in_db.get("is_paused"):
         return
     try:
         await database_assistant(
