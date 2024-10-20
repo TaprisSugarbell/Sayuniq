@@ -42,7 +42,7 @@ async def count_err(title, site):
         await update_one(db, find_with, {"err": err + 1})
 
 
-async def streamtape(self, downLink: str):
+async def streamtape(downLink: str):
     async with aiohttp.ClientSession(skip_auto_headers={}) as session:
         async with session.get(downLink) as response:
             cookies = response.cookies
@@ -145,8 +145,8 @@ class SayuDownloader:
                 soup = BeautifulSoup(_r.content, "html.parser")
                 dwnld = soup.find(id="downloadButton")
                 return dwnld.get("href")
-            case host if re.match(r"streamtape\.com", host):
-                return await streamtape(_url)
+            case "streamtape.com":
+                return await streamtape(_url.replace("/e/", "/v/"))
             case host if re.match(r"www\.solidfiles\.com", host) and solidfiles:
                 soup = BeautifulSoup(_r.content, "html.parser")
                 fnd_dct = re.findall(
@@ -154,7 +154,8 @@ class SayuDownloader:
                 )[0]
                 return json.loads(fnd_dct)["downloadUrl"]
             case host if re.match(
-                r"streamwish\.to|mega\.nz|https://[\w.]*/v/[\w-]*|www\d*.zippyshare.com",
+                r"streamwish\.to|mega\.nz|https://[\w.]*/v/[\w-]*|www\d*.zippyshare.com|hqq\.tv|"
+                r"cdnplaypro\.com",
                 host,
             ):
                 return None
