@@ -26,6 +26,7 @@ def ikb(rows=None):
 
 
 def chapter_data(item, page):
+    # return f"chapter_{key_id}_{item['chapter']}"
     return base_channel_url(CHANNEL_ID, item["message_id"])
 
 
@@ -34,6 +35,7 @@ def chapter_title(item, page):
 
 
 async def chapters_ikb(obj, index=0, lines=5, columns=3):
+    # global key_id
     key_id = obj["key_id"]
     page_data = staticmethod(lambda page: f"pgd_{key_id}_{page}")
     original_chapters = obj["chapters"]
@@ -46,6 +48,6 @@ async def chapters_ikb(obj, index=0, lines=5, columns=3):
         page_data=page_data,
         item_data=chapter_data,
         item_title=chapter_title,
-        callback_type="url",
+        callback_type="callback_data",
     )
     return ikb(paginated.create(index, lines, columns))

@@ -87,7 +87,6 @@ async def __pgd__(bot: Client, callback: types.CallbackQuery):
     c, key_id, page = callback.data.split("_")
     _c = await confirm_one(db, {"key_id": key_id})
     if _c:
-
         chikb = await chapters_ikb(_c, int(page))
         await bot.edit_message_reply_markup(chat_id, message_id, reply_markup=chikb)
     else:
@@ -177,3 +176,19 @@ async def __ban_anime__(bot, update):
         case "all":
             await update_many(db, {"anime": _c["anime"]}, _chng_inf_is)
     await bot.send_message(chat_id, _arm_txt_inf)
+
+
+@Client.on_callback_query(filters.regex(r"chapter_.*"))
+async def __chapter__(bot: Client, callback: types.CallbackQuery):
+    chat_id = callback.from_user.id
+    _, key_id, chapter = callback.data.split("_")
+    anime = await confirm_one(db, {"key_id": key_id})
+    chapter = anime["chapters"].get(chapter)
+    print(chapter)
+    if chapter:
+        try:
+            await bot.send_video(chat_id, video=chapter["file_id"])
+        except Exception as e:
+            print(e)
+    else:
+        await bot.send_message(chat_id, "No hay capítulo...")

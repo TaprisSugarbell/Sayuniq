@@ -186,7 +186,7 @@ class SayuDownloader:
         # Thumbnail?
         _thumb = await self.get_thumbnail()
         # Demás datos, title, ext
-        _title = re.sub("/", "", custom or video_info["title"]) + f"@{CHANNEL_ID}"
+        _title = re.sub("/", "", custom or video_info["title"]) + "@JapanemisionRebirth"
         try:
             _ext = ext or video_info["ext"]
         except KeyError:
